@@ -1,8 +1,9 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../infrastructure/di/types';
-import { InsufficientStockError, ProductNotFoundError } from '../../shared/errors';
 import { Order, type OrderItem } from '../aggregates/order';
+import { InsufficientStockError } from '../aggregates/order/errors';
 import { type Product } from '../aggregates/product';
+import { ProductNotFoundError } from '../aggregates/product/errors';
 import { type IProductRepository } from '../repositories';
 import { ProductId, Quantity } from '../value-objects';
 

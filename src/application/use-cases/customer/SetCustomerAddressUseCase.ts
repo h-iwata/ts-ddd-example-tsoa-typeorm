@@ -1,8 +1,8 @@
 import { injectable, inject } from 'inversify';
+import { CustomerNotFoundError } from '../../../domain/aggregates/customer/errors';
 import { ICustomerRepository } from '../../../domain/repositories';
 import { CustomerId, Address } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
-import { CustomerNotFoundError } from '../../../shared/errors';
 import { SetAddressDto, CustomerResponseDto, toCustomerResponseDto } from '../../dtos';
 
 @injectable()

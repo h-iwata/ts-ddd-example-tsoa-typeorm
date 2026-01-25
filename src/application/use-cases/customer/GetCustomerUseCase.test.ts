@@ -1,5 +1,5 @@
 import { type ICustomerRepository } from '../../../domain/repositories';
-import { CustomerNotFoundError } from '../../../shared/errors';
+import { CustomerNotFoundError } from '../../../domain/aggregates/customer/errors';
 import { customerFactory } from '../../../test/factories';
 import { GetCustomerUseCase } from './GetCustomerUseCase';
 

@@ -1,5 +1,5 @@
 import { type IProductRepository } from '../../../domain/repositories';
-import { ProductNotFoundError } from '../../../shared/errors';
+import { ProductNotFoundError } from '../../../domain/aggregates/product/errors';
 import { productFactory } from '../../../test/factories';
 import { GetProductUseCase } from './GetProductUseCase';
 

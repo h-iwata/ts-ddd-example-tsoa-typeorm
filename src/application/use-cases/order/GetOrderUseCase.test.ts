@@ -1,5 +1,5 @@
 import { type IOrderRepository } from '../../../domain/repositories';
-import { OrderNotFoundError } from '../../../shared/errors';
+import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
 import { orderFactory } from '../../../test/factories';
 import { GetOrderUseCase } from './GetOrderUseCase';
 

@@ -1,9 +1,9 @@
 import { injectable, inject } from 'inversify';
+import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
 import { IOrderRepository } from '../../../domain/repositories';
 import { OrderDomainService } from '../../../domain/services';
 import { OrderId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
-import { OrderNotFoundError } from '../../../shared/errors';
 import { OrderResponseDto, toOrderResponseDto } from '../../dtos';
 
 /**

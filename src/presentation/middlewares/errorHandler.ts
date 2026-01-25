@@ -1,6 +1,6 @@
 import { type Request, type Response, type NextFunction } from 'express';
 import { ValidateError } from 'tsoa';
-import { DomainError } from '../../shared/errors';
+import { DomainError } from '../../domain/shared/errors';
 
 export function errorHandler(error: unknown, _req: Request, res: Response, next: NextFunction): void {
   if (res.headersSent) {

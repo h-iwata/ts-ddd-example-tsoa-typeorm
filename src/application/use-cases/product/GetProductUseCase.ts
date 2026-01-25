@@ -1,8 +1,8 @@
 import { injectable, inject } from 'inversify';
+import { ProductNotFoundError } from '../../../domain/aggregates/product/errors';
 import { IProductRepository } from '../../../domain/repositories';
 import { ProductId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
-import { ProductNotFoundError } from '../../../shared/errors';
 import { ProductResponseDto, toProductResponseDto } from '../../dtos';
 
 @injectable()

@@ -1,5 +1,5 @@
 import { type IOrderRepository, type ICustomerRepository } from '../../../domain/repositories';
-import { CustomerNotFoundError } from '../../../shared/errors';
+import { CustomerNotFoundError } from '../../../domain/aggregates/customer/errors';
 import { customerFactory } from '../../../test/factories';
 import { CreateOrderUseCase } from './CreateOrderUseCase';
 
