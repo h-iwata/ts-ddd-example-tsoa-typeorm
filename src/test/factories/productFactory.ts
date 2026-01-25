@@ -22,3 +22,14 @@ export const productFactory = Factory.define<Product, ProductTransientParams>(({
     updatedAt: new Date(),
   });
 });
+
+/**
+ * 新規商品作成用ファクトリ（統合テスト用）
+ * Product.create() を使用してIDを自動生成
+ */
+export const newProductFactory = Factory.define<Product, ProductTransientParams>(({ sequence, transientParams }) => {
+  const stock = transientParams.stock ?? 10;
+  const price = transientParams.price ?? 1000;
+
+  return Product.create(`テスト商品${sequence}`, `商品${sequence}の説明`, Money.create(price), Quantity.create(stock));
+});

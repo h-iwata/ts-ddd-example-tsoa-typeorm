@@ -10,7 +10,7 @@ import {
   GetCustomerOrdersUseCase,
 } from '../../application/use-cases/order';
 import { TYPES } from '../../infrastructure/di/types';
-import { ErrorResponse } from '../../shared/types';
+import { ErrorResponse } from '../types';
 
 @Route('api/orders')
 @Tags('Orders')

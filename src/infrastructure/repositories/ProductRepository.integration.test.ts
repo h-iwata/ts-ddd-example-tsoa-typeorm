@@ -1,25 +1,22 @@
-import { Product, ProductId } from '../../domain/aggregates/product';
-import { Money, Quantity } from '../../domain/shared/value-objects';
+import { ProductId } from '../../domain/aggregates/product';
+import { Quantity } from '../../domain/shared/value-objects';
+import { newProductFactory } from '../../test/factories';
 import { ProductRepository } from './ProductRepository';
 
 describe('ProductRepository Integration', () => {
   const repository = new ProductRepository();
 
-  const createProduct = (name = 'テスト商品', price = 1000, stock = 10) => {
-    return Product.create(name, '商品説明', Money.create(price, 'JPY'), Quantity.create(stock));
-  };
-
   describe('#save と #findById', () => {
     it('商品を保存して取得できる', async () => {
-      const product = createProduct();
+      const product = newProductFactory.build();
       await repository.save(product);
 
       const found = await repository.findById(product.getId());
 
       expect(found).not.toBeNull();
       expect(found!.getId().getValue()).toBe(product.getId().getValue());
-      expect(found!.getName()).toBe('テスト商品');
-      expect(found!.getDescription()).toBe('商品説明');
+      expect(found!.getName()).toBe(product.getName());
+      expect(found!.getDescription()).toBe(product.getDescription());
       expect(found!.getPrice().getAmount()).toBe(1000);
       expect(found!.getStock().getValue()).toBe(10);
     });
@@ -34,9 +31,9 @@ describe('ProductRepository Integration', () => {
 
   describe('#findByIds', () => {
     it('複数の商品をIDで取得できる', async () => {
-      const product1 = createProduct('商品1', 100);
-      const product2 = createProduct('商品2', 200);
-      const product3 = createProduct('商品3', 300);
+      const product1 = newProductFactory.build({}, { transient: { price: 100 } });
+      const product2 = newProductFactory.build({}, { transient: { price: 200 } });
+      const product3 = newProductFactory.build({}, { transient: { price: 300 } });
       await repository.save(product1);
       await repository.save(product2);
       await repository.save(product3);
@@ -44,9 +41,9 @@ describe('ProductRepository Integration', () => {
       const found = await repository.findByIds([product1.getId(), product3.getId()]);
 
       expect(found).toHaveLength(2);
-      const names = found.map((p) => p.getName());
-      expect(names).toContain('商品1');
-      expect(names).toContain('商品3');
+      const ids = found.map((p) => p.getId().getValue());
+      expect(ids).toContain(product1.getId().getValue());
+      expect(ids).toContain(product3.getId().getValue());
     });
 
     context('when 空配列', () => {
@@ -59,8 +56,8 @@ describe('ProductRepository Integration', () => {
 
   describe('#findAll', () => {
     it('全商品を取得できる', async () => {
-      await repository.save(createProduct('商品A'));
-      await repository.save(createProduct('商品B'));
+      await repository.save(newProductFactory.build());
+      await repository.save(newProductFactory.build());
 
       const all = await repository.findAll();
 
@@ -77,7 +74,7 @@ describe('ProductRepository Integration', () => {
 
   describe('#delete', () => {
     it('商品を削除できる', async () => {
-      const product = createProduct();
+      const product = newProductFactory.build();
       await repository.save(product);
 
       await repository.delete(product.getId());
@@ -89,7 +86,7 @@ describe('ProductRepository Integration', () => {
 
   describe('更新', () => {
     it('既存の商品を更新できる', async () => {
-      const product = createProduct('更新前');
+      const product = newProductFactory.build();
       await repository.save(product);
 
       product.increaseStock(Quantity.create(89));

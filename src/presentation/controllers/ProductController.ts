@@ -3,7 +3,7 @@ import { Controller, Get, Post, Route, Path, Body, SuccessResponse, Response, Ta
 import { CreateProductDto, ProductResponseDto } from '../../application/dtos';
 import { CreateProductUseCase, GetProductUseCase, GetAllProductsUseCase } from '../../application/use-cases/product';
 import { TYPES } from '../../infrastructure/di/types';
-import { ErrorResponse } from '../../shared/types';
+import { ErrorResponse } from '../types';
 
 @Route('api/products')
 @Tags('Products')

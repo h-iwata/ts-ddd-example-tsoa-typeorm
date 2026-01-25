@@ -47,3 +47,22 @@ export const paidOrderFactory = orderFactory.transient({
   withItems: true,
   withAddress: true,
 });
+
+/**
+ * 新規注文作成用ファクトリ（統合テスト用）
+ * Order.create() を使用してIDを自動生成
+ * customerId は必須で transientParams から渡す
+ */
+export const newOrderFactory = Factory.define<Order, OrderTransientParams>(({ transientParams }) => {
+  if (!transientParams.customerId) {
+    throw new Error('newOrderFactory requires customerId in transientParams');
+  }
+
+  const order = Order.create(CustomerId.fromString(transientParams.customerId));
+
+  if (transientParams.withAddress) {
+    order.setShippingAddress(Address.create('100-0001', '東京都', '千代田区', '1-1-1'));
+  }
+
+  return order;
+});

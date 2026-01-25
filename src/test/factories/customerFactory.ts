@@ -20,3 +20,17 @@ export const customerFactory = Factory.define<Customer, CustomerTransientParams>
     updatedAt: new Date(),
   });
 });
+
+/**
+ * 新規顧客作成用ファクトリ（統合テスト用）
+ * Customer.create() を使用してIDを自動生成
+ */
+export const newCustomerFactory = Factory.define<Customer, CustomerTransientParams>(({ sequence, transientParams }) => {
+  const customer = Customer.create(`テスト太郎${sequence}`, Email.create(`test${sequence}@example.com`));
+
+  if (transientParams.withAddress) {
+    customer.setShippingAddress(Address.create('100-0001', '東京都', '千代田区', '1-1-1'));
+  }
+
+  return customer;
+});

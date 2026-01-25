@@ -1,7 +1,8 @@
-import { Customer, Email } from '../../domain/aggregates/customer';
-import { Order, OrderId } from '../../domain/aggregates/order';
-import { Product } from '../../domain/aggregates/product';
-import { Money, Quantity, Address } from '../../domain/shared/value-objects';
+import { type Customer } from '../../domain/aggregates/customer';
+import { type Order, OrderId } from '../../domain/aggregates/order';
+import { type Product } from '../../domain/aggregates/product';
+import { Quantity, Address } from '../../domain/shared/value-objects';
+import { newCustomerFactory, newProductFactory, newOrderFactory } from '../../test/factories';
 import { CustomerRepository } from './CustomerRepository';
 import { OrderRepository } from './OrderRepository';
 import { ProductRepository } from './ProductRepository';
@@ -16,15 +17,15 @@ describe('OrderRepository Integration', () => {
 
   beforeEach(async () => {
     // 注文に必要な顧客と商品を事前に作成
-    savedCustomer = Customer.create('テスト顧客', Email.create('order-test@example.com'));
+    savedCustomer = newCustomerFactory.build();
     await customerRepository.save(savedCustomer);
 
-    savedProduct = Product.create('テスト商品', '説明', Money.create(1000, 'JPY'), Quantity.create(100));
+    savedProduct = newProductFactory.build({}, { transient: { stock: 100 } });
     await productRepository.save(savedProduct);
   });
 
   const createOrder = () => {
-    return Order.create(savedCustomer.getId());
+    return newOrderFactory.build({}, { transient: { customerId: savedCustomer.getId().getValue() } });
   };
 
   const addItemToOrder = (order: Order) => {
@@ -55,7 +56,7 @@ describe('OrderRepository Integration', () => {
 
         const item = found!.getItems()[0];
         expect(item.getProductId().getValue()).toBe(savedProduct.getId().getValue());
-        expect(item.getProductName()).toBe('テスト商品');
+        expect(item.getProductName()).toBe(savedProduct.getName());
         expect(item.getUnitPrice().getAmount()).toBe(1000);
         expect(item.getQuantity().getValue()).toBe(2);
       });
@@ -85,7 +86,7 @@ describe('OrderRepository Integration', () => {
 
     context('when 注文なし', () => {
       it('空配列を返す', async () => {
-        const otherCustomer = Customer.create('別顧客', Email.create('other@example.com'));
+        const otherCustomer = newCustomerFactory.build();
         await customerRepository.save(otherCustomer);
 
         const found = await orderRepository.findByCustomerId(otherCustomer.getId());
@@ -150,7 +151,7 @@ describe('OrderRepository Integration', () => {
       await orderRepository.save(order);
 
       // 別商品を追加
-      const anotherProduct = Product.create('追加商品', '説明', Money.create(500, 'JPY'), Quantity.create(50));
+      const anotherProduct = newProductFactory.build({}, { transient: { price: 500, stock: 50 } });
       await productRepository.save(anotherProduct);
       order.addItem(anotherProduct.getId(), anotherProduct.getName(), anotherProduct.getPrice(), Quantity.create(3));
       await orderRepository.save(order);

@@ -3,7 +3,7 @@ import { Controller, Get, Post, Put, Route, Path, Body, SuccessResponse, Respons
 import { CreateCustomerDto, SetAddressDto, CustomerResponseDto } from '../../application/dtos';
 import { CreateCustomerUseCase, GetCustomerUseCase, SetCustomerAddressUseCase } from '../../application/use-cases/customer';
 import { TYPES } from '../../infrastructure/di/types';
-import { ErrorResponse } from '../../shared/types';
+import { ErrorResponse } from '../types';
 
 @Route('api/customers')
 @Tags('Customers')

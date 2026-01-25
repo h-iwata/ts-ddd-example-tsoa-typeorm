@@ -1,30 +1,27 @@
-import { Customer, CustomerId, Email } from '../../domain/aggregates/customer';
+import { CustomerId } from '../../domain/aggregates/customer';
 import { Address } from '../../domain/shared/value-objects';
+import { newCustomerFactory } from '../../test/factories';
 import { CustomerRepository } from './CustomerRepository';
 
 describe('CustomerRepository Integration', () => {
   const repository = new CustomerRepository();
 
-  const createCustomer = (email = 'test@example.com', name = '山田太郎') => {
-    return Customer.create(name, Email.create(email));
-  };
-
   describe('#save と #findById', () => {
     it('顧客を保存して取得できる', async () => {
-      const customer = createCustomer();
+      const customer = newCustomerFactory.build();
       await repository.save(customer);
 
       const found = await repository.findById(customer.getId());
 
       expect(found).not.toBeNull();
       expect(found!.getId().getValue()).toBe(customer.getId().getValue());
-      expect(found!.getName()).toBe('山田太郎');
-      expect(found!.getEmail().getValue()).toBe('test@example.com');
+      expect(found!.getName()).toBe(customer.getName());
+      expect(found!.getEmail().getValue()).toBe(customer.getEmail().getValue());
     });
 
     context('with 配送先住所', () => {
       it('住所も保存される', async () => {
-        const customer = createCustomer('addr@example.com');
+        const customer = newCustomerFactory.build();
         customer.setShippingAddress(Address.create('100-0001', '東京都', '千代田区', '1-1-1', 'ビル101'));
         await repository.save(customer);
 
@@ -50,10 +47,10 @@ describe('CustomerRepository Integration', () => {
 
   describe('#findByEmail', () => {
     it('メールアドレスで顧客を取得できる', async () => {
-      const customer = createCustomer('find@example.com');
+      const customer = newCustomerFactory.build();
       await repository.save(customer);
 
-      const found = await repository.findByEmail(Email.create('find@example.com'));
+      const found = await repository.findByEmail(customer.getEmail());
 
       expect(found).not.toBeNull();
       expect(found!.getId().getValue()).toBe(customer.getId().getValue());
@@ -61,7 +58,8 @@ describe('CustomerRepository Integration', () => {
 
     context('when 存在しないメール', () => {
       it('nullを返す', async () => {
-        const found = await repository.findByEmail(Email.create('notfound@example.com'));
+        const customer = newCustomerFactory.build();
+        const found = await repository.findByEmail(customer.getEmail());
         expect(found).toBeNull();
       });
     });
@@ -69,24 +67,25 @@ describe('CustomerRepository Integration', () => {
 
   describe('#existsByEmail', () => {
     it('存在する場合 true', async () => {
-      const customer = createCustomer('exists@example.com');
+      const customer = newCustomerFactory.build();
       await repository.save(customer);
 
-      const exists = await repository.existsByEmail(Email.create('exists@example.com'));
+      const exists = await repository.existsByEmail(customer.getEmail());
 
       expect(exists).toBe(true);
     });
 
     it('存在しない場合 false', async () => {
-      const exists = await repository.existsByEmail(Email.create('notexists@example.com'));
+      const customer = newCustomerFactory.build();
+      const exists = await repository.existsByEmail(customer.getEmail());
       expect(exists).toBe(false);
     });
   });
 
   describe('#findAll', () => {
     it('全顧客を取得できる', async () => {
-      await repository.save(createCustomer('user1@example.com', 'User 1'));
-      await repository.save(createCustomer('user2@example.com', 'User 2'));
+      await repository.save(newCustomerFactory.build());
+      await repository.save(newCustomerFactory.build());
 
       const all = await repository.findAll();
 
@@ -103,7 +102,7 @@ describe('CustomerRepository Integration', () => {
 
   describe('#delete', () => {
     it('顧客を削除できる', async () => {
-      const customer = createCustomer('delete@example.com');
+      const customer = newCustomerFactory.build();
       await repository.save(customer);
 
       await repository.delete(customer.getId());
@@ -115,14 +114,14 @@ describe('CustomerRepository Integration', () => {
 
   describe('更新', () => {
     it('既存の顧客を更新できる', async () => {
-      const customer = createCustomer('update@example.com', 'Before');
+      const customer = newCustomerFactory.build();
       await repository.save(customer);
 
-      customer.updateProfile('After', customer.getEmail());
+      customer.updateProfile('更新後の名前', customer.getEmail());
       await repository.save(customer);
 
       const found = await repository.findById(customer.getId());
-      expect(found!.getName()).toBe('After');
+      expect(found!.getName()).toBe('更新後の名前');
     });
   });
 });
