@@ -1,0 +1,94 @@
+import { injectable } from 'inversify';
+import { Repository } from 'typeorm';
+import { Customer, CustomerId, Email } from '../../../domain/aggregates/customer';
+import { Address } from '../../../domain/shared/value-objects';
+import { ICustomerRepository } from '../../../domain/repositories';
+import { AppDataSource } from '../../database';
+import { CustomerEntity } from '../../database/entities';
+
+@injectable()
+export class MySQLCustomerRepository implements ICustomerRepository {
+  private get repository(): Repository<CustomerEntity> {
+    return AppDataSource.getRepository(CustomerEntity);
+  }
+
+  async findById(id: CustomerId): Promise<Customer | null> {
+    const entity = await this.repository.findOne({
+      where: { id: id.getValue() },
+    });
+    return entity ? this.toDomain(entity) : null;
+  }
+
+  async findByEmail(email: Email): Promise<Customer | null> {
+    const entity = await this.repository.findOne({
+      where: { email: email.getValue() },
+    });
+    return entity ? this.toDomain(entity) : null;
+  }
+
+  async findAll(): Promise<Customer[]> {
+    const entities = await this.repository.find();
+    return entities.map((e) => this.toDomain(e));
+  }
+
+  async save(customer: Customer): Promise<void> {
+    const entity = this.toEntity(customer);
+    await this.repository.save(entity);
+  }
+
+  async delete(id: CustomerId): Promise<void> {
+    await this.repository.delete({ id: id.getValue() });
+  }
+
+  async existsByEmail(email: Email): Promise<boolean> {
+    const count = await this.repository.count({
+      where: { email: email.getValue() },
+    });
+    return count > 0;
+  }
+
+  private toDomain(entity: CustomerEntity): Customer {
+    let address: Address | null = null;
+
+    if (entity.shippingPostalCode && entity.shippingPrefecture && entity.shippingCity && entity.shippingStreet) {
+      address = Address.create(
+        entity.shippingPostalCode,
+        entity.shippingPrefecture,
+        entity.shippingCity,
+        entity.shippingStreet,
+        entity.shippingBuilding
+      );
+    }
+
+    return Customer.reconstruct(
+      CustomerId.fromString(entity.id),
+      entity.name,
+      Email.create(entity.email),
+      address,
+      entity.createdAt,
+      entity.updatedAt
+    );
+  }
+
+  private toEntity(customer: Customer): CustomerEntity {
+    const entity = new CustomerEntity();
+    const address = customer.getShippingAddress();
+
+    entity.id = customer.getId().getValue();
+    entity.name = customer.getName();
+    entity.email = customer.getEmail().getValue();
+
+    if (address) {
+      entity.shippingPostalCode = address.getPostalCode();
+      entity.shippingPrefecture = address.getPrefecture();
+      entity.shippingCity = address.getCity();
+      entity.shippingStreet = address.getStreet();
+      entity.shippingBuilding = address.getBuilding();
+    }
+
+    entity.createdAt = customer.getCreatedAt();
+    entity.updatedAt = customer.getUpdatedAt();
+
+    return entity;
+  }
+}

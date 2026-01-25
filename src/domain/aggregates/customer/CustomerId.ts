@@ -1,0 +1,31 @@
+import { v4 as uuidv4 } from 'uuid';
+
+/**
+ * 顧客IDを表す値オブジェクト
+ */
+export class CustomerId {
+  private constructor(private readonly value: string) {}
+
+  static generate(): CustomerId {
+    return new CustomerId(uuidv4());
+  }
+
+  static fromString(id: string): CustomerId {
+    if (!id || id.trim() === '') {
+      throw new Error('CustomerId cannot be empty');
+    }
+    return new CustomerId(id);
+  }
+
+  getValue(): string {
+    return this.value;
+  }
+
+  equals(other: CustomerId): boolean {
+    return this.value === other.value;
+  }
+
+  toString(): string {
+    return this.value;
+  }
+}

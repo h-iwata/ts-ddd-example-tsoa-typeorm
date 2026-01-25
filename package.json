@@ -1,0 +1,33 @@
+{
+  "name": "ddd-example",
+  "version": "1.0.0",
+  "description": "DDD example with TypeScript, tsoa, and InversifyJS",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsoa spec-and-routes && tsc",
+    "start": "node dist/index.js",
+    "dev": "tsoa spec-and-routes && ts-node src/index.ts",
+    "tsoa:generate": "tsoa spec-and-routes",
+    "watch": "concurrently \"tsoa spec-and-routes -w\" \"ts-node-dev src/index.ts\""
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "reflect-metadata": "^0.2.1",
+    "swagger-ui-express": "^5.0.0",
+    "tsoa": "^6.0.0",
+    "inversify": "^6.0.2",
+    "typeorm": "^0.3.20",
+    "mysql2": "^3.9.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "@types/swagger-ui-express": "^4.1.6",
+    "@types/uuid": "^9.0.7",
+    "concurrently": "^8.2.2",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.3.2"
+  }
+}
