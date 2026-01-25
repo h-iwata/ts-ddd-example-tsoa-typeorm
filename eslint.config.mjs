@@ -21,17 +21,17 @@ export default tseslint.config(
       // 複雑度メトリクス（RuboCop ABC相当）
       // ============================================
 
-      // 循環的複雑度（Condition相当）- 最大10
-      complexity: ['error', { max: 10 }],
+      // 循環的複雑度（RuboCop CyclomaticComplexity相当）- 最大7
+      complexity: ['error', { max: 7 }],
 
       // ネストの深さ - 最大3（RuboCop Metrics/BlockNesting相当）
       'max-depth': ['error', { max: 3 }],
 
-      // 関数の行数 - 最大15行
+      // 関数の行数 - 最大10行（RuboCop Metrics/MethodLength相当）
       'max-lines-per-function': [
         'error',
         {
-          max: 15,
+          max: 10,
           skipBlankLines: true,
           skipComments: true,
         },
@@ -300,6 +300,14 @@ export default tseslint.config(
     files: ['**/middlewares/**/*.ts'],
     rules: {
       'max-lines-per-function': ['error', { max: 40, skipBlankLines: true, skipComments: true }],
+      'no-console': 'off', // エラーログ出力を許可
+    },
+  },
+  {
+    // エントリーポイント用の緩和ルール
+    files: ['src/index.ts'],
+    rules: {
+      'no-console': 'off', // サーバー起動ログを許可
     },
   },
   {
@@ -308,6 +316,21 @@ export default tseslint.config(
     ignores: ['**/*.test.ts', '**/*.integration.test.ts'],
     rules: {
       'max-lines-per-function': ['error', { max: 25, skipBlankLines: true, skipComments: true }],
+    },
+  },
+  {
+    // DTO用の緩和ルール（マッピング関数は行数が多くなりがち）
+    files: ['**/dtos/**/*.ts'],
+    rules: {
+      'max-lines-per-function': ['error', { max: 15, skipBlankLines: true, skipComments: true }],
+    },
+  },
+  {
+    // ユースケース用の緩和ルール（executeメソッドは処理が多い）
+    files: ['**/use-cases/**/*.ts'],
+    ignores: ['**/*.test.ts'],
+    rules: {
+      'max-lines-per-function': ['error', { max: 15, skipBlankLines: true, skipComments: true }],
     },
   },
   {
@@ -326,11 +349,12 @@ export default tseslint.config(
     },
   },
   {
-    // 集約用の緩和ルール（private constructorのパラメータ数）
+    // 集約用の緩和ルール（ドメインロジックは複雑になりがち）
     files: ['**/aggregates/**/*.ts'],
     ignores: ['**/*.test.ts'],
     rules: {
       'max-params': ['error', { max: 7 }], // 集約は属性が多くなりがち
+      'max-lines-per-function': ['error', { max: 15, skipBlankLines: true, skipComments: true }],
     },
   },
   {
