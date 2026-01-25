@@ -12,7 +12,7 @@ export class CustomerId {
 
   static fromString(id: string): CustomerId {
     if (!id || id.trim() === '') {
-      throw new Error('CustomerId cannot be empty');
+      throw new Error('顧客IDは空にできません');
     }
     return new CustomerId(id);
   }

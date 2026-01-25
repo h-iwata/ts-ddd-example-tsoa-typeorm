@@ -22,7 +22,7 @@ export class CreateCustomerUseCase {
     // メールアドレスの重複チェック
     const exists = await this.customerRepository.existsByEmail(email);
     if (exists) {
-      throw new Error(`Email already exists: ${dto.email}`);
+      throw new Error(`このメールアドレスは既に登録されています: ${dto.email}`);
     }
 
     const customer = Customer.create(dto.name, email);

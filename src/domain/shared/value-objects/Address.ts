@@ -18,7 +18,7 @@ export class Address {
     building?: string
   ): Address {
     if (!postalCode || !prefecture || !city || !street) {
-      throw new Error('Address fields cannot be empty');
+      throw new Error('住所の必須項目は空にできません');
     }
     return new Address(postalCode, prefecture, city, street, building);
   }

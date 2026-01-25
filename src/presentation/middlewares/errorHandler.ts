@@ -15,7 +15,7 @@ export function errorHandler(
   // tsoa バリデーションエラー
   if (error instanceof ValidateError) {
     res.status(400).json({
-      message: 'Validation failed',
+      message: 'バリデーションエラー',
       code: 'VALIDATION_ERROR',
       details: error.fields,
     });
@@ -34,9 +34,9 @@ export function errorHandler(
 
   // その他のエラー
   if (error instanceof Error) {
-    console.error('Unexpected error:', error);
+    console.error('予期しないエラー:', error);
     res.status(500).json({
-      message: 'Internal server error',
+      message: 'サーバー内部エラーが発生しました',
       code: 'INTERNAL_ERROR',
     });
     return;

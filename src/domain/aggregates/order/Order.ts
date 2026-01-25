@@ -168,7 +168,7 @@ export class Order {
     );
 
     if (!item) {
-      throw new Error(`Product ${productId.getValue()} not found in order`);
+      throw new Error(`注文内に商品が見つかりません: ${productId.getValue()}`);
     }
 
     if (newQuantity.isZero()) {
@@ -200,7 +200,7 @@ export class Order {
     }
 
     if (!this.shippingAddress) {
-      throw new Error('Shipping address is required to confirm order');
+      throw new Error('注文を確定するには配送先の設定が必要です');
     }
 
     this.status = OrderStatus.CONFIRMED;
@@ -254,7 +254,7 @@ export class Order {
 
   private assertCanModify(): void {
     if (this.status !== OrderStatus.PENDING) {
-      throw new InvalidOrderStateError(this.status, 'modify');
+      throw new InvalidOrderStateError(this.status, '変更');
     }
   }
 
@@ -262,7 +262,7 @@ export class Order {
     if (!canTransitionTo(this.status, newStatus)) {
       throw new InvalidOrderStateError(
         this.status,
-        `transition to ${newStatus}`
+        `${newStatus}への遷移`
       );
     }
   }
