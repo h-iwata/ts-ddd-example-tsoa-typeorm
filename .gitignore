@@ -27,8 +27,8 @@ npm-debug.log*
 *.tsbuildinfo
 
 # tsoa generated files
-src/generated/*
-!src/generated/.gitkeep
+generated/*
+!generated/.gitkeep
 
 # Test coverage
 coverage/

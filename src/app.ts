@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import express, { type Express } from 'express';
 import swaggerUi from 'swagger-ui-express';
-import { RegisterRoutes } from './generated/routes';
+import { RegisterRoutes } from '../generated/routes';
 import { setupContainer } from './infrastructure/di';
 import { errorHandler } from './presentation/middlewares';
 
@@ -31,7 +31,7 @@ export function createApp(): Express {
 
   // OpenAPI仕様を提供
   app.get('/swagger.json', (_req, res) => {
-    res.sendFile(`${__dirname}/generated/swagger.json`);
+    res.sendFile(`${__dirname}/../generated/swagger.json`);
   });
 
   // tsoaが生成したルートを登録

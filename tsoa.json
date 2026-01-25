@@ -3,13 +3,13 @@
   "noImplicitAdditionalProperties": "throw-on-extras",
   "controllerPathGlobs": ["src/presentation/controllers/**/*.ts"],
   "spec": {
-    "outputDirectory": "src/generated",
+    "outputDirectory": "generated",
     "specVersion": 3,
     "basePath": "/",
     "securityDefinitions": {}
   },
   "routes": {
-    "routesDir": "src/generated",
+    "routesDir": "generated",
     "iocModule": "src/infrastructure/di/iocModule"
   }
 }

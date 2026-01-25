@@ -12,7 +12,7 @@ import {
 import { CreateProductUseCase, GetProductUseCase, GetAllProductsUseCase } from '../../application/use-cases/product';
 import { type ICustomerRepository, type IProductRepository, type IOrderRepository } from '../../domain/repositories';
 import { OrderDomainService } from '../../domain/services';
-import { RegisterRoutes } from '../../generated/routes';
+import { RegisterRoutes } from '../../../generated/routes';
 
 // tsoaのiocModuleが参照するグローバルコンテナ
 import { container } from '../../infrastructure/di/container';
