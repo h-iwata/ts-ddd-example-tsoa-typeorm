@@ -14,9 +14,11 @@
     "migration:run": "npm run typeorm -- migration:run -d src/infrastructure/database/dataSource.ts",
     "migration:revert": "npm run typeorm -- migration:revert -d src/infrastructure/database/dataSource.ts",
     "migration:show": "npm run typeorm -- migration:show -d src/infrastructure/database/dataSource.ts",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test": "jest --selectProjects unit",
+    "test:watch": "jest --selectProjects unit --watch",
+    "test:coverage": "jest --selectProjects unit --coverage",
+    "test:integration": "NODE_ENV=test jest --selectProjects integration --runInBand",
+    "test:all": "NODE_ENV=test jest --runInBand"
   },
   "dependencies": {
     "dotenv": "^16.4.7",

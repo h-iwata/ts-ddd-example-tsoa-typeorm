@@ -1,4 +1,4 @@
-.PHONY: help up down logs build ps migrate migrate-generate clean test test-coverage test-watch
+.PHONY: help up down logs build ps migrate migrate-generate clean test test-coverage test-watch test-integration test-all
 
 help: ## ヘルプを表示
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -28,11 +28,17 @@ migrate-generate: ## マイグレーションを生成
 clean: ## コンテナとボリュームを削除
 	docker compose down -v
 
-test: ## テストを実行
-	npm test
+test: ## ユニットテストを実行
+	docker compose exec app npm test
 
-test-coverage: ## テストをカバレッジ付きで実行
-	npm run test:coverage
+test-coverage: ## ユニットテストをカバレッジ付きで実行
+	docker compose exec app npm run test:coverage
 
-test-watch: ## テストをウォッチモードで実行
-	npm run test:watch
+test-watch: ## ユニットテストをウォッチモードで実行
+	docker compose exec app npm run test:watch
+
+test-integration: ## 統合テストを実行
+	docker compose exec app npm run test:integration
+
+test-all: ## 全テストを実行
+	docker compose exec app npm run test:all

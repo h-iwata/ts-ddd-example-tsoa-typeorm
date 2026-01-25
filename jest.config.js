@@ -1,9 +1,34 @@
 /** @type {import('ts-jest').JestConfigWithTsJest} */
-module.exports = {
+
+/** 共通設定 */
+const baseConfig = {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
+};
+
+/** ユニットテスト設定 */
+const unitConfig = {
+  ...baseConfig,
+  displayName: 'unit',
   testMatch: ['**/*.test.ts'],
+  testPathIgnorePatterns: ['/node_modules/', '\\.integration\\.test\\.ts$'],
+  setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
+};
+
+/** 統合テスト設定 */
+const integrationConfig = {
+  ...baseConfig,
+  displayName: 'integration',
+  testMatch: ['**/*.integration.test.ts'],
+  setupFilesAfterEnv: ['<rootDir>/src/test/integration/setup.ts'],
+};
+
+module.exports = {
+  // プロジェクト定義（--selectProjects で選択可能）
+  projects: [unitConfig, integrationConfig],
+
+  // カバレッジ設定
   collectCoverageFrom: [
     'src/domain/**/*.ts',
     'src/application/use-cases/**/*.ts',
@@ -34,5 +59,4 @@ module.exports = {
     },
   },
   coverageReporters: ['text', 'text-summary', 'html'],
-  setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
 };

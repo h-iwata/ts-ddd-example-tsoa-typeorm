@@ -161,6 +161,10 @@ make down     # コンテナ停止
 | `make migrate` | マイグレーションを実行 |
 | `make migrate-generate` | マイグレーションを生成 |
 | `make clean` | コンテナとボリュームを削除 |
+| `make test` | ユニットテストを実行 |
+| `make test-coverage` | カバレッジ付きでテスト |
+| `make test-integration` | 統合テストを実行 |
+| `make test-all` | 全テストを実行 |
 
 ### Docker構成
 
@@ -168,6 +172,46 @@ make down     # コンテナ停止
 - `mysql`: MySQL 8.0（ポート3307）
 
 ソースコードはボリュームマウントされているため、変更がリアルタイムで反映されます。
+
+## テスト
+
+### テストの種類
+
+| 種類 | コマンド | 説明 |
+|------|---------|------|
+| ユニットテスト | `make test` | ドメイン層・アプリケーション層のテスト（202件） |
+| 統合テスト | `make test-integration` | リポジトリ層のDBアクセステスト（29件） |
+| 全テスト | `make test-all` | 上記すべてを実行（231件） |
+
+### テスト実行
+
+```bash
+# コンテナを起動
+make up
+
+# ユニットテスト
+make test
+
+# カバレッジ付き
+make test-coverage
+
+# 統合テスト
+make test-integration
+
+# 全テスト
+make test-all
+```
+
+※ すべてのテストはDocker上で実行されます。事前に `make up` でコンテナを起動してください。
+
+### カバレッジ
+
+ドメイン層は100%のカバレッジを維持しています。
+
+| 対象 | カバレッジ閾値 |
+|------|--------------|
+| `src/domain/aggregates/` | 100% |
+| `src/domain/shared/` | 100% |
 
 ### アクセス
 
@@ -225,13 +269,15 @@ src/
 │   └── dtos/                  # データ転送オブジェクト
 │
 ├── infrastructure/            # インフラストラクチャ層
-│   ├── repositories/          # リポジトリ実装
-│   │   ├── in-memory/         # インメモリ実装（デフォルト）
-│   │   └── mysql/             # MySQL実装
+│   ├── repositories/          # リポジトリ実装（MySQL）
 │   ├── database/              # TypeORM設定・エンティティ
 │   │   ├── dataSource.ts      # DB接続設定
 │   │   └── entities/          # ORMエンティティ
 │   └── di/                    # DIコンテナ設定（InversifyJS）
+│
+├── test/                      # テスト設定
+│   ├── setup.ts               # ユニットテスト用セットアップ
+│   └── integration/           # 統合テスト用セットアップ
 │
 ├── presentation/              # プレゼンテーション層
 │   ├── controllers/           # tsoaコントローラー
