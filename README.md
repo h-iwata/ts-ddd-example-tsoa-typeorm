@@ -90,9 +90,9 @@ Customer ──────┐
 
 | 値オブジェクト | 役割 | 場所 |
 |---------------|------|------|
-| **Money** | 金額（通貨付き） | `src/domain/value-objects/Money.ts` |
-| **Quantity** | 数量（正の整数） | `src/domain/value-objects/Quantity.ts` |
-| **Address** | 住所 | `src/domain/value-objects/Address.ts` |
+| **Money** | 金額（通貨付き） | `src/domain/shared/value-objects/Money.ts` |
+| **Quantity** | 数量（正の整数） | `src/domain/shared/value-objects/Quantity.ts` |
+| **Address** | 住所 | `src/domain/shared/value-objects/Address.ts` |
 | **Email** | メールアドレス（バリデーション付き） | `src/domain/aggregates/customer/Email.ts` |
 | **OrderId** | 注文ID | `src/domain/aggregates/order/OrderId.ts` |
 | **ProductId** | 商品ID | `src/domain/aggregates/product/ProductId.ts` |
@@ -165,6 +165,9 @@ make down     # コンテナ停止
 | `make test-coverage` | カバレッジ付きでテスト |
 | `make test-integration` | 統合テストを実行 |
 | `make test-all` | 全テストを実行 |
+| `make lint` | ESLint実行 |
+| `make lint-fix` | ESLint自動修正 |
+| `make format` | コードフォーマット |
 
 ### Docker構成
 
@@ -204,6 +207,22 @@ make test-all
 
 ※ すべてのテストはDocker上で実行されます。事前に `make up` でコンテナを起動してください。
 
+### テストファクトリ
+
+テストデータの生成には[fishery](https://github.com/thoughtbot/fishery)ライブラリを使用しています（RailsのFactoryBot相当）。
+
+```typescript
+// ユニットテスト用（既存IDで再構築）
+const customer = customerFactory.build();
+const product = productFactory.build({ transient: { price: 500 } });
+
+// 統合テスト用（新規作成、IDは自動生成）
+const customer = newCustomerFactory.build();
+const product = newProductFactory.build({}, { transient: { stock: 100 } });
+```
+
+ファクトリは `src/test/factories/` に配置されています。
+
 ### カバレッジ
 
 ドメイン層は100%のカバレッジを維持しています。
@@ -230,15 +249,17 @@ make lint-fix
 make format
 ```
 
-### 主要なLintルール（RuboCop ABC相当）
+### 主要なLintルール（RuboCop相当の厳格設定）
 
 | ルール | 閾値 | 説明 |
 |--------|------|------|
-| `complexity` | 10 | 循環的複雑度 |
-| `max-depth` | 4 | ネストの深さ |
-| `max-lines-per-function` | 50 | 関数の行数 |
-| `max-params` | 7 | パラメータ数 |
+| `complexity` | 7 | 循環的複雑度 |
+| `max-depth` | 3 | ネストの深さ |
+| `max-lines-per-function` | 10 | 関数の行数 |
+| `max-params` | 5 | パラメータ数 |
 | `max-statements` | 15 | 文の数 |
+
+レイヤー別に緩和ルールが適用されます（詳細は `CLAUDE.md` 参照）。
 
 ### アクセス
 
@@ -281,12 +302,16 @@ src/
 ├── domain/                    # ドメイン層（ビジネスロジックの中核）
 │   ├── aggregates/            # 集約
 │   │   ├── customer/          # Customer集約
+│   │   │   └── errors/        # 顧客ドメインエラー
 │   │   ├── order/             # Order集約（OrderItem含む）
+│   │   │   └── errors/        # 注文ドメインエラー
 │   │   └── product/           # Product集約
-│   ├── value-objects/         # 値オブジェクト（Money, Quantity, Address）
+│   │       └── errors/        # 商品ドメインエラー
+│   ├── shared/                # 共有ドメインオブジェクト
+│   │   ├── value-objects/     # 値オブジェクト（Money, Quantity, Address）
+│   │   └── errors/            # 共通ドメインエラー
 │   ├── repositories/          # リポジトリインターフェース
-│   ├── services/              # ドメインサービス
-│   └── events/                # ドメインイベント
+│   └── services/              # ドメインサービス
 │
 ├── application/               # アプリケーション層（ユースケース）
 │   ├── use-cases/             # ユースケース（11個）
@@ -302,21 +327,20 @@ src/
 │   │   └── entities/          # ORMエンティティ
 │   └── di/                    # DIコンテナ設定（InversifyJS）
 │
-├── test/                      # テスト設定
-│   ├── setup.ts               # ユニットテスト用セットアップ
-│   └── integration/           # 統合テスト用セットアップ
-│
 ├── presentation/              # プレゼンテーション層
 │   ├── controllers/           # tsoaコントローラー
-│   └── middlewares/           # エラーハンドラー等
+│   ├── middlewares/           # エラーハンドラー等
+│   └── types/                 # レスポンス型定義
 │
-├── shared/                    # 共通モジュール
-│   ├── errors/                # カスタムエラー
-│   └── types/                 # 共通型定義
-│
-└── generated/                 # tsoa自動生成ファイル
-    ├── routes.ts              # ルーティング定義
-    └── swagger.json           # OpenAPI仕様
+└── test/                      # テスト設定
+    ├── factories/             # テストファクトリ（fishery）
+    ├── helpers/               # テストヘルパー
+    ├── setup.ts               # ユニットテスト用セットアップ
+    └── integration/           # 統合テスト用セットアップ
+
+generated/                     # tsoa自動生成ファイル（.gitignore対象）
+├── routes.ts                  # ルーティング定義
+└── swagger.json               # OpenAPI仕様
 ```
 
 ## 依存関係の方向
@@ -342,5 +366,7 @@ Presentation → Application → Domain ← Infrastructure
 | **InversifyJS** | ^7.0.1 | DIコンテナ（依存性注入） |
 | **TypeORM** | ^0.3.20 | ORM（Object-Relational Mapping） |
 | **MySQL2** | ^3.12.0 | MySQLドライバ |
+| **Jest** | ^29.7.0 | テストフレームワーク |
+| **fishery** | ^2.2.2 | テストファクトリ（FactoryBot相当） |
 | **swagger-ui-express** | ^5.0.1 | Swagger UIの提供 |
 | **uuid** | ^11.0.5 | UUID生成 |
