@@ -4,7 +4,6 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - USE_MYSQL=true
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USERNAME=root

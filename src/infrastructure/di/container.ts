@@ -4,9 +4,6 @@ import { TYPES } from './types';
 // Repositories
 import { IProductRepository, ICustomerRepository, IOrderRepository } from '../../domain/repositories';
 import {
-  InMemoryProductRepository,
-  InMemoryCustomerRepository,
-  InMemoryOrderRepository,
   MySQLProductRepository,
   MySQLCustomerRepository,
   MySQLOrderRepository,
@@ -51,41 +48,21 @@ const container = new Container();
  * 依存性注入コンテナの設定
  */
 export function setupContainer(): Container {
-  const useMySQL = process.env.USE_MYSQL === 'true';
-
   // リポジトリの登録（シングルトン）
-  // 環境変数 USE_MYSQL=true でMySQL実装に切り替え
-  if (useMySQL) {
-    container
-      .bind<IProductRepository>(TYPES.IProductRepository)
-      .to(MySQLProductRepository)
-      .inSingletonScope();
+  container
+    .bind<IProductRepository>(TYPES.IProductRepository)
+    .to(MySQLProductRepository)
+    .inSingletonScope();
 
-    container
-      .bind<ICustomerRepository>(TYPES.ICustomerRepository)
-      .to(MySQLCustomerRepository)
-      .inSingletonScope();
+  container
+    .bind<ICustomerRepository>(TYPES.ICustomerRepository)
+    .to(MySQLCustomerRepository)
+    .inSingletonScope();
 
-    container
-      .bind<IOrderRepository>(TYPES.IOrderRepository)
-      .to(MySQLOrderRepository)
-      .inSingletonScope();
-  } else {
-    container
-      .bind<IProductRepository>(TYPES.IProductRepository)
-      .to(InMemoryProductRepository)
-      .inSingletonScope();
-
-    container
-      .bind<ICustomerRepository>(TYPES.ICustomerRepository)
-      .to(InMemoryCustomerRepository)
-      .inSingletonScope();
-
-    container
-      .bind<IOrderRepository>(TYPES.IOrderRepository)
-      .to(InMemoryOrderRepository)
-      .inSingletonScope();
-  }
+  container
+    .bind<IOrderRepository>(TYPES.IOrderRepository)
+    .to(MySQLOrderRepository)
+    .inSingletonScope();
 
   // ドメインサービスの登録
   container

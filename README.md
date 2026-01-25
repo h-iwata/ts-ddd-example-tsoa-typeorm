@@ -121,18 +121,32 @@ PENDING → CONFIRMED → PAID → SHIPPED → DELIVERED
 
 ## 起動方法
 
-### クイックスタート
+### 必要な環境
+
+- Docker
+- Docker Compose
+- make
+
+### 初回セットアップ
+
+```bash
+# 1. コンテナを起動（初回はイメージのビルドが行われます）
+make up
+
+# 2. マイグレーションを実行してテーブルを作成
+make migrate
+
+# 3. 動作確認
+curl http://localhost:3000/api/products
+# [] が返れば成功
+```
+
+### 通常の起動・停止
 
 ```bash
 make up       # コンテナ起動
 make logs     # ログ確認
 make down     # コンテナ停止
-```
-
-初回起動後、マイグレーションを実行してテーブルを作成します。
-
-```bash
-make migrate
 ```
 
 ### Makeコマンド一覧
