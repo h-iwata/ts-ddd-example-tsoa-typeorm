@@ -346,14 +346,24 @@ generated/                     # tsoa自動生成ファイル（.gitignore対象
 ## 依存関係の方向
 
 ```
-Presentation → Application → Domain ← Infrastructure
-                    ↓
-              Infrastructure
+Presentation → Application → Domain（Interface）
+                                    ↑ implements
+                              Infrastructure
+```
+
+**例: リポジトリの依存関係**
+```
+Application層                Domain層                    Infrastructure層
+     │                          │                              │
+CreateOrderUseCase ───→ IOrderRepository ←─────────── OrderRepository
+     │                    (interface)                   (implements)
+     └──────────────────→ Order, OrderItem
 ```
 
 - **Domain層**は何にも依存しない（純粋なビジネスロジック）
-- **Infrastructure層**がDomain層のインターフェースを実装（依存性逆転）
-- 外側の層は内側の層に依存するが、逆はない
+- **Domain層**にインターフェース（`IOrderRepository`等）を定義
+- **Infrastructure層**がそのインターフェースを実装（依存性逆転）
+- **Application層**はインターフェースに依存し、実行時にDIで実装を注入
 
 ## 技術スタック
 
