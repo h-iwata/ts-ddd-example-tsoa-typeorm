@@ -1,15 +1,15 @@
 import { injectable } from 'inversify';
 import { Repository } from 'typeorm';
-import { Order, OrderItem, OrderStatus, OrderId, OrderItemId } from '../../../domain/aggregates/order';
-import { CustomerId } from '../../../domain/aggregates/customer';
-import { ProductId } from '../../../domain/aggregates/product';
-import { Money, Quantity } from '../../../domain/shared/value-objects';
-import { IOrderRepository } from '../../../domain/repositories';
-import { AppDataSource } from '../../database';
-import { OrderEntity, OrderItemEntity } from '../../database/entities';
+import { Order, OrderItem, OrderStatus, OrderId, OrderItemId } from '../../domain/aggregates/order';
+import { CustomerId } from '../../domain/aggregates/customer';
+import { ProductId } from '../../domain/aggregates/product';
+import { Money, Quantity } from '../../domain/shared/value-objects';
+import { IOrderRepository } from '../../domain/repositories';
+import { AppDataSource } from '../database';
+import { OrderEntity, OrderItemEntity } from '../database/entities';
 
 @injectable()
-export class MySQLOrderRepository implements IOrderRepository {
+export class OrderRepository implements IOrderRepository {
   private get repository(): Repository<OrderEntity> {
     return AppDataSource.getRepository(OrderEntity);
   }

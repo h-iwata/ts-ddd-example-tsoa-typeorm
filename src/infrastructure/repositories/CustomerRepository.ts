@@ -1,13 +1,13 @@
 import { injectable } from 'inversify';
 import { Repository } from 'typeorm';
-import { Customer, CustomerId, Email } from '../../../domain/aggregates/customer';
-import { Address } from '../../../domain/shared/value-objects';
-import { ICustomerRepository } from '../../../domain/repositories';
-import { AppDataSource } from '../../database';
-import { CustomerEntity } from '../../database/entities';
+import { Customer, CustomerId, Email } from '../../domain/aggregates/customer';
+import { Address } from '../../domain/shared/value-objects';
+import { ICustomerRepository } from '../../domain/repositories';
+import { AppDataSource } from '../database';
+import { CustomerEntity } from '../database/entities';
 
 @injectable()
-export class MySQLCustomerRepository implements ICustomerRepository {
+export class CustomerRepository implements ICustomerRepository {
   private get repository(): Repository<CustomerEntity> {
     return AppDataSource.getRepository(CustomerEntity);
   }

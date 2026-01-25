@@ -3,11 +3,7 @@ import { TYPES } from './types';
 
 // Repositories
 import { IProductRepository, ICustomerRepository, IOrderRepository } from '../../domain/repositories';
-import {
-  MySQLProductRepository,
-  MySQLCustomerRepository,
-  MySQLOrderRepository,
-} from '../repositories';
+import { ProductRepository, CustomerRepository, OrderRepository } from '../repositories';
 
 // Domain Services
 import { OrderDomainService } from '../../domain/services';
@@ -51,17 +47,17 @@ export function setupContainer(): Container {
   // リポジトリの登録（シングルトン）
   container
     .bind<IProductRepository>(TYPES.IProductRepository)
-    .to(MySQLProductRepository)
+    .to(ProductRepository)
     .inSingletonScope();
 
   container
     .bind<ICustomerRepository>(TYPES.ICustomerRepository)
-    .to(MySQLCustomerRepository)
+    .to(CustomerRepository)
     .inSingletonScope();
 
   container
     .bind<IOrderRepository>(TYPES.IOrderRepository)
-    .to(MySQLOrderRepository)
+    .to(OrderRepository)
     .inSingletonScope();
 
   // ドメインサービスの登録

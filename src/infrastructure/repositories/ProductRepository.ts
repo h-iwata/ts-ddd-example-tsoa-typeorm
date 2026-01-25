@@ -1,13 +1,13 @@
 import { injectable } from 'inversify';
 import { Repository } from 'typeorm';
-import { Product, ProductId } from '../../../domain/aggregates/product';
-import { Money, Quantity } from '../../../domain/shared/value-objects';
-import { IProductRepository } from '../../../domain/repositories';
-import { AppDataSource } from '../../database';
-import { ProductEntity } from '../../database/entities';
+import { Product, ProductId } from '../../domain/aggregates/product';
+import { Money, Quantity } from '../../domain/shared/value-objects';
+import { IProductRepository } from '../../domain/repositories';
+import { AppDataSource } from '../database';
+import { ProductEntity } from '../database/entities';
 
 @injectable()
-export class MySQLProductRepository implements IProductRepository {
+export class ProductRepository implements IProductRepository {
   private get repository(): Repository<ProductEntity> {
     return AppDataSource.getRepository(ProductEntity);
   }

@@ -1,2 +1,3 @@
-// MySQL実装
-export * from './mysql';
+export { CustomerRepository } from './CustomerRepository';
+export { ProductRepository } from './ProductRepository';
+export { OrderRepository } from './OrderRepository';
