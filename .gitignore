@@ -27,8 +27,8 @@ npm-debug.log*
 *.tsbuildinfo
 
 # tsoa generated files
-src/routes.ts
-swagger.json
+src/generated/*
+!src/generated/.gitkeep
 
 # Test coverage
 coverage/
