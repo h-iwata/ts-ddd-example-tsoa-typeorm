@@ -8,11 +8,6 @@ export interface CreateCustomerDto {
   email: string;
 }
 
-export interface UpdateCustomerDto {
-  name?: string;
-  email?: string;
-}
-
 export interface SetAddressDto {
   postalCode: string;
   prefecture: string;

@@ -10,16 +10,6 @@ export interface CreateProductDto {
   initialStock: number;
 }
 
-export interface UpdateProductDto {
-  name?: string;
-  description?: string;
-  price?: number;
-}
-
-export interface AddStockDto {
-  quantity: number;
-}
-
 // ========== Response DTOs ==========
 
 export interface ProductResponseDto {

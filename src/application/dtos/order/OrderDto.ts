@@ -12,10 +12,6 @@ export interface AddOrderItemDto {
   quantity: number;
 }
 
-export interface UpdateOrderItemDto {
-  quantity: number;
-}
-
 export interface SetShippingAddressDto {
   postalCode: string;
   prefecture: string;
