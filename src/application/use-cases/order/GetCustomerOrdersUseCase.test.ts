@@ -3,35 +3,27 @@ import { IOrderRepository } from '../../../domain/repositories';
 import { orderFactory } from '../../../test/factories';
 
 describe('GetCustomerOrdersUseCase', () => {
-  let useCase: GetCustomerOrdersUseCase;
-  let mockOrderRepository: jest.Mocked<IOrderRepository>;
-
-  beforeEach(() => {
-    mockOrderRepository = {
-      findById: jest.fn(),
-      findByCustomerId: jest.fn(),
-      findAll: jest.fn(),
-      save: jest.fn(),
-      delete: jest.fn(),
-    };
-
-    useCase = new GetCustomerOrdersUseCase(mockOrderRepository);
+  const mockRepo = (): jest.Mocked<IOrderRepository> => ({
+    findById: jest.fn(), findByCustomerId: jest.fn(), findAll: jest.fn(), save: jest.fn(), delete: jest.fn(),
   });
 
-  it('顧客の注文一覧を取得できる', async () => {
-    const orders = orderFactory.buildList(2, {}, { transient: { customerId: 'customer-123' } });
-    mockOrderRepository.findByCustomerId.mockResolvedValue(orders);
+  it('顧客の注文一覧を取得する', async () => {
+    const repo = mockRepo();
+    repo.findByCustomerId.mockResolvedValue(orderFactory.buildList(2));
 
-    const result = await useCase.execute('customer-123');
+    const result = await new GetCustomerOrdersUseCase(repo).execute('customer-1');
 
     expect(result).toHaveLength(2);
   });
 
-  it('注文がない場合は空配列を返す', async () => {
-    mockOrderRepository.findByCustomerId.mockResolvedValue([]);
+  context('when 注文なし', () => {
+    it('空配列を返す', async () => {
+      const repo = mockRepo();
+      repo.findByCustomerId.mockResolvedValue([]);
 
-    const result = await useCase.execute('customer-123');
+      const result = await new GetCustomerOrdersUseCase(repo).execute('customer-1');
 
-    expect(result).toHaveLength(0);
+      expect(result).toHaveLength(0);
+    });
   });
 });

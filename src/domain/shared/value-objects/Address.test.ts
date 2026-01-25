@@ -1,9 +1,12 @@
 import { Address } from './Address';
 
 describe('Address', () => {
-  describe('create', () => {
-    it('必須項目のみで作成できる', () => {
-      const address = Address.create('100-0001', '東京都', '千代田区', '1-1-1');
+  const create = (postalCode = '100-0001', prefecture = '東京都', city = '千代田区', street = '1-1-1', building?: string) =>
+    Address.create(postalCode, prefecture, city, street, building);
+
+  describe('.create', () => {
+    it('必須項目のみで作成する', () => {
+      const address = create();
       expect(address.getPostalCode()).toBe('100-0001');
       expect(address.getPrefecture()).toBe('東京都');
       expect(address.getCity()).toBe('千代田区');
@@ -11,127 +14,93 @@ describe('Address', () => {
       expect(address.getBuilding()).toBeUndefined();
     });
 
-    it('建物名を含めて作成できる', () => {
-      const address = Address.create(
-        '100-0001',
-        '東京都',
-        '千代田区',
-        '1-1-1',
-        'テストビル101'
-      );
-      expect(address.getBuilding()).toBe('テストビル101');
+    context('with 建物名', () => {
+      it('建物名も設定する', () => {
+        expect(create('100-0001', '東京都', '千代田区', '1-1-1', 'テストビル101').getBuilding()).toBe('テストビル101');
+      });
     });
 
-    it('郵便番号が空だとエラー', () => {
-      expect(() =>
-        Address.create('', '東京都', '千代田区', '1-1-1')
-      ).toThrow('住所の必須項目は空にできません');
+    context('when 郵便番号が空', () => {
+      it('エラーを投げる', () => {
+        expect(() => create('')).toThrow('住所の必須項目は空にできません');
+      });
     });
 
-    it('都道府県が空だとエラー', () => {
-      expect(() =>
-        Address.create('100-0001', '', '千代田区', '1-1-1')
-      ).toThrow('住所の必須項目は空にできません');
+    context('when 都道府県が空', () => {
+      it('エラーを投げる', () => {
+        expect(() => create('100-0001', '')).toThrow('住所の必須項目は空にできません');
+      });
     });
 
-    it('市区町村が空だとエラー', () => {
-      expect(() =>
-        Address.create('100-0001', '東京都', '', '1-1-1')
-      ).toThrow('住所の必須項目は空にできません');
+    context('when 市区町村が空', () => {
+      it('エラーを投げる', () => {
+        expect(() => create('100-0001', '東京都', '')).toThrow('住所の必須項目は空にできません');
+      });
     });
 
-    it('番地が空だとエラー', () => {
-      expect(() =>
-        Address.create('100-0001', '東京都', '千代田区', '')
-      ).toThrow('住所の必須項目は空にできません');
+    context('when 番地が空', () => {
+      it('エラーを投げる', () => {
+        expect(() => create('100-0001', '東京都', '千代田区', '')).toThrow('住所の必須項目は空にできません');
+      });
     });
   });
 
-  describe('getFullAddress', () => {
-    it('建物名なしの完全な住所を取得できる', () => {
-      const address = Address.create('100-0001', '東京都', '千代田区', '1-1-1');
-      expect(address.getFullAddress()).toBe('100-0001 東京都 千代田区 1-1-1');
+  describe('#getFullAddress', () => {
+    it('建物名なしの完全な住所を返す', () => {
+      expect(create().getFullAddress()).toBe('100-0001 東京都 千代田区 1-1-1');
     });
 
-    it('建物名ありの完全な住所を取得できる', () => {
-      const address = Address.create(
-        '100-0001',
-        '東京都',
-        '千代田区',
-        '1-1-1',
-        'テストビル101'
-      );
-      expect(address.getFullAddress()).toBe(
-        '100-0001 東京都 千代田区 1-1-1 テストビル101'
-      );
+    context('with 建物名', () => {
+      it('建物名を含めて返す', () => {
+        expect(create('100-0001', '東京都', '千代田区', '1-1-1', 'テストビル101').getFullAddress())
+          .toBe('100-0001 東京都 千代田区 1-1-1 テストビル101');
+      });
     });
   });
 
-  describe('equals', () => {
+  describe('#equals', () => {
     it('同じ住所は等しい', () => {
-      const a = Address.create('100-0001', '東京都', '千代田区', '1-1-1');
-      const b = Address.create('100-0001', '東京都', '千代田区', '1-1-1');
-      expect(a.equals(b)).toBe(true);
+      expect(create().equals(create())).toBe(true);
     });
 
-    it('建物名も含めて同じ住所は等しい', () => {
-      const a = Address.create(
-        '100-0001',
-        '東京都',
-        '千代田区',
-        '1-1-1',
-        'ビル101'
-      );
-      const b = Address.create(
-        '100-0001',
-        '東京都',
-        '千代田区',
-        '1-1-1',
-        'ビル101'
-      );
-      expect(a.equals(b)).toBe(true);
+    context('with 建物名', () => {
+      it('建物名も含めて比較する', () => {
+        const a = create('100-0001', '東京都', '千代田区', '1-1-1', 'ビル101');
+        const b = create('100-0001', '東京都', '千代田区', '1-1-1', 'ビル101');
+        expect(a.equals(b)).toBe(true);
+      });
     });
 
-    it('郵便番号が異なると等しくない', () => {
-      const a = Address.create('100-0001', '東京都', '千代田区', '1-1-1');
-      const b = Address.create('100-0002', '東京都', '千代田区', '1-1-1');
-      expect(a.equals(b)).toBe(false);
+    context('when 郵便番号が異なる', () => {
+      it('等しくない', () => {
+        expect(create().equals(create('100-0002'))).toBe(false);
+      });
     });
 
-    it('都道府県が異なると等しくない', () => {
-      const a = Address.create('100-0001', '東京都', '千代田区', '1-1-1');
-      const b = Address.create('100-0001', '大阪府', '千代田区', '1-1-1');
-      expect(a.equals(b)).toBe(false);
+    context('when 都道府県が異なる', () => {
+      it('等しくない', () => {
+        expect(create().equals(create('100-0001', '大阪府'))).toBe(false);
+      });
     });
 
-    it('市区町村が異なると等しくない', () => {
-      const a = Address.create('100-0001', '東京都', '千代田区', '1-1-1');
-      const b = Address.create('100-0001', '東京都', '港区', '1-1-1');
-      expect(a.equals(b)).toBe(false);
+    context('when 市区町村が異なる', () => {
+      it('等しくない', () => {
+        expect(create().equals(create('100-0001', '東京都', '港区'))).toBe(false);
+      });
     });
 
-    it('番地が異なると等しくない', () => {
-      const a = Address.create('100-0001', '東京都', '千代田区', '1-1-1');
-      const b = Address.create('100-0001', '東京都', '千代田区', '2-2-2');
-      expect(a.equals(b)).toBe(false);
+    context('when 番地が異なる', () => {
+      it('等しくない', () => {
+        expect(create().equals(create('100-0001', '東京都', '千代田区', '2-2-2'))).toBe(false);
+      });
     });
 
-    it('建物名が異なると等しくない', () => {
-      const a = Address.create(
-        '100-0001',
-        '東京都',
-        '千代田区',
-        '1-1-1',
-        'ビルA'
-      );
-      const b = Address.create(
-        '100-0001',
-        '東京都',
-        '千代田区',
-        '1-1-1',
-        'ビルB'
-      );
-      expect(a.equals(b)).toBe(false);
+    context('when 建物名が異なる', () => {
+      it('等しくない', () => {
+        const a = create('100-0001', '東京都', '千代田区', '1-1-1', 'ビルA');
+        const b = create('100-0001', '東京都', '千代田区', '1-1-1', 'ビルB');
+        expect(a.equals(b)).toBe(false);
+      });
     });
   });
 });

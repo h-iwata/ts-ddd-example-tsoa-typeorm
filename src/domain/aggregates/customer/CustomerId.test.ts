@@ -1,53 +1,49 @@
 import { CustomerId } from './CustomerId';
 
 describe('CustomerId', () => {
-  describe('generate', () => {
-    it('新しいIDを生成できる', () => {
+  describe('.generate', () => {
+    it('新しいIDを生成する', () => {
       const id = CustomerId.generate();
       expect(id.getValue()).toBeDefined();
       expect(id.getValue().length).toBeGreaterThan(0);
     });
 
-    it('生成されるIDはユニーク', () => {
-      const id1 = CustomerId.generate();
-      const id2 = CustomerId.generate();
-      expect(id1.getValue()).not.toBe(id2.getValue());
+    it('ユニークなIDを生成する', () => {
+      expect(CustomerId.generate().getValue()).not.toBe(CustomerId.generate().getValue());
     });
   });
 
-  describe('fromString', () => {
-    it('文字列からIDを作成できる', () => {
-      const id = CustomerId.fromString('customer-id-123');
-      expect(id.getValue()).toBe('customer-id-123');
+  describe('.fromString', () => {
+    it('文字列からIDを作成する', () => {
+      expect(CustomerId.fromString('customer-id-123').getValue()).toBe('customer-id-123');
     });
 
-    it('空文字列はエラー', () => {
-      expect(() => CustomerId.fromString('')).toThrow('顧客IDは空にできません');
+    context('when 空文字列', () => {
+      it('エラーを投げる', () => {
+        expect(() => CustomerId.fromString('')).toThrow('顧客IDは空にできません');
+      });
     });
 
-    it('空白のみの文字列はエラー', () => {
-      expect(() => CustomerId.fromString('   ')).toThrow('顧客IDは空にできません');
+    context('when 空白のみ', () => {
+      it('エラーを投げる', () => {
+        expect(() => CustomerId.fromString('   ')).toThrow('顧客IDは空にできません');
+      });
     });
   });
 
-  describe('equals', () => {
+  describe('#equals', () => {
     it('同じ値は等しい', () => {
-      const id1 = CustomerId.fromString('test-id');
-      const id2 = CustomerId.fromString('test-id');
-      expect(id1.equals(id2)).toBe(true);
+      expect(CustomerId.fromString('test-id').equals(CustomerId.fromString('test-id'))).toBe(true);
     });
 
     it('異なる値は等しくない', () => {
-      const id1 = CustomerId.fromString('test-id-1');
-      const id2 = CustomerId.fromString('test-id-2');
-      expect(id1.equals(id2)).toBe(false);
+      expect(CustomerId.fromString('test-id-1').equals(CustomerId.fromString('test-id-2'))).toBe(false);
     });
   });
 
-  describe('toString', () => {
-    it('文字列として出力できる', () => {
-      const id = CustomerId.fromString('customer-id');
-      expect(id.toString()).toBe('customer-id');
+  describe('#toString', () => {
+    it('文字列として出力する', () => {
+      expect(CustomerId.fromString('customer-id').toString()).toBe('customer-id');
     });
   });
 });

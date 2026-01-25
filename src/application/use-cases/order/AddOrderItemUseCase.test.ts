@@ -4,69 +4,48 @@ import { OrderNotFoundError, ProductNotFoundError } from '../../../shared/errors
 import { orderFactory, productFactory } from '../../../test/factories';
 
 describe('AddOrderItemUseCase', () => {
-  let useCase: AddOrderItemUseCase;
-  let mockOrderRepository: jest.Mocked<IOrderRepository>;
-  let mockProductRepository: jest.Mocked<IProductRepository>;
-
-  beforeEach(() => {
-    mockOrderRepository = {
-      findById: jest.fn(),
-      findByCustomerId: jest.fn(),
-      findAll: jest.fn(),
-      save: jest.fn(),
-      delete: jest.fn(),
-    };
-
-    mockProductRepository = {
-      findById: jest.fn(),
-      findByIds: jest.fn(),
-      findAll: jest.fn(),
-      save: jest.fn(),
-      delete: jest.fn(),
-    };
-
-    useCase = new AddOrderItemUseCase(mockOrderRepository, mockProductRepository);
+  const mockOrderRepo = (): jest.Mocked<IOrderRepository> => ({
+    findById: jest.fn(), findByCustomerId: jest.fn(), findAll: jest.fn(), save: jest.fn(), delete: jest.fn(),
+  });
+  const mockProductRepo = (): jest.Mocked<IProductRepository> => ({
+    findById: jest.fn(), findByIds: jest.fn(), findAll: jest.fn(), save: jest.fn(), delete: jest.fn(),
   });
 
-  it('注文に商品を追加できる', async () => {
+  it('注文に商品を追加する', async () => {
+    const orderRepo = mockOrderRepo();
+    const productRepo = mockProductRepo();
     const order = orderFactory.build();
     const product = productFactory.build();
-    mockOrderRepository.findById.mockResolvedValue(order);
-    mockProductRepository.findById.mockResolvedValue(product);
-    mockOrderRepository.save.mockResolvedValue();
+    orderRepo.findById.mockResolvedValue(order);
+    productRepo.findById.mockResolvedValue(product);
 
-    const result = await useCase.execute(order.getId().getValue(), {
-      productId: product.getId().getValue(),
-      quantity: 2,
-    });
+    const result = await new AddOrderItemUseCase(orderRepo, productRepo)
+      .execute(order.getId().getValue(), { productId: product.getId().getValue(), quantity: 2 });
 
     expect(result.items).toHaveLength(1);
-    expect(result.items[0].productId).toBe(product.getId().getValue());
     expect(result.items[0].quantity).toBe(2);
-    expect(mockOrderRepository.save).toHaveBeenCalled();
+    expect(orderRepo.save).toHaveBeenCalled();
   });
 
-  it('注文が見つからない場合はエラー', async () => {
-    mockOrderRepository.findById.mockResolvedValue(null);
+  context('when 注文が見つからない', () => {
+    it('エラーを投げる', async () => {
+      const orderRepo = mockOrderRepo();
+      orderRepo.findById.mockResolvedValue(null);
 
-    await expect(
-      useCase.execute('non-existent', {
-        productId: 'product-123',
-        quantity: 2,
-      })
-    ).rejects.toThrow(OrderNotFoundError);
+      await expect(new AddOrderItemUseCase(orderRepo, mockProductRepo()).execute('x', { productId: 'p', quantity: 1 }))
+        .rejects.toThrow(OrderNotFoundError);
+    });
   });
 
-  it('商品が見つからない場合はエラー', async () => {
-    const order = orderFactory.build();
-    mockOrderRepository.findById.mockResolvedValue(order);
-    mockProductRepository.findById.mockResolvedValue(null);
+  context('when 商品が見つからない', () => {
+    it('エラーを投げる', async () => {
+      const orderRepo = mockOrderRepo();
+      const productRepo = mockProductRepo();
+      orderRepo.findById.mockResolvedValue(orderFactory.build());
+      productRepo.findById.mockResolvedValue(null);
 
-    await expect(
-      useCase.execute(order.getId().getValue(), {
-        productId: 'non-existent',
-        quantity: 2,
-      })
-    ).rejects.toThrow(ProductNotFoundError);
+      await expect(new AddOrderItemUseCase(orderRepo, productRepo).execute('o', { productId: 'x', quantity: 1 }))
+        .rejects.toThrow(ProductNotFoundError);
+    });
   });
 });

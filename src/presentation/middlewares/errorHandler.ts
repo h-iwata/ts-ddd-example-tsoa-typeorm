@@ -50,6 +50,7 @@ function getStatusCodeForDomainError(code: string): number {
     ORDER_NOT_FOUND: 404,
     PRODUCT_NOT_FOUND: 404,
     CUSTOMER_NOT_FOUND: 404,
+    EMAIL_ALREADY_EXISTS: 409,
     INSUFFICIENT_STOCK: 400,
     INVALID_ORDER_STATE: 400,
     EMPTY_ORDER: 400,

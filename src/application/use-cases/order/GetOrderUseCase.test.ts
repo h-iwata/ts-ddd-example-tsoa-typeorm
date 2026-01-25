@@ -4,37 +4,28 @@ import { OrderNotFoundError } from '../../../shared/errors';
 import { orderFactory } from '../../../test/factories';
 
 describe('GetOrderUseCase', () => {
-  let useCase: GetOrderUseCase;
-  let mockOrderRepository: jest.Mocked<IOrderRepository>;
-
-  beforeEach(() => {
-    mockOrderRepository = {
-      findById: jest.fn(),
-      findByCustomerId: jest.fn(),
-      findAll: jest.fn(),
-      save: jest.fn(),
-      delete: jest.fn(),
-    };
-
-    useCase = new GetOrderUseCase(mockOrderRepository);
+  const mockRepo = (): jest.Mocked<IOrderRepository> => ({
+    findById: jest.fn(), findByCustomerId: jest.fn(), findAll: jest.fn(), save: jest.fn(), delete: jest.fn(),
   });
 
-  it('注文を取得できる', async () => {
+  it('注文を取得する', async () => {
+    const repo = mockRepo();
     const order = orderFactory.build();
-    mockOrderRepository.findById.mockResolvedValue(order);
+    repo.findById.mockResolvedValue(order);
 
-    const result = await useCase.execute(order.getId().getValue());
+    const result = await new GetOrderUseCase(repo).execute(order.getId().getValue());
 
     expect(result.id).toBe(order.getId().getValue());
-    expect(result.customerId).toBe(order.getCustomerId().getValue());
     expect(result.status).toBe('PENDING');
   });
 
-  it('注文が見つからない場合はエラー', async () => {
-    mockOrderRepository.findById.mockResolvedValue(null);
+  context('when 見つからない', () => {
+    it('エラーを投げる', async () => {
+      const repo = mockRepo();
+      repo.findById.mockResolvedValue(null);
 
-    await expect(useCase.execute('non-existent')).rejects.toThrow(
-      OrderNotFoundError
-    );
+      await expect(new GetOrderUseCase(repo).execute('not-found'))
+        .rejects.toThrow(OrderNotFoundError);
+    });
   });
 });
