@@ -1,8 +1,8 @@
-import { ConfirmOrderUseCase } from './ConfirmOrderUseCase';
-import { IOrderRepository } from '../../../domain/repositories';
-import { OrderDomainService } from '../../../domain/services';
+import { type IOrderRepository } from '../../../domain/repositories';
+import { type OrderDomainService } from '../../../domain/services';
 import { OrderNotFoundError } from '../../../shared/errors';
 import { orderFactory } from '../../../test/factories';
+import { ConfirmOrderUseCase } from './ConfirmOrderUseCase';
 
 describe('ConfirmOrderUseCase', () => {
   const mockRepo = (): jest.Mocked<IOrderRepository> => ({

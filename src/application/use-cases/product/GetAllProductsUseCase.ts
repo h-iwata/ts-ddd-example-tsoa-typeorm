@@ -1,6 +1,6 @@
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../../../infrastructure/di/types';
 import { IProductRepository } from '../../../domain/repositories';
+import { TYPES } from '../../../infrastructure/di/types';
 import { ProductResponseDto, toProductResponseDto } from '../../dtos';
 
 @injectable()

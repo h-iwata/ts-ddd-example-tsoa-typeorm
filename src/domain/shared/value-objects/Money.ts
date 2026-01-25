@@ -10,14 +10,14 @@ export class Money {
     private readonly currency: string
   ) {}
 
-  static create(amount: number, currency: string = 'JPY'): Money {
+  static create(amount: number, currency = 'JPY'): Money {
     if (amount < 0) {
       throw new InvalidPriceError(amount);
     }
     return new Money(amount, currency);
   }
 
-  static zero(currency: string = 'JPY'): Money {
+  static zero(currency = 'JPY'): Money {
     return new Money(0, currency);
   }
 

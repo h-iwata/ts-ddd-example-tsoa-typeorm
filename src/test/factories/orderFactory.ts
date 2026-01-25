@@ -1,16 +1,16 @@
 import { Factory } from 'fishery';
+import { CustomerId } from '../../domain/aggregates/customer/CustomerId';
 import { Order, OrderStatus, OrderItem } from '../../domain/aggregates/order';
 import { OrderId } from '../../domain/aggregates/order/OrderId';
-import { CustomerId } from '../../domain/aggregates/customer/CustomerId';
 import { ProductId } from '../../domain/aggregates/product/ProductId';
 import { Address, Money, Quantity } from '../../domain/shared/value-objects';
 
-type OrderTransientParams = {
+interface OrderTransientParams {
   customerId?: string;
   status?: OrderStatus;
   withItems?: boolean;
   withAddress?: boolean;
-};
+}
 
 export const orderFactory = Factory.define<Order, OrderTransientParams>(
   ({ sequence, transientParams }) => {

@@ -1,7 +1,7 @@
 import { DomainError } from '../../../shared/errors';
-import { InvalidOrderStateError } from './InvalidOrderStateError';
 import { EmptyOrderError } from './EmptyOrderError';
 import { InsufficientStockError } from './InsufficientStockError';
+import { InvalidOrderStateError } from './InvalidOrderStateError';
 import { OrderNotFoundError } from './OrderNotFoundError';
 
 describe('Order Errors', () => {

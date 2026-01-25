@@ -1,5 +1,5 @@
-import { Quantity } from './Quantity';
 import { InvalidQuantityError } from '../errors';
+import { Quantity } from './Quantity';
 
 describe('Quantity', () => {
   describe('.create', () => {

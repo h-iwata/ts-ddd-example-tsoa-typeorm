@@ -1,6 +1,6 @@
-import { Address } from '../../shared/value-objects';
+import { type Address } from '../../shared/value-objects';
 import { CustomerId } from './CustomerId';
-import { Email } from './Email';
+import { type Email } from './Email';
 
 /**
  * 顧客集約ルート

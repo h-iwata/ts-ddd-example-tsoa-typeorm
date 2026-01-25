@@ -213,6 +213,33 @@ make test-all
 | `src/domain/aggregates/` | 100% |
 | `src/domain/shared/` | 100% |
 
+## コード品質
+
+### Lint
+
+ESLint + Prettierで厳格なコード品質チェックを行っています。
+
+```bash
+# Lint実行
+make lint
+
+# 自動修正
+make lint-fix
+
+# フォーマット
+make format
+```
+
+### 主要なLintルール（RuboCop ABC相当）
+
+| ルール | 閾値 | 説明 |
+|--------|------|------|
+| `complexity` | 10 | 循環的複雑度 |
+| `max-depth` | 4 | ネストの深さ |
+| `max-lines-per-function` | 50 | 関数の行数 |
+| `max-params` | 7 | パラメータ数 |
+| `max-statements` | 15 | 文の数 |
+
 ### アクセス
 
 - API: http://localhost:3000

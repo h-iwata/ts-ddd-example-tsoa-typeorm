@@ -1,5 +1,5 @@
-import { Money, Quantity } from '../../shared/value-objects';
-import { ProductId } from '../product/ProductId';
+import { type Money, type Quantity } from '../../shared/value-objects';
+import { type ProductId } from '../product/ProductId';
 import { OrderItemId } from './OrderItemId';
 
 /**

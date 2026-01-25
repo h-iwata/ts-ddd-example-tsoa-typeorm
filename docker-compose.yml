@@ -16,6 +16,8 @@ services:
     volumes:
       - ./src:/app/src
       - ./tsoa.json:/app/tsoa.json
+      - ./eslint.config.mjs:/app/eslint.config.mjs
+      - ./.prettierrc:/app/.prettierrc
 
   mysql:
     image: mysql:8.0

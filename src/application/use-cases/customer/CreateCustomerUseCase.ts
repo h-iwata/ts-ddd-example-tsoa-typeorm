@@ -1,8 +1,8 @@
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../../../infrastructure/di/types';
 import { Customer } from '../../../domain/aggregates/customer';
-import { Email } from '../../../domain/value-objects';
 import { ICustomerRepository } from '../../../domain/repositories';
+import { Email } from '../../../domain/value-objects';
+import { TYPES } from '../../../infrastructure/di/types';
 import { EmailAlreadyExistsError } from '../../../shared/errors';
 import {
   CreateCustomerDto,

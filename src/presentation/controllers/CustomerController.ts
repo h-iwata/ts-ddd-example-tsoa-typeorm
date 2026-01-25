@@ -1,3 +1,4 @@
+import { injectable, inject } from 'inversify';
 import {
   Controller,
   Get,
@@ -10,18 +11,17 @@ import {
   Response,
   Tags,
 } from 'tsoa';
-import { injectable, inject } from 'inversify';
-import { TYPES } from '../../infrastructure/di/types';
-import {
-  CreateCustomerUseCase,
-  GetCustomerUseCase,
-  SetCustomerAddressUseCase,
-} from '../../application/use-cases/customer';
 import {
   CreateCustomerDto,
   SetAddressDto,
   CustomerResponseDto,
 } from '../../application/dtos';
+import {
+  CreateCustomerUseCase,
+  GetCustomerUseCase,
+  SetCustomerAddressUseCase,
+} from '../../application/use-cases/customer';
+import { TYPES } from '../../infrastructure/di/types';
 import { ErrorResponse } from '../../shared/types';
 
 @Route('api/customers')
@@ -45,7 +45,7 @@ export class CustomerController extends Controller {
    */
   @Get('{customerId}')
   @Response<ErrorResponse>(404, 'Customer not found')
-  public async getCustomer(
+  async getCustomer(
     @Path() customerId: string
   ): Promise<CustomerResponseDto> {
     return this.getCustomerUseCase.execute(customerId);
@@ -59,7 +59,7 @@ export class CustomerController extends Controller {
   @SuccessResponse(201, 'Created')
   @Response<ErrorResponse>(400, 'Validation error')
   @Response<ErrorResponse>(409, 'Email already exists')
-  public async createCustomer(
+  async createCustomer(
     @Body() requestBody: CreateCustomerDto
   ): Promise<CustomerResponseDto> {
     this.setStatus(201);
@@ -73,7 +73,7 @@ export class CustomerController extends Controller {
    */
   @Put('{customerId}/address')
   @Response<ErrorResponse>(404, 'Customer not found')
-  public async setAddress(
+  async setAddress(
     @Path() customerId: string,
     @Body() requestBody: SetAddressDto
   ): Promise<CustomerResponseDto> {

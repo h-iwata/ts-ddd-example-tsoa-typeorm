@@ -1,5 +1,5 @@
-import { Product } from '../aggregates/product';
-import { ProductId } from '../value-objects';
+import { type Product } from '../aggregates/product';
+import { type ProductId } from '../value-objects';
 
 export interface IProductRepository {
   findById(id: ProductId): Promise<Product | null>;

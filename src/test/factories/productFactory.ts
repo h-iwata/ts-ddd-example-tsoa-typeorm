@@ -3,10 +3,10 @@ import { Product } from '../../domain/aggregates/product';
 import { ProductId } from '../../domain/aggregates/product/ProductId';
 import { Money, Quantity } from '../../domain/shared/value-objects';
 
-type ProductTransientParams = {
+interface ProductTransientParams {
   stock?: number;
   price?: number;
-};
+}
 
 export const productFactory = Factory.define<Product, ProductTransientParams>(
   ({ sequence, transientParams }) => {

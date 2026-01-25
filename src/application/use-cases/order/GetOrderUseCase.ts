@@ -1,9 +1,9 @@
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../../../infrastructure/di/types';
-import { OrderId } from '../../../domain/value-objects';
 import { IOrderRepository } from '../../../domain/repositories';
-import { OrderResponseDto, toOrderResponseDto } from '../../dtos';
+import { OrderId } from '../../../domain/value-objects';
+import { TYPES } from '../../../infrastructure/di/types';
 import { OrderNotFoundError } from '../../../shared/errors';
+import { OrderResponseDto, toOrderResponseDto } from '../../dtos';
 
 @injectable()
 export class GetOrderUseCase {

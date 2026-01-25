@@ -1,8 +1,8 @@
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../../../infrastructure/di/types';
 import { Product } from '../../../domain/aggregates/product';
-import { Money, Quantity } from '../../../domain/value-objects';
 import { IProductRepository } from '../../../domain/repositories';
+import { Money, Quantity } from '../../../domain/value-objects';
+import { TYPES } from '../../../infrastructure/di/types';
 import {
   CreateProductDto,
   ProductResponseDto,

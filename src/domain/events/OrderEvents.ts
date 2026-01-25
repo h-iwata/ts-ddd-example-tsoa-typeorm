@@ -1,5 +1,4 @@
-import { OrderId, CustomerId } from '../value-objects';
-import { Money } from '../value-objects';
+import { type OrderId, type CustomerId , type Money } from '../value-objects';
 
 /**
  * ドメインイベントの基底インターフェース
@@ -19,8 +18,8 @@ export class OrderCreatedEvent implements DomainEvent {
   readonly occurredAt: Date;
 
   constructor(
-    public readonly orderId: OrderId,
-    public readonly customerId: CustomerId
+    readonly orderId: OrderId,
+    readonly customerId: CustomerId
   ) {
     this.eventId = crypto.randomUUID();
     this.occurredAt = new Date();
@@ -36,8 +35,8 @@ export class OrderConfirmedEvent implements DomainEvent {
   readonly occurredAt: Date;
 
   constructor(
-    public readonly orderId: OrderId,
-    public readonly totalAmount: Money
+    readonly orderId: OrderId,
+    readonly totalAmount: Money
   ) {
     this.eventId = crypto.randomUUID();
     this.occurredAt = new Date();
@@ -53,8 +52,8 @@ export class OrderCancelledEvent implements DomainEvent {
   readonly occurredAt: Date;
 
   constructor(
-    public readonly orderId: OrderId,
-    public readonly reason?: string
+    readonly orderId: OrderId,
+    readonly reason?: string
   ) {
     this.eventId = crypto.randomUUID();
     this.occurredAt = new Date();
@@ -70,8 +69,8 @@ export class OrderShippedEvent implements DomainEvent {
   readonly occurredAt: Date;
 
   constructor(
-    public readonly orderId: OrderId,
-    public readonly trackingNumber?: string
+    readonly orderId: OrderId,
+    readonly trackingNumber?: string
   ) {
     this.eventId = crypto.randomUUID();
     this.occurredAt = new Date();

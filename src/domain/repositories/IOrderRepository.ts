@@ -1,5 +1,5 @@
-import { Order } from '../aggregates/order';
-import { OrderId, CustomerId } from '../value-objects';
+import { type Order } from '../aggregates/order';
+import { type OrderId, type CustomerId } from '../value-objects';
 
 export interface IOrderRepository {
   findById(id: OrderId): Promise<Order | null>;

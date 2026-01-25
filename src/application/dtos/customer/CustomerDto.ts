@@ -1,4 +1,4 @@
-import { Customer } from '../../../domain/aggregates/customer';
+import { type Customer } from '../../../domain/aggregates/customer';
 
 // ========== Request DTOs ==========
 

@@ -1,5 +1,5 @@
-import { Money } from './Money';
 import { InvalidPriceError } from '../errors';
+import { Money } from './Money';
 
 describe('Money', () => {
   const jpy = (amount: number) => Money.create(amount, 'JPY');

@@ -1,10 +1,10 @@
-import { OrderRepository } from './OrderRepository';
-import { CustomerRepository } from './CustomerRepository';
-import { ProductRepository } from './ProductRepository';
+import { Customer, Email } from '../../domain/aggregates/customer';
 import { Order, OrderId } from '../../domain/aggregates/order';
-import { Customer, CustomerId, Email } from '../../domain/aggregates/customer';
 import { Product } from '../../domain/aggregates/product';
 import { Money, Quantity, Address } from '../../domain/shared/value-objects';
+import { CustomerRepository } from './CustomerRepository';
+import { OrderRepository } from './OrderRepository';
+import { ProductRepository } from './ProductRepository';
 
 describe('OrderRepository Integration', () => {
   const orderRepository = new OrderRepository();

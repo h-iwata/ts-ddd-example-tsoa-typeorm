@@ -1,6 +1,6 @@
-import { Money, Quantity } from '../../shared/value-objects';
-import { ProductId } from './ProductId';
+import { type Money, type Quantity } from '../../shared/value-objects';
 import { InsufficientStockError } from '../order/errors';
+import { ProductId } from './ProductId';
 
 /**
  * 商品集約ルート

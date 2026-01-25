@@ -1,5 +1,5 @@
-import { AppDataSource } from './infrastructure/database';
 import { createApp } from './app';
+import { AppDataSource } from './infrastructure/database';
 
 async function bootstrap(): Promise<void> {
   // データベース接続
@@ -10,7 +10,7 @@ async function bootstrap(): Promise<void> {
   const app = createApp();
 
   // サーバー起動
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT ?? 3000;
   app.listen(PORT, () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════╗

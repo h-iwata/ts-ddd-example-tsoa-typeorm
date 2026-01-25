@@ -4,9 +4,9 @@ import { CustomerId } from '../../domain/aggregates/customer/CustomerId';
 import { Email } from '../../domain/aggregates/customer/Email';
 import { Address } from '../../domain/shared/value-objects';
 
-type CustomerTransientParams = {
+interface CustomerTransientParams {
   withAddress?: boolean;
-};
+}
 
 export const customerFactory = Factory.define<Customer, CustomerTransientParams>(
   ({ sequence, transientParams }) => {

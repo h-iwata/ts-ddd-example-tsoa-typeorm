@@ -1,6 +1,6 @@
-import { CustomerRepository } from './CustomerRepository';
 import { Customer, CustomerId, Email } from '../../domain/aggregates/customer';
 import { Address } from '../../domain/shared/value-objects';
+import { CustomerRepository } from './CustomerRepository';
 
 describe('CustomerRepository Integration', () => {
   const repository = new CustomerRepository();

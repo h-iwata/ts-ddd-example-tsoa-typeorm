@@ -1,10 +1,9 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../infrastructure/di/types';
-import { Order } from '../aggregates/order';
-import { Product } from '../aggregates/product';
-import { ProductId, Quantity } from '../value-objects';
-import { IProductRepository } from '../repositories';
 import { InsufficientStockError, ProductNotFoundError } from '../../shared/errors';
+import { Order } from '../aggregates/order';
+import { type IProductRepository } from '../repositories';
+import { ProductId, Quantity } from '../value-objects';
 
 /**
  * 注文ドメインサービス
@@ -49,9 +48,12 @@ export class OrderDomainService {
 
     // 在庫引き当て（全ての在庫チェックが通った後に実行）
     for (const item of items) {
-      const product = productMap.get(item.getProductId().getValue())!;
-      product.decreaseStock(item.getQuantity());
-      await this.productRepository.save(product);
+      const product = productMap.get(item.getProductId().getValue());
+      // 上記ループで存在確認済みのため必ず存在する
+      if (product) {
+        product.decreaseStock(item.getQuantity());
+        await this.productRepository.save(product);
+      }
     }
   }
 

@@ -1,5 +1,5 @@
-import { Customer } from '../aggregates/customer';
-import { CustomerId, Email } from '../value-objects';
+import { type Customer } from '../aggregates/customer';
+import { type CustomerId, type Email } from '../value-objects';
 
 export interface ICustomerRepository {
   findById(id: CustomerId): Promise<Customer | null>;

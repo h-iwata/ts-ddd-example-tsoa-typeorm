@@ -1,4 +1,4 @@
-import { Order, OrderItem } from '../../../domain/aggregates/order';
+import { type Order, type OrderItem } from '../../../domain/aggregates/order';
 
 // ========== Request DTOs ==========
 

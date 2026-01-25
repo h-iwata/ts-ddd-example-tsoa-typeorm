@@ -1,7 +1,7 @@
-import { SetCustomerAddressUseCase } from './SetCustomerAddressUseCase';
-import { ICustomerRepository } from '../../../domain/repositories';
+import { type ICustomerRepository } from '../../../domain/repositories';
 import { CustomerNotFoundError } from '../../../shared/errors';
 import { customerFactory } from '../../../test/factories';
+import { SetCustomerAddressUseCase } from './SetCustomerAddressUseCase';
 
 describe('SetCustomerAddressUseCase', () => {
   const mockRepo = (): jest.Mocked<ICustomerRepository> => ({

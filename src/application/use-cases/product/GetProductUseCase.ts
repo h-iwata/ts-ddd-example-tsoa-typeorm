@@ -1,9 +1,9 @@
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../../../infrastructure/di/types';
-import { ProductId } from '../../../domain/value-objects';
 import { IProductRepository } from '../../../domain/repositories';
-import { ProductResponseDto, toProductResponseDto } from '../../dtos';
+import { ProductId } from '../../../domain/value-objects';
+import { TYPES } from '../../../infrastructure/di/types';
 import { ProductNotFoundError } from '../../../shared/errors';
+import { ProductResponseDto, toProductResponseDto } from '../../dtos';
 
 @injectable()
 export class GetProductUseCase {

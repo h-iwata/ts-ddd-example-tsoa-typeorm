@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { type Request, type Response, type NextFunction } from 'express';
 import { ValidateError } from 'tsoa';
 import { DomainError } from '../../shared/errors';
 
@@ -9,7 +9,7 @@ export function errorHandler(
   next: NextFunction
 ): void {
   if (res.headersSent) {
-    return next(error);
+    next(error); return;
   }
 
   // tsoa バリデーションエラー

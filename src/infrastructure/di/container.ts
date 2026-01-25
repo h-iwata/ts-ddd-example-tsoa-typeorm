@@ -1,19 +1,10 @@
 import { Container } from 'inversify';
-import { TYPES } from './types';
 
 // Repositories
-import { IProductRepository, ICustomerRepository, IOrderRepository } from '../../domain/repositories';
-import { ProductRepository, CustomerRepository, OrderRepository } from '../repositories';
 
 // Domain Services
-import { OrderDomainService } from '../../domain/services';
 
 // Use Cases - Product
-import {
-  CreateProductUseCase,
-  GetProductUseCase,
-  GetAllProductsUseCase,
-} from '../../application/use-cases/product';
 
 // Use Cases - Customer
 import {
@@ -31,9 +22,18 @@ import {
   CancelOrderUseCase,
   GetCustomerOrdersUseCase,
 } from '../../application/use-cases/order';
+import {
+  CreateProductUseCase,
+  GetProductUseCase,
+  GetAllProductsUseCase,
+} from '../../application/use-cases/product';
+import { type IProductRepository, type ICustomerRepository, type IOrderRepository } from '../../domain/repositories';
+import { OrderDomainService } from '../../domain/services';
 
 // Controllers
 import { ProductController, CustomerController, OrderController } from '../../presentation/controllers';
+import { ProductRepository, CustomerRepository, OrderRepository } from '../repositories';
+import { TYPES } from './types';
 
 /**
  * InversifyJS DIコンテナ

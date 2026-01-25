@@ -1,4 +1,4 @@
-import { Product } from '../../../domain/aggregates/product';
+import { type Product } from '../../../domain/aggregates/product';
 
 // ========== Request DTOs ==========
 

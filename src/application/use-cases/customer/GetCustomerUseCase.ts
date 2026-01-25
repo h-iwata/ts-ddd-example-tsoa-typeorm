@@ -1,9 +1,9 @@
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../../../infrastructure/di/types';
-import { CustomerId } from '../../../domain/value-objects';
 import { ICustomerRepository } from '../../../domain/repositories';
-import { CustomerResponseDto, toCustomerResponseDto } from '../../dtos';
+import { CustomerId } from '../../../domain/value-objects';
+import { TYPES } from '../../../infrastructure/di/types';
 import { CustomerNotFoundError } from '../../../shared/errors';
+import { CustomerResponseDto, toCustomerResponseDto } from '../../dtos';
 
 @injectable()
 export class GetCustomerUseCase {

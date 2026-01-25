@@ -1,7 +1,7 @@
-import { CreateOrderUseCase } from './CreateOrderUseCase';
-import { IOrderRepository, ICustomerRepository } from '../../../domain/repositories';
+import { type IOrderRepository, type ICustomerRepository } from '../../../domain/repositories';
 import { CustomerNotFoundError } from '../../../shared/errors';
 import { customerFactory } from '../../../test/factories';
+import { CreateOrderUseCase } from './CreateOrderUseCase';
 
 describe('CreateOrderUseCase', () => {
   const mockOrderRepo = (): jest.Mocked<IOrderRepository> => ({

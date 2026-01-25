@@ -1,7 +1,7 @@
-import { Product } from './Product';
-import { ProductId } from './ProductId';
 import { Money, Quantity } from '../../shared/value-objects';
 import { InsufficientStockError } from '../order/errors';
+import { Product } from './Product';
+import { ProductId } from './ProductId';
 
 describe('Product', () => {
   const createProduct = (stock = 10) =>
@@ -49,7 +49,7 @@ describe('Product', () => {
 
     context('when 在庫不足', () => {
       it('エラーを投げる', () => {
-        expect(() => createProduct(5).decreaseStock(Quantity.create(10)))
+        expect(() => { createProduct(5).decreaseStock(Quantity.create(10)); })
           .toThrow(InsufficientStockError);
       });
     });

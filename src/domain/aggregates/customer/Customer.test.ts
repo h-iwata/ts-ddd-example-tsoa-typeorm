@@ -1,7 +1,7 @@
+import { Address } from '../../shared/value-objects';
 import { Customer } from './Customer';
 import { CustomerId } from './CustomerId';
 import { Email } from './Email';
-import { Address } from '../../shared/value-objects';
 
 describe('Customer', () => {
   const email = () => Email.create('test@example.com');

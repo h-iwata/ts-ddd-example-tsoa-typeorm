@@ -1,12 +1,12 @@
-import { OrderDomainService } from './OrderDomainService';
-import { Order } from '../aggregates/order';
-import { Product } from '../aggregates/product';
-import { ProductId } from '../aggregates/product/ProductId';
 import { CustomerId } from '../aggregates/customer/CustomerId';
-import { IProductRepository } from '../repositories';
-import { Money, Quantity, Address } from '../shared/value-objects';
+import { Order } from '../aggregates/order';
 import { InsufficientStockError } from '../aggregates/order/errors';
+import { Product } from '../aggregates/product';
 import { ProductNotFoundError } from '../aggregates/product/errors';
+import { ProductId } from '../aggregates/product/ProductId';
+import { type IProductRepository } from '../repositories';
+import { Money, Quantity, Address } from '../shared/value-objects';
+import { OrderDomainService } from './OrderDomainService';
 
 describe('OrderDomainService', () => {
   const mockRepo = (): jest.Mocked<IProductRepository> => ({

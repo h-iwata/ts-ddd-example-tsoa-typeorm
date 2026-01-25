@@ -1,5 +1,5 @@
+import { type ICustomerRepository } from '../../../domain/repositories';
 import { CreateCustomerUseCase } from './CreateCustomerUseCase';
-import { ICustomerRepository } from '../../../domain/repositories';
 
 describe('CreateCustomerUseCase', () => {
   const mockRepo = (): jest.Mocked<ICustomerRepository> => ({

@@ -1,7 +1,7 @@
+import { Money, Quantity } from '../../shared/value-objects';
+import { ProductId } from '../product/ProductId';
 import { OrderItem } from './OrderItem';
 import { OrderItemId } from './OrderItemId';
-import { ProductId } from '../product/ProductId';
-import { Money, Quantity } from '../../shared/value-objects';
 
 describe('OrderItem', () => {
   const productId = () => ProductId.fromString('product-1');

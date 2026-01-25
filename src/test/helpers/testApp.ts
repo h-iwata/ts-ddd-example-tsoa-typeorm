@@ -1,21 +1,10 @@
 import 'reflect-metadata';
-import express, { Express } from 'express';
-import { Container } from 'inversify';
-import { RegisterRoutes } from '../../generated/routes';
-import { errorHandler } from '../../presentation/middlewares';
-import { TYPES } from '../../infrastructure/di/types';
-import { ICustomerRepository, IProductRepository, IOrderRepository } from '../../domain/repositories';
-import { OrderDomainService } from '../../domain/services';
+import express, { type Express } from 'express';
 import {
   CreateCustomerUseCase,
   GetCustomerUseCase,
   SetCustomerAddressUseCase,
 } from '../../application/use-cases/customer';
-import {
-  CreateProductUseCase,
-  GetProductUseCase,
-  GetAllProductsUseCase,
-} from '../../application/use-cases/product';
 import {
   CreateOrderUseCase,
   GetOrderUseCase,
@@ -24,10 +13,20 @@ import {
   CancelOrderUseCase,
   GetCustomerOrdersUseCase,
 } from '../../application/use-cases/order';
-import { CustomerController, ProductController, OrderController } from '../../presentation/controllers';
+import {
+  CreateProductUseCase,
+  GetProductUseCase,
+  GetAllProductsUseCase,
+} from '../../application/use-cases/product';
+import { type ICustomerRepository, type IProductRepository, type IOrderRepository } from '../../domain/repositories';
+import { OrderDomainService } from '../../domain/services';
+import { RegisterRoutes } from '../../generated/routes';
 
 // tsoaのiocModuleが参照するグローバルコンテナ
 import { container } from '../../infrastructure/di/container';
+import { TYPES } from '../../infrastructure/di/types';
+import { CustomerController, ProductController, OrderController } from '../../presentation/controllers';
+import { errorHandler } from '../../presentation/middlewares';
 
 export interface MockRepositories {
   customerRepository?: jest.Mocked<ICustomerRepository>;

@@ -1,8 +1,8 @@
 import { injectable } from 'inversify';
 import { Repository } from 'typeorm';
 import { Product, ProductId } from '../../domain/aggregates/product';
-import { Money, Quantity } from '../../domain/shared/value-objects';
 import { IProductRepository } from '../../domain/repositories';
+import { Money, Quantity } from '../../domain/shared/value-objects';
 import { AppDataSource } from '../database';
 import { ProductEntity } from '../database/entities';
 

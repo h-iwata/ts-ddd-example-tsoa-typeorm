@@ -1,10 +1,10 @@
 import { injectable } from 'inversify';
 import { Repository } from 'typeorm';
-import { Order, OrderItem, OrderStatus, OrderId, OrderItemId } from '../../domain/aggregates/order';
 import { CustomerId } from '../../domain/aggregates/customer';
+import { Order, OrderItem, OrderStatus, OrderId, OrderItemId } from '../../domain/aggregates/order';
 import { ProductId } from '../../domain/aggregates/product';
-import { Money, Quantity } from '../../domain/shared/value-objects';
 import { IOrderRepository } from '../../domain/repositories';
+import { Money, Quantity } from '../../domain/shared/value-objects';
 import { AppDataSource } from '../database';
 import { OrderEntity, OrderItemEntity } from '../database/entities';
 
@@ -49,7 +49,7 @@ export class OrderRepository implements IOrderRepository {
   }
 
   private toDomain(entity: OrderEntity): Order {
-    const items = (entity.items || []).map((itemEntity) =>
+    const items = (entity.items ?? []).map((itemEntity) =>
       OrderItem.reconstruct(
         OrderItemId.fromString(itemEntity.id),
         ProductId.fromString(itemEntity.productId),

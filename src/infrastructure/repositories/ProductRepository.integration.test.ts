@@ -1,6 +1,6 @@
-import { ProductRepository } from './ProductRepository';
 import { Product, ProductId } from '../../domain/aggregates/product';
 import { Money, Quantity } from '../../domain/shared/value-objects';
+import { ProductRepository } from './ProductRepository';
 
 describe('ProductRepository Integration', () => {
   const repository = new ProductRepository();

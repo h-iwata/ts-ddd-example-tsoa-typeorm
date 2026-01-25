@@ -1,6 +1,6 @@
-import { GetAllProductsUseCase } from './GetAllProductsUseCase';
-import { IProductRepository } from '../../../domain/repositories';
+import { type IProductRepository } from '../../../domain/repositories';
 import { productFactory } from '../../../test/factories';
+import { GetAllProductsUseCase } from './GetAllProductsUseCase';
 
 describe('GetAllProductsUseCase', () => {
   const mockRepo = (): jest.Mocked<IProductRepository> => ({
