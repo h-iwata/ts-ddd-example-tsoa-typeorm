@@ -3,86 +3,77 @@ import { CustomerId } from './CustomerId';
 import { type Email } from './Email';
 
 /**
+ * 顧客再構築用パラメータ
+ */
+export interface CustomerReconstructParams {
+  id: CustomerId;
+  name: string;
+  email: Email;
+  shippingAddress: Address | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
  * 顧客集約ルート
  */
 export class Customer {
-  private constructor(
-    private readonly id: CustomerId,
-    private name: string,
-    private email: Email,
-    private shippingAddress: Address | null,
-    private readonly createdAt: Date,
-    private updatedAt: Date
-  ) {}
+  private constructor(private props: CustomerReconstructParams) {}
 
   static create(name: string, email: Email): Customer {
     const now = new Date();
-    return new Customer(
-      CustomerId.generate(),
-      name,
-      email,
-      null,
-      now,
-      now
-    );
+    return new Customer({ id: CustomerId.generate(), name, email, shippingAddress: null, createdAt: now, updatedAt: now });
   }
 
-  static reconstruct(
-    id: CustomerId,
-    name: string,
-    email: Email,
-    shippingAddress: Address | null,
-    createdAt: Date,
-    updatedAt: Date
-  ): Customer {
-    return new Customer(id, name, email, shippingAddress, createdAt, updatedAt);
+  static reconstruct(params: CustomerReconstructParams): Customer {
+    return new Customer(params);
   }
 
   getId(): CustomerId {
-    return this.id;
+    return this.props.id;
   }
 
   getName(): string {
-    return this.name;
+    return this.props.name;
   }
 
   getEmail(): Email {
-    return this.email;
+    return this.props.email;
   }
 
   getShippingAddress(): Address | null {
-    return this.shippingAddress;
+    return this.props.shippingAddress;
   }
 
   getCreatedAt(): Date {
-    return this.createdAt;
+    return this.props.createdAt;
   }
 
   getUpdatedAt(): Date {
-    return this.updatedAt;
+    return this.props.updatedAt;
   }
 
   /**
    * 配送先住所を設定
    */
   setShippingAddress(address: Address): void {
-    this.shippingAddress = address;
-    this.updatedAt = new Date();
+    this.props.shippingAddress = address;
+    this.props.updatedAt = new Date();
   }
 
   /**
    * プロフィールを更新
    */
   updateProfile(name: string, email: Email): void {
-    this.name = name;
-    this.email = email;
-    this.updatedAt = new Date();
+    this.props.name = name;
+    this.props.email = email;
+    this.props.updatedAt = new Date();
   }
 
   /**
    * 配送先が設定されているか
    */
   hasShippingAddress(): boolean {
-    return this.shippingAddress !== null;
+    return this.props.shippingAddress !== null;
   }
 }

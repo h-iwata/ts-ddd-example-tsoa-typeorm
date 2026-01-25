@@ -20,8 +20,7 @@ describe('SetCustomerAddressUseCase', () => {
     const customer = customerFactory.build();
     repo.findById.mockResolvedValue(customer);
 
-    const result = await new SetCustomerAddressUseCase(repo)
-      .execute(customer.getId().getValue(), addressDto);
+    const result = await new SetCustomerAddressUseCase(repo).execute(customer.getId().getValue(), addressDto);
 
     expect(result.shippingAddress?.postalCode).toBe('100-0001');
     expect(repo.save).toHaveBeenCalled();
@@ -32,8 +31,10 @@ describe('SetCustomerAddressUseCase', () => {
     const customer = customerFactory.build();
     repo.findById.mockResolvedValue(customer);
 
-    const result = await new SetCustomerAddressUseCase(repo)
-      .execute(customer.getId().getValue(), { ...addressDto, building: 'テストビル101' });
+    const result = await new SetCustomerAddressUseCase(repo).execute(customer.getId().getValue(), {
+      ...addressDto,
+      building: 'テストビル101',
+    });
 
     expect(result.shippingAddress?.building).toBe('テストビル101');
   });
@@ -43,8 +44,7 @@ describe('SetCustomerAddressUseCase', () => {
       const repo = mockRepo();
       repo.findById.mockResolvedValue(null);
 
-      await expect(new SetCustomerAddressUseCase(repo).execute('not-found', addressDto))
-        .rejects.toThrow(CustomerNotFoundError);
+      await expect(new SetCustomerAddressUseCase(repo).execute('not-found', addressDto)).rejects.toThrow(CustomerNotFoundError);
     });
   });
 });

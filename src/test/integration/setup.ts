@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { AppDataSource } from '../../infrastructure/database';
 
 // RSpec風のcontext記法を有効化
- 
+
 declare global {
   var context: typeof describe;
 }

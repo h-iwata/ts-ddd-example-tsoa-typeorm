@@ -8,19 +8,17 @@ interface ProductTransientParams {
   price?: number;
 }
 
-export const productFactory = Factory.define<Product, ProductTransientParams>(
-  ({ sequence, transientParams }) => {
-    const stock = transientParams.stock ?? 10;
-    const price = transientParams.price ?? 1000;
+export const productFactory = Factory.define<Product, ProductTransientParams>(({ sequence, transientParams }) => {
+  const stock = transientParams.stock ?? 10;
+  const price = transientParams.price ?? 1000;
 
-    return Product.reconstruct(
-      ProductId.fromString(`product-${sequence}`),
-      `テスト商品${sequence}`,
-      `商品${sequence}の説明`,
-      Money.create(price),
-      Quantity.create(stock),
-      new Date(),
-      new Date()
-    );
-  }
-);
+  return Product.reconstruct({
+    id: ProductId.fromString(`product-${sequence}`),
+    name: `テスト商品${sequence}`,
+    description: `商品${sequence}の説明`,
+    price: Money.create(price),
+    stock: Quantity.create(stock),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+});

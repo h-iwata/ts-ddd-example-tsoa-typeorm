@@ -24,21 +24,21 @@ export default tseslint.config(
       // 循環的複雑度（Condition相当）- 最大10
       complexity: ['error', { max: 10 }],
 
-      // ネストの深さ - 最大4
-      'max-depth': ['error', { max: 4 }],
+      // ネストの深さ - 最大3（RuboCop Metrics/BlockNesting相当）
+      'max-depth': ['error', { max: 3 }],
 
-      // 関数の行数 - 最大30行
+      // 関数の行数 - 最大15行
       'max-lines-per-function': [
         'error',
         {
-          max: 30,
+          max: 15,
           skipBlankLines: true,
           skipComments: true,
         },
       ],
 
-      // パラメータ数 - 最大7（DDD再構築メソッド考慮）
-      'max-params': ['error', { max: 7 }],
+      // パラメータ数 - 最大5（RuboCop Metrics/ParameterLists相当）
+      'max-params': ['error', { max: 5 }],
 
       // 文の数 - 最大15（ABC総合相当）
       'max-statements': ['error', { max: 15 }],
@@ -268,8 +268,20 @@ export default tseslint.config(
     },
   },
   {
-    // 設定ファイル用の緩和ルール
-    files: ['*.config.js', '*.config.mjs', '*.config.ts'],
+    // JavaScript設定ファイル用の緩和ルール（TypeScriptパーサーを使わない）
+    files: ['*.config.js', '*.config.mjs'],
+    languageOptions: {
+      parserOptions: {
+        project: null, // TypeScriptプロジェクトを使わない
+      },
+    },
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+  {
+    // TypeScript設定ファイル用の緩和ルール
+    files: ['*.config.ts'],
     rules: {
       '@typescript-eslint/no-require-imports': 'off',
     },
@@ -288,6 +300,37 @@ export default tseslint.config(
     files: ['**/middlewares/**/*.ts'],
     rules: {
       'max-lines-per-function': ['error', { max: 40, skipBlankLines: true, skipComments: true }],
+    },
+  },
+  {
+    // リポジトリ用の緩和ルール（toDomain/toEntityマッピングは行数が多い）
+    files: ['**/repositories/**/*.ts'],
+    ignores: ['**/*.test.ts', '**/*.integration.test.ts'],
+    rules: {
+      'max-lines-per-function': ['error', { max: 25, skipBlankLines: true, skipComments: true }],
+    },
+  },
+  {
+    // マイグレーション用の緩和ルール
+    files: ['**/migrations/**/*.ts'],
+    rules: {
+      'max-lines-per-function': 'off',
+    },
+  },
+  {
+    // コントローラー用の緩和ルール（DI注入でコンストラクタが長くなる）
+    files: ['**/controllers/**/*.ts'],
+    rules: {
+      'max-lines-per-function': ['error', { max: 20, skipBlankLines: true, skipComments: true }],
+      'max-params': 'off', // DI注入でパラメータ数が多くなる
+    },
+  },
+  {
+    // 集約用の緩和ルール（private constructorのパラメータ数）
+    files: ['**/aggregates/**/*.ts'],
+    ignores: ['**/*.test.ts'],
+    rules: {
+      'max-params': ['error', { max: 7 }], // 集約は属性が多くなりがち
     },
   },
   {

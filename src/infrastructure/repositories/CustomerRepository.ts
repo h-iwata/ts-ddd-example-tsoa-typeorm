@@ -60,14 +60,14 @@ export class CustomerRepository implements ICustomerRepository {
       );
     }
 
-    return Customer.reconstruct(
-      CustomerId.fromString(entity.id),
-      entity.name,
-      Email.create(entity.email),
-      address,
-      entity.createdAt,
-      entity.updatedAt
-    );
+    return Customer.reconstruct({
+      id: CustomerId.fromString(entity.id),
+      name: entity.name,
+      email: Email.create(entity.email),
+      shippingAddress: address,
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    });
   }
 
   private toEntity(customer: Customer): CustomerEntity {

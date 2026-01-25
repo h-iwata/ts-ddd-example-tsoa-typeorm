@@ -59,15 +59,15 @@ export class OrderRepository implements IOrderRepository {
       )
     );
 
-    return Order.reconstruct(
-      OrderId.fromString(entity.id),
-      CustomerId.fromString(entity.customerId),
+    return Order.reconstruct({
+      id: OrderId.fromString(entity.id),
+      customerId: CustomerId.fromString(entity.customerId),
       items,
-      entity.status as OrderStatus,
-      null, // shippingAddress - OrderEntityには保存していないためnull
-      entity.createdAt,
-      entity.updatedAt
-    );
+      status: entity.status as OrderStatus,
+      shippingAddress: null, // OrderEntityには保存していないためnull
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    });
   }
 
   private toEntity(order: Order): OrderEntity {

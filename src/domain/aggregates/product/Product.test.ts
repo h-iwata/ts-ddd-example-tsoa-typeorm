@@ -4,8 +4,7 @@ import { Product } from './Product';
 import { ProductId } from './ProductId';
 
 describe('Product', () => {
-  const createProduct = (stock = 10) =>
-    Product.create('テスト商品', '説明', Money.create(1000), Quantity.create(stock));
+  const createProduct = (stock = 10) => Product.create('テスト商品', '説明', Money.create(1000), Quantity.create(stock));
 
   describe('#create', () => {
     it('商品を作成する', () => {
@@ -18,10 +17,16 @@ describe('Product', () => {
 
   describe('#reconstruct', () => {
     it('全属性を復元する', () => {
-      const product = Product.reconstruct(
-        ProductId.fromString('id-1'), 'テスト', '説明',
-        Money.create(1000), Quantity.create(10), new Date(), new Date()
-      );
+      const now = new Date();
+      const product = Product.reconstruct({
+        id: ProductId.fromString('id-1'),
+        name: 'テスト',
+        description: '説明',
+        price: Money.create(1000),
+        stock: Quantity.create(10),
+        createdAt: now,
+        updatedAt: now,
+      });
       expect(product.getId().getValue()).toBe('id-1');
     });
   });
@@ -49,8 +54,9 @@ describe('Product', () => {
 
     context('when 在庫不足', () => {
       it('エラーを投げる', () => {
-        expect(() => { createProduct(5).decreaseStock(Quantity.create(10)); })
-          .toThrow(InsufficientStockError);
+        expect(() => {
+          createProduct(5).decreaseStock(Quantity.create(10));
+        }).toThrow(InsufficientStockError);
       });
     });
   });

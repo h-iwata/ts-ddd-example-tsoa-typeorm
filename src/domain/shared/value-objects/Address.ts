@@ -10,13 +10,7 @@ export class Address {
     private readonly building?: string
   ) {}
 
-  static create(
-    postalCode: string,
-    prefecture: string,
-    city: string,
-    street: string,
-    building?: string
-  ): Address {
+  static create(postalCode: string, prefecture: string, city: string, street: string, building?: string): Address {
     if (!postalCode || !prefecture || !city || !street) {
       throw new Error('住所の必須項目は空にできません');
     }

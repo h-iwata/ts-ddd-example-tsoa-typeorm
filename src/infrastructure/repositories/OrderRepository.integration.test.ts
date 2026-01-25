@@ -28,12 +28,7 @@ describe('OrderRepository Integration', () => {
   };
 
   const addItemToOrder = (order: Order) => {
-    order.addItem(
-      savedProduct.getId(),
-      savedProduct.getName(),
-      savedProduct.getPrice(),
-      Quantity.create(2)
-    );
+    order.addItem(savedProduct.getId(), savedProduct.getName(), savedProduct.getPrice(), Quantity.create(2));
   };
 
   describe('#save と #findById', () => {
@@ -157,12 +152,7 @@ describe('OrderRepository Integration', () => {
       // 別商品を追加
       const anotherProduct = Product.create('追加商品', '説明', Money.create(500, 'JPY'), Quantity.create(50));
       await productRepository.save(anotherProduct);
-      order.addItem(
-        anotherProduct.getId(),
-        anotherProduct.getName(),
-        anotherProduct.getPrice(),
-        Quantity.create(3)
-      );
+      order.addItem(anotherProduct.getId(), anotherProduct.getName(), anotherProduct.getPrice(), Quantity.create(3));
       await orderRepository.save(order);
 
       const found = await orderRepository.findById(order.getId());

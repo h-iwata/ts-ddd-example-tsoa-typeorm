@@ -1,4 +1,5 @@
 import { type Order, type OrderItem } from '../../../domain/aggregates/order';
+import { type Address } from '../../../domain/shared';
 
 // ========== Request DTOs ==========
 
@@ -63,26 +64,27 @@ function toOrderItemResponseDto(item: OrderItem): OrderItemResponseDto {
   };
 }
 
+function toShippingAddressDto(address: Address): OrderResponseDto['shippingAddress'] {
+  return {
+    postalCode: address.getPostalCode(),
+    prefecture: address.getPrefecture(),
+    city: address.getCity(),
+    street: address.getStreet(),
+    building: address.getBuilding(),
+  };
+}
+
 export function toOrderResponseDto(order: Order): OrderResponseDto {
   const address = order.getShippingAddress();
-  const totalAmount = order.getTotalAmount();
-
+  const total = order.getTotalAmount();
   return {
     id: order.getId().getValue(),
     customerId: order.getCustomerId().getValue(),
     status: order.getStatus(),
     items: order.getItems().map(toOrderItemResponseDto),
-    totalAmount: totalAmount.getAmount(),
-    currency: totalAmount.getCurrency(),
-    shippingAddress: address
-      ? {
-          postalCode: address.getPostalCode(),
-          prefecture: address.getPrefecture(),
-          city: address.getCity(),
-          street: address.getStreet(),
-          building: address.getBuilding(),
-        }
-      : null,
+    totalAmount: total.getAmount(),
+    currency: total.getCurrency(),
+    shippingAddress: address ? toShippingAddressDto(address) : null,
     createdAt: order.getCreatedAt().toISOString(),
     updatedAt: order.getUpdatedAt().toISOString(),
   };

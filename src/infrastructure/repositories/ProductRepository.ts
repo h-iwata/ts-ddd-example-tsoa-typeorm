@@ -22,9 +22,7 @@ export class ProductRepository implements IProductRepository {
   async findByIds(ids: ProductId[]): Promise<Product[]> {
     if (ids.length === 0) return [];
 
-    const entities = await this.repository.findBy(
-      ids.map((id) => ({ id: id.getValue() }))
-    );
+    const entities = await this.repository.findBy(ids.map((id) => ({ id: id.getValue() })));
     return entities.map((e) => this.toDomain(e));
   }
 
@@ -43,15 +41,15 @@ export class ProductRepository implements IProductRepository {
   }
 
   private toDomain(entity: ProductEntity): Product {
-    return Product.reconstruct(
-      ProductId.fromString(entity.id),
-      entity.name,
-      entity.description ?? '',
-      Money.create(entity.price, entity.currency),
-      Quantity.create(entity.stock),
-      entity.createdAt,
-      entity.updatedAt
-    );
+    return Product.reconstruct({
+      id: ProductId.fromString(entity.id),
+      name: entity.name,
+      description: entity.description ?? '',
+      price: Money.create(entity.price, entity.currency),
+      stock: Quantity.create(entity.stock),
+      createdAt: entity.createdAt,
+      updatedAt: entity.updatedAt,
+    });
   }
 
   private toEntity(product: Product): ProductEntity {

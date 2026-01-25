@@ -6,11 +6,18 @@ import { ConfirmOrderUseCase } from './ConfirmOrderUseCase';
 
 describe('ConfirmOrderUseCase', () => {
   const mockRepo = (): jest.Mocked<IOrderRepository> => ({
-    findById: jest.fn(), findByCustomerId: jest.fn(), findAll: jest.fn(), save: jest.fn(), delete: jest.fn(),
+    findById: jest.fn(),
+    findByCustomerId: jest.fn(),
+    findAll: jest.fn(),
+    save: jest.fn(),
+    delete: jest.fn(),
   });
-  const mockService = (): jest.Mocked<OrderDomainService> => ({
-    validateAndReserveStock: jest.fn(), releaseStock: jest.fn(), checkStockAvailability: jest.fn(),
-  }) as unknown as jest.Mocked<OrderDomainService>;
+  const mockService = (): jest.Mocked<OrderDomainService> =>
+    ({
+      validateAndReserveStock: jest.fn(),
+      releaseStock: jest.fn(),
+      checkStockAvailability: jest.fn(),
+    }) as unknown as jest.Mocked<OrderDomainService>;
 
   it('注文を確定する', async () => {
     const repo = mockRepo();
@@ -30,8 +37,7 @@ describe('ConfirmOrderUseCase', () => {
       const repo = mockRepo();
       repo.findById.mockResolvedValue(null);
 
-      await expect(new ConfirmOrderUseCase(repo, mockService()).execute('x'))
-        .rejects.toThrow(OrderNotFoundError);
+      await expect(new ConfirmOrderUseCase(repo, mockService()).execute('x')).rejects.toThrow(OrderNotFoundError);
     });
   });
 
@@ -43,8 +49,7 @@ describe('ConfirmOrderUseCase', () => {
       repo.findById.mockResolvedValue(order);
       service.validateAndReserveStock.mockRejectedValue(new Error('在庫不足'));
 
-      await expect(new ConfirmOrderUseCase(repo, service).execute(order.getId().getValue()))
-        .rejects.toThrow('在庫不足');
+      await expect(new ConfirmOrderUseCase(repo, service).execute(order.getId().getValue())).rejects.toThrow('在庫不足');
     });
   });
 });

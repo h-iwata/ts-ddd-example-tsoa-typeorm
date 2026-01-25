@@ -29,9 +29,7 @@ export class CancelOrderUseCase {
     }
 
     // 確定後のキャンセルは在庫を戻す
-    const needsStockRelease =
-      order.getStatus() === OrderStatus.CONFIRMED ||
-      order.getStatus() === OrderStatus.PAID;
+    const needsStockRelease = order.getStatus() === OrderStatus.CONFIRMED || order.getStatus() === OrderStatus.PAID;
 
     if (needsStockRelease) {
       await this.orderDomainService.releaseStock(order);

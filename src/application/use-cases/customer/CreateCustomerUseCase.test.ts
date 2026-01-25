@@ -29,8 +29,7 @@ describe('CreateCustomerUseCase', () => {
       repo.existsByEmail.mockResolvedValue(true);
       const useCase = new CreateCustomerUseCase(repo);
 
-      await expect(useCase.execute({ name: 'テスト', email: 'dup@example.com' }))
-        .rejects.toThrow('既に登録されています');
+      await expect(useCase.execute({ name: 'テスト', email: 'dup@example.com' })).rejects.toThrow('既に登録されています');
     });
   });
 

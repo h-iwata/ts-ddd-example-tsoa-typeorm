@@ -7,11 +7,7 @@ import { Container } from 'inversify';
 // Use Cases - Product
 
 // Use Cases - Customer
-import {
-  CreateCustomerUseCase,
-  GetCustomerUseCase,
-  SetCustomerAddressUseCase,
-} from '../../application/use-cases/customer';
+import { CreateCustomerUseCase, GetCustomerUseCase, SetCustomerAddressUseCase } from '../../application/use-cases/customer';
 
 // Use Cases - Order
 import {
@@ -22,11 +18,7 @@ import {
   CancelOrderUseCase,
   GetCustomerOrdersUseCase,
 } from '../../application/use-cases/order';
-import {
-  CreateProductUseCase,
-  GetProductUseCase,
-  GetAllProductsUseCase,
-} from '../../application/use-cases/product';
+import { CreateProductUseCase, GetProductUseCase, GetAllProductsUseCase } from '../../application/use-cases/product';
 import { type IProductRepository, type ICustomerRepository, type IOrderRepository } from '../../domain/repositories';
 import { OrderDomainService } from '../../domain/services';
 
@@ -45,26 +37,14 @@ const container = new Container();
  */
 export function setupContainer(): Container {
   // リポジトリの登録（シングルトン）
-  container
-    .bind<IProductRepository>(TYPES.IProductRepository)
-    .to(ProductRepository)
-    .inSingletonScope();
+  container.bind<IProductRepository>(TYPES.IProductRepository).to(ProductRepository).inSingletonScope();
 
-  container
-    .bind<ICustomerRepository>(TYPES.ICustomerRepository)
-    .to(CustomerRepository)
-    .inSingletonScope();
+  container.bind<ICustomerRepository>(TYPES.ICustomerRepository).to(CustomerRepository).inSingletonScope();
 
-  container
-    .bind<IOrderRepository>(TYPES.IOrderRepository)
-    .to(OrderRepository)
-    .inSingletonScope();
+  container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository).inSingletonScope();
 
   // ドメインサービスの登録
-  container
-    .bind<OrderDomainService>(TYPES.OrderDomainService)
-    .to(OrderDomainService)
-    .inSingletonScope();
+  container.bind<OrderDomainService>(TYPES.OrderDomainService).to(OrderDomainService).inSingletonScope();
 
   // Product Use Cases
   container.bind<CreateProductUseCase>(TYPES.CreateProductUseCase).to(CreateProductUseCase);

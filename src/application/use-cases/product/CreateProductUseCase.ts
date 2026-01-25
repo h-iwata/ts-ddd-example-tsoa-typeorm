@@ -3,11 +3,7 @@ import { Product } from '../../../domain/aggregates/product';
 import { IProductRepository } from '../../../domain/repositories';
 import { Money, Quantity } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
-import {
-  CreateProductDto,
-  ProductResponseDto,
-  toProductResponseDto,
-} from '../../dtos';
+import { CreateProductDto, ProductResponseDto, toProductResponseDto } from '../../dtos';
 
 @injectable()
 export class CreateProductUseCase {

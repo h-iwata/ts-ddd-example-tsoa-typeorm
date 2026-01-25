@@ -1,10 +1,6 @@
 import 'reflect-metadata';
 import express, { type Express } from 'express';
-import {
-  CreateCustomerUseCase,
-  GetCustomerUseCase,
-  SetCustomerAddressUseCase,
-} from '../../application/use-cases/customer';
+import { CreateCustomerUseCase, GetCustomerUseCase, SetCustomerAddressUseCase } from '../../application/use-cases/customer';
 import {
   CreateOrderUseCase,
   GetOrderUseCase,
@@ -13,11 +9,7 @@ import {
   CancelOrderUseCase,
   GetCustomerOrdersUseCase,
 } from '../../application/use-cases/order';
-import {
-  CreateProductUseCase,
-  GetProductUseCase,
-  GetAllProductsUseCase,
-} from '../../application/use-cases/product';
+import { CreateProductUseCase, GetProductUseCase, GetAllProductsUseCase } from '../../application/use-cases/product';
 import { type ICustomerRepository, type IProductRepository, type IOrderRepository } from '../../domain/repositories';
 import { OrderDomainService } from '../../domain/services';
 import { RegisterRoutes } from '../../generated/routes';

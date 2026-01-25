@@ -1,4 +1,5 @@
 import { type Customer } from '../../../domain/aggregates/customer';
+import { type Address } from '../../../domain/shared';
 
 // ========== Request DTOs ==========
 
@@ -40,22 +41,24 @@ export interface CustomerResponseDto {
   updatedAt: string;
 }
 
+function toAddressResponseDto(address: Address): AddressResponseDto {
+  return {
+    postalCode: address.getPostalCode(),
+    prefecture: address.getPrefecture(),
+    city: address.getCity(),
+    street: address.getStreet(),
+    building: address.getBuilding(),
+    fullAddress: address.getFullAddress(),
+  };
+}
+
 export function toCustomerResponseDto(customer: Customer): CustomerResponseDto {
-  const address = customer.getShippingAddress();
+  const addr = customer.getShippingAddress();
   return {
     id: customer.getId().getValue(),
     name: customer.getName(),
     email: customer.getEmail().getValue(),
-    shippingAddress: address
-      ? {
-          postalCode: address.getPostalCode(),
-          prefecture: address.getPrefecture(),
-          city: address.getCity(),
-          street: address.getStreet(),
-          building: address.getBuilding(),
-          fullAddress: address.getFullAddress(),
-        }
-      : null,
+    shippingAddress: addr ? toAddressResponseDto(addr) : null,
     createdAt: customer.getCreatedAt().toISOString(),
     updatedAt: customer.getUpdatedAt().toISOString(),
   };

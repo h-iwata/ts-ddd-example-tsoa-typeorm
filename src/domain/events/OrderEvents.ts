@@ -1,4 +1,4 @@
-import { type OrderId, type CustomerId , type Money } from '../value-objects';
+import { type OrderId, type CustomerId, type Money } from '../value-objects';
 
 /**
  * ドメインイベントの基底インターフェース

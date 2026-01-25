@@ -18,11 +18,12 @@ describe('Customer', () => {
   });
 
   describe('#reconstruct', () => {
+    const now = new Date();
+    const params = () => ({ id: CustomerId.fromString('id-1'), name: '山田太郎', email: email(), createdAt: now, updatedAt: now });
+
     context('with 配送先あり', () => {
       it('全属性を復元する', () => {
-        const customer = Customer.reconstruct(
-          CustomerId.fromString('id-1'), '山田太郎', email(), address(), new Date(), new Date()
-        );
+        const customer = Customer.reconstruct({ ...params(), shippingAddress: address() });
         expect(customer.getId().getValue()).toBe('id-1');
         expect(customer.getShippingAddress()).toEqual(address());
       });
@@ -30,9 +31,7 @@ describe('Customer', () => {
 
     context('without 配送先', () => {
       it('nullで復元する', () => {
-        const customer = Customer.reconstruct(
-          CustomerId.fromString('id-1'), '山田太郎', email(), null, new Date(), new Date()
-        );
+        const customer = Customer.reconstruct({ ...params(), shippingAddress: null });
         expect(customer.getShippingAddress()).toBeNull();
       });
     });

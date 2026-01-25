@@ -10,11 +10,17 @@ import { OrderDomainService } from './OrderDomainService';
 
 describe('OrderDomainService', () => {
   const mockRepo = (): jest.Mocked<IProductRepository> => ({
-    findById: jest.fn(), findByIds: jest.fn(), findAll: jest.fn(), save: jest.fn(), delete: jest.fn(),
+    findById: jest.fn(),
+    findByIds: jest.fn(),
+    findAll: jest.fn(),
+    save: jest.fn(),
+    delete: jest.fn(),
   });
 
-  const createProduct = (id: string, stock: number) =>
-    Product.reconstruct(ProductId.fromString(id), 'テスト商品', '説明', Money.create(1000), Quantity.create(stock), new Date(), new Date());
+  const createProduct = (id: string, stock: number) => {
+    const now = new Date();
+    return Product.reconstruct({ id: ProductId.fromString(id), name: 'テスト商品', description: '説明', price: Money.create(1000), stock: Quantity.create(stock), createdAt: now, updatedAt: now });
+  };
 
   const createOrder = () => {
     const order = Order.create(CustomerId.fromString('customer-1'));
@@ -40,8 +46,7 @@ describe('OrderDomainService', () => {
         const repo = mockRepo();
         repo.findByIds.mockResolvedValue([]);
 
-        await expect(new OrderDomainService(repo).validateAndReserveStock(createOrder()))
-          .rejects.toThrow(ProductNotFoundError);
+        await expect(new OrderDomainService(repo).validateAndReserveStock(createOrder())).rejects.toThrow(ProductNotFoundError);
       });
     });
 
@@ -50,8 +55,7 @@ describe('OrderDomainService', () => {
         const repo = mockRepo();
         repo.findByIds.mockResolvedValue([createProduct('product-1', 1)]);
 
-        await expect(new OrderDomainService(repo).validateAndReserveStock(createOrder()))
-          .rejects.toThrow(InsufficientStockError);
+        await expect(new OrderDomainService(repo).validateAndReserveStock(createOrder())).rejects.toThrow(InsufficientStockError);
       });
     });
 

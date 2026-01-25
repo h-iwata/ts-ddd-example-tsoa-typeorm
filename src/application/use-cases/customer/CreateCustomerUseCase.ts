@@ -4,11 +4,7 @@ import { ICustomerRepository } from '../../../domain/repositories';
 import { Email } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
 import { EmailAlreadyExistsError } from '../../../shared/errors';
-import {
-  CreateCustomerDto,
-  CustomerResponseDto,
-  toCustomerResponseDto,
-} from '../../dtos';
+import { CreateCustomerDto, CustomerResponseDto, toCustomerResponseDto } from '../../dtos';
 
 @injectable()
 export class CreateCustomerUseCase {

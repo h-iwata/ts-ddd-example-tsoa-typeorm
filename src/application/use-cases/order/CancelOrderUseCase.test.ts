@@ -6,11 +6,18 @@ import { CancelOrderUseCase } from './CancelOrderUseCase';
 
 describe('CancelOrderUseCase', () => {
   const mockRepo = (): jest.Mocked<IOrderRepository> => ({
-    findById: jest.fn(), findByCustomerId: jest.fn(), findAll: jest.fn(), save: jest.fn(), delete: jest.fn(),
+    findById: jest.fn(),
+    findByCustomerId: jest.fn(),
+    findAll: jest.fn(),
+    save: jest.fn(),
+    delete: jest.fn(),
   });
-  const mockService = (): jest.Mocked<OrderDomainService> => ({
-    validateAndReserveStock: jest.fn(), releaseStock: jest.fn(), checkStockAvailability: jest.fn(),
-  }) as unknown as jest.Mocked<OrderDomainService>;
+  const mockService = (): jest.Mocked<OrderDomainService> =>
+    ({
+      validateAndReserveStock: jest.fn(),
+      releaseStock: jest.fn(),
+      checkStockAvailability: jest.fn(),
+    }) as unknown as jest.Mocked<OrderDomainService>;
 
   context('when PENDING状態', () => {
     it('キャンセルする（在庫戻しなし）', async () => {
@@ -59,8 +66,7 @@ describe('CancelOrderUseCase', () => {
       const repo = mockRepo();
       repo.findById.mockResolvedValue(null);
 
-      await expect(new CancelOrderUseCase(repo, mockService()).execute('x'))
-        .rejects.toThrow(OrderNotFoundError);
+      await expect(new CancelOrderUseCase(repo, mockService()).execute('x')).rejects.toThrow(OrderNotFoundError);
     });
   });
 });

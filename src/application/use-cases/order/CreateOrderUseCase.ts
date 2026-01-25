@@ -4,11 +4,7 @@ import { IOrderRepository, ICustomerRepository } from '../../../domain/repositor
 import { CustomerId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
 import { CustomerNotFoundError } from '../../../shared/errors';
-import {
-  CreateOrderDto,
-  OrderResponseDto,
-  toOrderResponseDto,
-} from '../../dtos';
+import { CreateOrderDto, OrderResponseDto, toOrderResponseDto } from '../../dtos';
 
 @injectable()
 export class CreateOrderUseCase {

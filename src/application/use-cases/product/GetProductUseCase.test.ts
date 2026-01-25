@@ -28,8 +28,7 @@ describe('GetProductUseCase', () => {
       const repo = mockRepo();
       repo.findById.mockResolvedValue(null);
 
-      await expect(new GetProductUseCase(repo).execute('not-found'))
-        .rejects.toThrow(ProductNotFoundError);
+      await expect(new GetProductUseCase(repo).execute('not-found')).rejects.toThrow(ProductNotFoundError);
     });
   });
 });

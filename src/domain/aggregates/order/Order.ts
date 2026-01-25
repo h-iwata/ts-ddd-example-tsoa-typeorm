@@ -7,6 +7,19 @@ import { OrderItem } from './OrderItem';
 import { OrderStatus, canTransitionTo } from './OrderStatus';
 
 /**
+ * 注文再構築用パラメータ
+ */
+export interface OrderReconstructParams {
+  id: OrderId;
+  customerId: CustomerId;
+  items: OrderItem[];
+  status: OrderStatus;
+  shippingAddress: Address | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
  * 注文集約ルート
  * 注文明細（OrderItem）を内包し、整合性を保証する
  */
@@ -26,38 +39,14 @@ export class Order {
    */
   static create(customerId: CustomerId): Order {
     const now = new Date();
-    return new Order(
-      OrderId.generate(),
-      customerId,
-      [],
-      OrderStatus.PENDING,
-      null,
-      now,
-      now
-    );
+    return new Order(OrderId.generate(), customerId, [], OrderStatus.PENDING, null, now, now);
   }
 
   /**
    * 永続化されたデータから復元
    */
-  static reconstruct(
-    id: OrderId,
-    customerId: CustomerId,
-    items: OrderItem[],
-    status: OrderStatus,
-    shippingAddress: Address | null,
-    createdAt: Date,
-    updatedAt: Date
-  ): Order {
-    return new Order(
-      id,
-      customerId,
-      items,
-      status,
-      shippingAddress,
-      createdAt,
-      updatedAt
-    );
+  static reconstruct(params: OrderReconstructParams): Order {
+    return new Order(params.id, params.customerId, params.items, params.status, params.shippingAddress, params.createdAt, params.updatedAt);
   }
 
   // ========== Getters ==========
@@ -96,10 +85,7 @@ export class Order {
    * 注文合計金額を計算
    */
   getTotalAmount(): Money {
-    return this.items.reduce(
-      (total, item) => total.add(item.getSubtotal()),
-      Money.zero()
-    );
+    return this.items.reduce((total, item) => total.add(item.getSubtotal()), Money.zero());
   }
 
   /**
@@ -122,17 +108,10 @@ export class Order {
    * 商品を注文に追加
    * 同じ商品が既にあれば数量を加算
    */
-  addItem(
-    productId: ProductId,
-    productName: string,
-    unitPrice: Money,
-    quantity: Quantity
-  ): void {
+  addItem(productId: ProductId, productName: string, unitPrice: Money, quantity: Quantity): void {
     this.assertCanModify();
 
-    const existingItem = this.items.find((item) =>
-      item.getProductId().equals(productId)
-    );
+    const existingItem = this.items.find((item) => item.getProductId().equals(productId));
 
     if (existingItem) {
       const newQuantity = existingItem.getQuantity().add(quantity);
@@ -151,9 +130,7 @@ export class Order {
   removeItem(productId: ProductId): void {
     this.assertCanModify();
 
-    this.items = this.items.filter(
-      (item) => !item.getProductId().equals(productId)
-    );
+    this.items = this.items.filter((item) => !item.getProductId().equals(productId));
     this.updatedAt = new Date();
   }
 
@@ -163,9 +140,7 @@ export class Order {
   updateItemQuantity(productId: ProductId, newQuantity: Quantity): void {
     this.assertCanModify();
 
-    const item = this.items.find((item) =>
-      item.getProductId().equals(productId)
-    );
+    const item = this.items.find((item) => item.getProductId().equals(productId));
 
     if (!item) {
       throw new Error(`注文内に商品が見つかりません: ${productId.getValue()}`);
@@ -260,10 +235,7 @@ export class Order {
 
   private assertCanTransitionTo(newStatus: OrderStatus): void {
     if (!canTransitionTo(this.status, newStatus)) {
-      throw new InvalidOrderStateError(
-        this.status,
-        `${newStatus}への遷移`
-      );
+      throw new InvalidOrderStateError(this.status, `${newStatus}への遷移`);
     }
   }
 }

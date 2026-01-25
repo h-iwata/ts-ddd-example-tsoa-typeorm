@@ -61,9 +61,7 @@ export class Money {
 
   private assertSameCurrency(other: Money): void {
     if (this.currency !== other.currency) {
-      throw new Error(
-        `通貨が一致しません: ${this.currency} と ${other.currency}`
-      );
+      throw new Error(`通貨が一致しません: ${this.currency} と ${other.currency}`);
     }
   }
 

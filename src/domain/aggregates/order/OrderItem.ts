@@ -15,28 +15,11 @@ export class OrderItem {
     private quantity: Quantity
   ) {}
 
-  static create(
-    productId: ProductId,
-    productName: string,
-    unitPrice: Money,
-    quantity: Quantity
-  ): OrderItem {
-    return new OrderItem(
-      OrderItemId.generate(),
-      productId,
-      productName,
-      unitPrice,
-      quantity
-    );
+  static create(productId: ProductId, productName: string, unitPrice: Money, quantity: Quantity): OrderItem {
+    return new OrderItem(OrderItemId.generate(), productId, productName, unitPrice, quantity);
   }
 
-  static reconstruct(
-    id: OrderItemId,
-    productId: ProductId,
-    productName: string,
-    unitPrice: Money,
-    quantity: Quantity
-  ): OrderItem {
+  static reconstruct(id: OrderItemId, productId: ProductId, productName: string, unitPrice: Money, quantity: Quantity): OrderItem {
     return new OrderItem(id, productId, productName, unitPrice, quantity);
   }
 

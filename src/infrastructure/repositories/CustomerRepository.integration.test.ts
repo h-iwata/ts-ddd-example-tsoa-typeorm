@@ -25,9 +25,7 @@ describe('CustomerRepository Integration', () => {
     context('with 配送先住所', () => {
       it('住所も保存される', async () => {
         const customer = createCustomer('addr@example.com');
-        customer.setShippingAddress(
-          Address.create('100-0001', '東京都', '千代田区', '1-1-1', 'ビル101')
-        );
+        customer.setShippingAddress(Address.create('100-0001', '東京都', '千代田区', '1-1-1', 'ビル101'));
         await repository.save(customer);
 
         const found = await repository.findById(customer.getId());

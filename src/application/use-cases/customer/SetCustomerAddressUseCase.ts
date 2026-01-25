@@ -3,11 +3,7 @@ import { ICustomerRepository } from '../../../domain/repositories';
 import { CustomerId, Address } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
 import { CustomerNotFoundError } from '../../../shared/errors';
-import {
-  SetAddressDto,
-  CustomerResponseDto,
-  toCustomerResponseDto,
-} from '../../dtos';
+import { SetAddressDto, CustomerResponseDto, toCustomerResponseDto } from '../../dtos';
 
 @injectable()
 export class SetCustomerAddressUseCase {
@@ -16,10 +12,7 @@ export class SetCustomerAddressUseCase {
     private readonly customerRepository: ICustomerRepository
   ) {}
 
-  async execute(
-    customerId: string,
-    dto: SetAddressDto
-  ): Promise<CustomerResponseDto> {
+  async execute(customerId: string, dto: SetAddressDto): Promise<CustomerResponseDto> {
     const id = CustomerId.fromString(customerId);
     const customer = await this.customerRepository.findById(id);
 
@@ -27,13 +20,7 @@ export class SetCustomerAddressUseCase {
       throw new CustomerNotFoundError(customerId);
     }
 
-    const address = Address.create(
-      dto.postalCode,
-      dto.prefecture,
-      dto.city,
-      dto.street,
-      dto.building
-    );
+    const address = Address.create(dto.postalCode, dto.prefecture, dto.city, dto.street, dto.building);
 
     customer.setShippingAddress(address);
 

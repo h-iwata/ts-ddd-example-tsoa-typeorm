@@ -11,8 +11,9 @@ describe('Order', () => {
   const address = () => Address.create('100-0001', '東京都', '千代田区', '1-1-1');
   const createOrder = () => Order.create(customerId());
 
-  const addItem = (order: Order, n = 1) =>
-    { order.addItem(productId(n), `商品${n}`, Money.create(1000), Quantity.create(1)); };
+  const addItem = (order: Order, n = 1) => {
+    order.addItem(productId(n), `商品${n}`, Money.create(1000), Quantity.create(1));
+  };
 
   const prepareForConfirm = (order: Order) => {
     addItem(order);
@@ -47,7 +48,9 @@ describe('Order', () => {
         const order = createOrder();
         prepareForConfirm(order);
         order.confirm();
-        expect(() => { addItem(order, 2); }).toThrow(InvalidOrderStateError);
+        expect(() => {
+          addItem(order, 2);
+        }).toThrow(InvalidOrderStateError);
       });
     });
   });
@@ -79,8 +82,9 @@ describe('Order', () => {
     context('when 商品が見つからない', () => {
       it('エラーを投げる', () => {
         const order = createOrder();
-        expect(() => { order.updateItemQuantity(productId(99), Quantity.create(1)); })
-          .toThrow('注文内に商品が見つかりません');
+        expect(() => {
+          order.updateItemQuantity(productId(99), Quantity.create(1));
+        }).toThrow('注文内に商品が見つかりません');
       });
     });
   });
@@ -131,7 +135,9 @@ describe('Order', () => {
       it('エラーを投げる', () => {
         const order = createOrder();
         order.setShippingAddress(address());
-        expect(() => { order.confirm(); }).toThrow(EmptyOrderError);
+        expect(() => {
+          order.confirm();
+        }).toThrow(EmptyOrderError);
       });
     });
 
@@ -139,7 +145,9 @@ describe('Order', () => {
       it('エラーを投げる', () => {
         const order = createOrder();
         addItem(order);
-        expect(() => { order.confirm(); }).toThrow('配送先の設定が必要です');
+        expect(() => {
+          order.confirm();
+        }).toThrow('配送先の設定が必要です');
       });
     });
   });
@@ -191,7 +199,9 @@ describe('Order', () => {
         order.confirm();
         order.markAsPaid();
         order.markAsShipped();
-        expect(() => { order.cancel(); }).toThrow(InvalidOrderStateError);
+        expect(() => {
+          order.cancel();
+        }).toThrow(InvalidOrderStateError);
       });
     });
   });

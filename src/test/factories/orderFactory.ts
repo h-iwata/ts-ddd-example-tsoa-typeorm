@@ -12,38 +12,27 @@ interface OrderTransientParams {
   withAddress?: boolean;
 }
 
-export const orderFactory = Factory.define<Order, OrderTransientParams>(
-  ({ sequence, transientParams }) => {
-    const customerId = transientParams.customerId ?? `customer-${sequence}`;
-    const status = transientParams.status ?? OrderStatus.PENDING;
-    const address = transientParams.withAddress
-      ? Address.create('100-0001', '東京都', '千代田区', '1-1-1')
-      : null;
+export const orderFactory = Factory.define<Order, OrderTransientParams>(({ sequence, transientParams }) => {
+  const customerId = transientParams.customerId ?? `customer-${sequence}`;
+  const status = transientParams.status ?? OrderStatus.PENDING;
+  const address = transientParams.withAddress ? Address.create('100-0001', '東京都', '千代田区', '1-1-1') : null;
 
-    // CONFIRMED/PAID状態では直接アイテムを追加できないため、
-    // reconstruct時にアイテムを含める
-    const items: OrderItem[] = transientParams.withItems
-      ? [
-          OrderItem.create(
-            ProductId.fromString(`product-${sequence}`),
-            `商品${sequence}`,
-            Money.create(1000),
-            Quantity.create(2)
-          ),
-        ]
-      : [];
+  // CONFIRMED/PAID状態では直接アイテムを追加できないため、
+  // reconstruct時にアイテムを含める
+  const items: OrderItem[] = transientParams.withItems
+    ? [OrderItem.create(ProductId.fromString(`product-${sequence}`), `商品${sequence}`, Money.create(1000), Quantity.create(2))]
+    : [];
 
-    return Order.reconstruct(
-      OrderId.fromString(`order-${sequence}`),
-      CustomerId.fromString(customerId),
-      items,
-      status,
-      address,
-      new Date(),
-      new Date()
-    );
-  }
-);
+  return Order.reconstruct({
+    id: OrderId.fromString(`order-${sequence}`),
+    customerId: CustomerId.fromString(customerId),
+    items,
+    status,
+    shippingAddress: address,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+});
 
 // 確定済み注文用のファクトリ
 export const confirmedOrderFactory = orderFactory.transient({

@@ -1,9 +1,22 @@
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../infrastructure/di/types';
 import { InsufficientStockError, ProductNotFoundError } from '../../shared/errors';
-import { Order } from '../aggregates/order';
+import { Order, type OrderItem } from '../aggregates/order';
+import { type Product } from '../aggregates/product';
 import { type IProductRepository } from '../repositories';
 import { ProductId, Quantity } from '../value-objects';
+
+type ProductMap = Map<string, Product>;
+
+function validateStock(items: readonly OrderItem[], productMap: ProductMap): void {
+  for (const item of items) {
+    const product = productMap.get(item.getProductId().getValue());
+    if (!product) throw new ProductNotFoundError(item.getProductId().getValue());
+    if (!product.hasStock(item.getQuantity())) {
+      throw new InsufficientStockError(item.getProductId().getValue(), item.getQuantity().getValue(), product.getStock().getValue());
+    }
+  }
+}
 
 /**
  * 注文ドメインサービス
@@ -16,40 +29,18 @@ export class OrderDomainService {
     private readonly productRepository: IProductRepository
   ) {}
 
-  /**
-   * 注文の在庫チェックと在庫引き当て
-   * 複数の商品（Product集約）に対して整合性を保証
-   */
   async validateAndReserveStock(order: Order): Promise<void> {
     const items = order.getItems();
-    const productIds = items.map((item) => item.getProductId());
+    const products = await this.productRepository.findByIds(items.map((item) => item.getProductId()));
+    const productMap: ProductMap = new Map(products.map((p) => [p.getId().getValue(), p]));
 
-    // 関連する商品を一括取得
-    const products = await this.productRepository.findByIds(productIds);
-    const productMap = new Map(
-      products.map((p) => [p.getId().getValue(), p])
-    );
+    validateStock(items, productMap);
+    await this.reserveStock(items, productMap);
+  }
 
-    // 在庫チェック
+  private async reserveStock(items: readonly OrderItem[], productMap: ProductMap): Promise<void> {
     for (const item of items) {
       const product = productMap.get(item.getProductId().getValue());
-      if (!product) {
-        throw new ProductNotFoundError(item.getProductId().getValue());
-      }
-
-      if (!product.hasStock(item.getQuantity())) {
-        throw new InsufficientStockError(
-          item.getProductId().getValue(),
-          item.getQuantity().getValue(),
-          product.getStock().getValue()
-        );
-      }
-    }
-
-    // 在庫引き当て（全ての在庫チェックが通った後に実行）
-    for (const item of items) {
-      const product = productMap.get(item.getProductId().getValue());
-      // 上記ループで存在確認済みのため必ず存在する
       if (product) {
         product.decreaseStock(item.getQuantity());
         await this.productRepository.save(product);
@@ -75,10 +66,7 @@ export class OrderDomainService {
   /**
    * 商品の在庫が十分かチェック
    */
-  async checkStockAvailability(
-    productId: ProductId,
-    quantity: Quantity
-  ): Promise<boolean> {
+  async checkStockAvailability(productId: ProductId, quantity: Quantity): Promise<boolean> {
     const product = await this.productRepository.findById(productId);
     if (!product) {
       return false;

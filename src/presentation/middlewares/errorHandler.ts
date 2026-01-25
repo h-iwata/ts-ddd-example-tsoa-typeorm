@@ -2,14 +2,10 @@ import { type Request, type Response, type NextFunction } from 'express';
 import { ValidateError } from 'tsoa';
 import { DomainError } from '../../shared/errors';
 
-export function errorHandler(
-  error: unknown,
-  _req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+export function errorHandler(error: unknown, _req: Request, res: Response, next: NextFunction): void {
   if (res.headersSent) {
-    next(error); return;
+    next(error);
+    return;
   }
 
   // tsoa バリデーションエラー

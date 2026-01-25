@@ -1,24 +1,7 @@
 import { injectable, inject } from 'inversify';
-import {
-  Controller,
-  Get,
-  Post,
-  Route,
-  Path,
-  Body,
-  SuccessResponse,
-  Response,
-  Tags,
-} from 'tsoa';
-import {
-  CreateProductDto,
-  ProductResponseDto,
-} from '../../application/dtos';
-import {
-  CreateProductUseCase,
-  GetProductUseCase,
-  GetAllProductsUseCase,
-} from '../../application/use-cases/product';
+import { Controller, Get, Post, Route, Path, Body, SuccessResponse, Response, Tags } from 'tsoa';
+import { CreateProductDto, ProductResponseDto } from '../../application/dtos';
+import { CreateProductUseCase, GetProductUseCase, GetAllProductsUseCase } from '../../application/use-cases/product';
 import { TYPES } from '../../infrastructure/di/types';
 import { ErrorResponse } from '../../shared/types';
 
@@ -51,9 +34,7 @@ export class ProductController extends Controller {
    */
   @Get('{productId}')
   @Response<ErrorResponse>(404, 'Product not found')
-  async getProduct(
-    @Path() productId: string
-  ): Promise<ProductResponseDto> {
+  async getProduct(@Path() productId: string): Promise<ProductResponseDto> {
     return this.getProductUseCase.execute(productId);
   }
 
@@ -64,9 +45,7 @@ export class ProductController extends Controller {
   @Post('/')
   @SuccessResponse(201, 'Created')
   @Response<ErrorResponse>(400, 'Validation error')
-  async createProduct(
-    @Body() requestBody: CreateProductDto
-  ): Promise<ProductResponseDto> {
+  async createProduct(@Body() requestBody: CreateProductDto): Promise<ProductResponseDto> {
     this.setStatus(201);
     return this.createProductUseCase.execute(requestBody);
   }

@@ -23,8 +23,7 @@ describe('CreateProductUseCase', () => {
   });
 
   it('通貨を指定できる', async () => {
-    const result = await new CreateProductUseCase(mockRepo())
-      .execute({ ...dto, currency: 'USD' });
+    const result = await new CreateProductUseCase(mockRepo()).execute({ ...dto, currency: 'USD' });
 
     expect(result.currency).toBe('USD');
   });

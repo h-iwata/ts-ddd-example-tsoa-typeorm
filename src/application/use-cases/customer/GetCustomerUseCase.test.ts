@@ -29,8 +29,7 @@ describe('GetCustomerUseCase', () => {
       const repo = mockRepo();
       repo.findById.mockResolvedValue(null);
 
-      await expect(new GetCustomerUseCase(repo).execute('not-found'))
-        .rejects.toThrow(CustomerNotFoundError);
+      await expect(new GetCustomerUseCase(repo).execute('not-found')).rejects.toThrow(CustomerNotFoundError);
     });
   });
 });

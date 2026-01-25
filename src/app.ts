@@ -8,6 +8,7 @@ import { errorHandler } from './presentation/middlewares';
 /**
  * Expressアプリケーションを作成
  */
+// eslint-disable-next-line max-lines-per-function -- アプリ初期化は分割不要
 export function createApp(): Express {
   // DIコンテナの設定
   setupContainer();
@@ -30,7 +31,7 @@ export function createApp(): Express {
 
   // OpenAPI仕様を提供
   app.get('/swagger.json', (_req, res) => {
-    res.sendFile(`${__dirname  }/generated/swagger.json`);
+    res.sendFile(`${__dirname}/generated/swagger.json`);
   });
 
   // tsoaが生成したルートを登録

@@ -3,6 +3,19 @@ import { InsufficientStockError } from '../order/errors';
 import { ProductId } from './ProductId';
 
 /**
+ * 商品再構築用パラメータ
+ */
+export interface ProductReconstructParams {
+  id: ProductId;
+  name: string;
+  description: string;
+  price: Money;
+  stock: Quantity;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
  * 商品集約ルート
  * 商品の在庫管理を含む
  */
@@ -17,34 +30,13 @@ export class Product {
     private updatedAt: Date
   ) {}
 
-  static create(
-    name: string,
-    description: string,
-    price: Money,
-    initialStock: Quantity
-  ): Product {
+  static create(name: string, description: string, price: Money, initialStock: Quantity): Product {
     const now = new Date();
-    return new Product(
-      ProductId.generate(),
-      name,
-      description,
-      price,
-      initialStock,
-      now,
-      now
-    );
+    return new Product(ProductId.generate(), name, description, price, initialStock, now, now);
   }
 
-  static reconstruct(
-    id: ProductId,
-    name: string,
-    description: string,
-    price: Money,
-    stock: Quantity,
-    createdAt: Date,
-    updatedAt: Date
-  ): Product {
-    return new Product(id, name, description, price, stock, createdAt, updatedAt);
+  static reconstruct(params: ProductReconstructParams): Product {
+    return new Product(params.id, params.name, params.description, params.price, params.stock, params.createdAt, params.updatedAt);
   }
 
   getId(): ProductId {
@@ -87,11 +79,7 @@ export class Product {
    */
   decreaseStock(quantity: Quantity): void {
     if (!this.hasStock(quantity)) {
-      throw new InsufficientStockError(
-        this.id.getValue(),
-        quantity.getValue(),
-        this.stock.getValue()
-      );
+      throw new InsufficientStockError(this.id.getValue(), quantity.getValue(), this.stock.getValue());
     }
     this.stock = this.stock.subtract(quantity);
     this.updatedAt = new Date();

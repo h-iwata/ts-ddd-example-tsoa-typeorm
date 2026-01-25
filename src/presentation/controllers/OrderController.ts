@@ -1,20 +1,6 @@
 import { injectable, inject } from 'inversify';
-import {
-  Controller,
-  Get,
-  Post,
-  Route,
-  Path,
-  Body,
-  SuccessResponse,
-  Response,
-  Tags,
-} from 'tsoa';
-import {
-  CreateOrderDto,
-  AddOrderItemDto,
-  OrderResponseDto,
-} from '../../application/dtos';
+import { Controller, Get, Post, Route, Path, Body, SuccessResponse, Response, Tags } from 'tsoa';
+import { CreateOrderDto, AddOrderItemDto, OrderResponseDto } from '../../application/dtos';
 import {
   CreateOrderUseCase,
   GetOrderUseCase,
@@ -62,9 +48,7 @@ export class OrderController extends Controller {
    * @param customerId 顧客ID
    */
   @Get('customer/{customerId}')
-  async getCustomerOrders(
-    @Path() customerId: string
-  ): Promise<OrderResponseDto[]> {
+  async getCustomerOrders(@Path() customerId: string): Promise<OrderResponseDto[]> {
     return this.getCustomerOrdersUseCase.execute(customerId);
   }
 
@@ -76,9 +60,7 @@ export class OrderController extends Controller {
   @SuccessResponse(201, 'Created')
   @Response<ErrorResponse>(400, 'Validation error')
   @Response<ErrorResponse>(404, 'Customer not found')
-  async createOrder(
-    @Body() requestBody: CreateOrderDto
-  ): Promise<OrderResponseDto> {
+  async createOrder(@Body() requestBody: CreateOrderDto): Promise<OrderResponseDto> {
     this.setStatus(201);
     return this.createOrderUseCase.execute(requestBody);
   }
@@ -91,10 +73,7 @@ export class OrderController extends Controller {
   @Post('{orderId}/items')
   @Response<ErrorResponse>(400, 'Invalid order state')
   @Response<ErrorResponse>(404, 'Order or Product not found')
-  async addItem(
-    @Path() orderId: string,
-    @Body() requestBody: AddOrderItemDto
-  ): Promise<OrderResponseDto> {
+  async addItem(@Path() orderId: string, @Body() requestBody: AddOrderItemDto): Promise<OrderResponseDto> {
     return this.addOrderItemUseCase.execute(orderId, requestBody);
   }
 
@@ -106,9 +85,7 @@ export class OrderController extends Controller {
   @Post('{orderId}/confirm')
   @Response<ErrorResponse>(400, 'Invalid order state / Insufficient stock')
   @Response<ErrorResponse>(404, 'Order not found')
-  async confirmOrder(
-    @Path() orderId: string
-  ): Promise<OrderResponseDto> {
+  async confirmOrder(@Path() orderId: string): Promise<OrderResponseDto> {
     return this.confirmOrderUseCase.execute(orderId);
   }
 
@@ -120,9 +97,7 @@ export class OrderController extends Controller {
   @Post('{orderId}/cancel')
   @Response<ErrorResponse>(400, 'Invalid order state')
   @Response<ErrorResponse>(404, 'Order not found')
-  async cancelOrder(
-    @Path() orderId: string
-  ): Promise<OrderResponseDto> {
+  async cancelOrder(@Path() orderId: string): Promise<OrderResponseDto> {
     return this.cancelOrderUseCase.execute(orderId);
   }
 }

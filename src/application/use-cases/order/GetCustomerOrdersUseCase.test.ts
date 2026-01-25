@@ -4,7 +4,11 @@ import { GetCustomerOrdersUseCase } from './GetCustomerOrdersUseCase';
 
 describe('GetCustomerOrdersUseCase', () => {
   const mockRepo = (): jest.Mocked<IOrderRepository> => ({
-    findById: jest.fn(), findByCustomerId: jest.fn(), findAll: jest.fn(), save: jest.fn(), delete: jest.fn(),
+    findById: jest.fn(),
+    findByCustomerId: jest.fn(),
+    findAll: jest.fn(),
+    save: jest.fn(),
+    delete: jest.fn(),
   });
 
   it('顧客の注文一覧を取得する', async () => {
