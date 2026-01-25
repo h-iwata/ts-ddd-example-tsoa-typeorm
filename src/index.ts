@@ -4,8 +4,15 @@ import swaggerUi from 'swagger-ui-express';
 import { RegisterRoutes } from './generated/routes';
 import { setupContainer } from './infrastructure/di';
 import { errorHandler } from './presentation/middlewares';
+import { AppDataSource } from './infrastructure/database';
 
 async function bootstrap(): Promise<void> {
+  // MySQL使用時はDataSourceを初期化
+  if (process.env.USE_MYSQL === 'true') {
+    await AppDataSource.initialize();
+    console.log('データベースに接続しました');
+  }
+
   // DIコンテナの設定
   setupContainer();
 

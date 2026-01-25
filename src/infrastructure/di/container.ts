@@ -111,10 +111,10 @@ export function setupContainer(): Container {
   container.bind<CancelOrderUseCase>(TYPES.CancelOrderUseCase).to(CancelOrderUseCase);
   container.bind<GetCustomerOrdersUseCase>(TYPES.GetCustomerOrdersUseCase).to(GetCustomerOrdersUseCase);
 
-  // Controllers
-  container.bind<ProductController>(TYPES.ProductController).to(ProductController);
-  container.bind<CustomerController>(TYPES.CustomerController).to(CustomerController);
-  container.bind<OrderController>(TYPES.OrderController).to(OrderController);
+  // Controllers（tsoaがクラスコンストラクタで解決するため、クラス自体をキーにバインド）
+  container.bind<ProductController>(ProductController).toSelf();
+  container.bind<CustomerController>(CustomerController).toSelf();
+  container.bind<OrderController>(OrderController).toSelf();
 
   return container;
 }

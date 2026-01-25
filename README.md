@@ -121,50 +121,39 @@ PENDING → CONFIRMED → PAID → SHIPPED → DELIVERED
 
 ## 起動方法
 
-### インストール
+### クイックスタート
 
 ```bash
-npm install
+make up       # コンテナ起動
+make logs     # ログ確認
+make down     # コンテナ停止
 ```
 
-### 環境変数の設定
-
-`.env.example`をコピーして`.env`を作成:
+初回起動後、マイグレーションを実行してテーブルを作成します。
 
 ```bash
-cp .env.example .env
+make migrate
 ```
 
-```bash
-# リポジトリ実装の切り替え
-USE_MYSQL=false                    # true: MySQL, false: InMemory
+### Makeコマンド一覧
 
-# MySQL接続設定（USE_MYSQL=trueの場合）
-DB_HOST=localhost
-DB_PORT=3306
-DB_USERNAME=root
-DB_PASSWORD=password
-DB_DATABASE=ddd_example
+| コマンド | 説明 |
+|---------|------|
+| `make up` | コンテナを起動 |
+| `make down` | コンテナを停止 |
+| `make logs` | アプリログを表示 |
+| `make build` | イメージを再ビルドして起動 |
+| `make ps` | コンテナの状態を表示 |
+| `make migrate` | マイグレーションを実行 |
+| `make migrate-generate` | マイグレーションを生成 |
+| `make clean` | コンテナとボリュームを削除 |
 
-# サーバー設定
-PORT=3000
-NODE_ENV=development
-```
+### Docker構成
 
-### 開発サーバー起動
+- `app`: Node.jsアプリケーション（ポート3000）
+- `mysql`: MySQL 8.0（ポート3307）
 
-```bash
-npm run dev   # tsoa generate + サーバー起動
-```
-
-### その他のコマンド
-
-```bash
-npm run build     # TypeScriptコンパイル + tsoa生成
-npm run start     # 本番実行
-npm run watch     # ホットリロード付き開発
-npm run tsoa:generate  # OpenAPI仕様の再生成
-```
+ソースコードはボリュームマウントされているため、変更がリアルタイムで反映されます。
 
 ### アクセス
 
@@ -259,11 +248,12 @@ Presentation → Application → Domain ← Infrastructure
 
 | ライブラリ | バージョン | 役割 |
 |-----------|-----------|------|
-| **TypeScript** | ^5.3.2 | 型安全な開発 |
-| **Express** | ^4.18.2 | HTTPサーバー |
-| **tsoa** | ^6.0.0 | OpenAPI仕様の自動生成とルーティング |
-| **InversifyJS** | ^6.0.2 | DIコンテナ（依存性注入） |
+| **Node.js** | 22 | JavaScript実行環境 |
+| **TypeScript** | ^5.7.3 | 型安全な開発 |
+| **Express** | ^4.21.2 | HTTPサーバー |
+| **tsoa** | ^6.6.0 | OpenAPI仕様の自動生成とルーティング |
+| **InversifyJS** | ^7.0.1 | DIコンテナ（依存性注入） |
 | **TypeORM** | ^0.3.20 | ORM（Object-Relational Mapping） |
-| **MySQL2** | ^3.9.0 | MySQLドライバ |
-| **swagger-ui-express** | ^5.0.0 | Swagger UIの提供 |
-| **uuid** | ^9.0.0 | UUID生成 |
+| **MySQL2** | ^3.12.0 | MySQLドライバ |
+| **swagger-ui-express** | ^5.0.1 | Swagger UIの提供 |
+| **uuid** | ^11.0.5 | UUID生成 |

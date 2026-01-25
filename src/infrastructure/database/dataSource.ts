@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import {
   ProductEntity,
@@ -13,9 +15,10 @@ export const AppDataSource = new DataSource({
   username: process.env.DB_USERNAME || 'root',
   password: process.env.DB_PASSWORD || '',
   database: process.env.DB_DATABASE || 'ddd_example',
-  synchronize: process.env.NODE_ENV !== 'production', // 本番では false
+  charset: 'utf8mb4',
+  synchronize: false, // マイグレーションを使用するため false に変更
   logging: process.env.NODE_ENV !== 'production',
   entities: [ProductEntity, CustomerEntity, OrderEntity, OrderItemEntity],
-  migrations: [],
+  migrations: ['src/infrastructure/database/migrations/*.ts'],
   subscribers: [],
 });
