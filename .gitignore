@@ -35,4 +35,6 @@ generated/*
 # Test coverage
 coverage/
 
+# Claude Code の設定・作業用ディレクトリ
 .claude/
+.local/

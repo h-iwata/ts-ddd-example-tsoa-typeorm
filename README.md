@@ -403,7 +403,11 @@ src/
 generated/                     # tsoa自動生成ファイル（.gitignore対象）
 ├── routes.ts                  # ルーティング定義
 └── swagger.json               # OpenAPI仕様
+
+.local/                        # 作業用の一時ファイル置き場（.gitignore対象）
 ```
+
+`.local/` は調査メモや生成物などの一時ファイルを置くためのディレクトリです。コミット対象外のため、リポジトリを汚さずに作業できます。
 
 ## 依存関係の方向
 
