@@ -176,6 +176,15 @@ make down     # コンテナ停止
 
 ソースコードはボリュームマウントされているため、変更がリアルタイムで反映されます。
 
+データベースは2つ作成されます。
+
+| データベース | 用途 | 作成元 |
+|---|---|---|
+| `ddd_example` | アプリ本体（マイグレーションで管理） | `docker-compose.yml` の `MYSQL_DATABASE` |
+| `ddd_example_test` | 統合テスト（各実行時にスキーマを再作成） | `docker/mysql/init/*.sql` |
+
+`docker/mysql/init/` 配下のSQLは MySQL のデータディレクトリが空のとき、つまりボリュームを新規作成したときにのみ実行されます。
+
 ## テスト
 
 ### テストの種類
@@ -185,6 +194,8 @@ make down     # コンテナ停止
 | ユニットテスト | `make test` | ドメイン層・アプリケーション層のテスト（202件） |
 | 統合テスト | `make test-integration` | リポジトリ層のDBアクセステスト（29件） |
 | 全テスト | `make test-all` | 上記すべてを実行（231件） |
+
+統合テストはアプリ本体とは別の `ddd_example_test` に接続し、実行のたびにスキーマを再作成します（`src/infrastructure/database/dataSource.ts` の `synchronize` / `dropSchema`）。そのため `make migrate` は不要で、アプリ側のデータにも影響しません。
 
 ### テスト実行
 

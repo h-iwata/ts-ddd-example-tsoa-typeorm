@@ -24,4 +24,7 @@ async function bootstrap(): Promise<void> {
   });
 }
 
-bootstrap().catch(console.error);
+bootstrap().catch((error: unknown) => {
+  console.error('サーバーの起動に失敗しました:', error);
+  process.exit(1);
+});
