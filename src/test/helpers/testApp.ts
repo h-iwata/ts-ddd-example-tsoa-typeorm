@@ -1,23 +1,23 @@
 import 'reflect-metadata';
 import express, { type Express } from 'express';
+import { RegisterRoutes } from '../../../generated/routes';
 import { CreateCustomerUseCase, GetCustomerUseCase, SetCustomerAddressUseCase } from '../../application/use-cases/customer';
 import {
-  CreateOrderUseCase,
-  GetOrderUseCase,
   AddOrderItemUseCase,
-  ConfirmOrderUseCase,
   CancelOrderUseCase,
+  ConfirmOrderUseCase,
+  CreateOrderUseCase,
   GetCustomerOrdersUseCase,
+  GetOrderUseCase,
 } from '../../application/use-cases/order';
-import { CreateProductUseCase, GetProductUseCase, GetAllProductsUseCase } from '../../application/use-cases/product';
-import { type ICustomerRepository, type IProductRepository, type IOrderRepository } from '../../domain/repositories';
+import { CreateProductUseCase, GetAllProductsUseCase, GetProductUseCase } from '../../application/use-cases/product';
+import { type ICustomerRepository, type IOrderRepository, type IProductRepository } from '../../domain/repositories';
 import { OrderDomainService } from '../../domain/services';
-import { RegisterRoutes } from '../../../generated/routes';
 
 // tsoaのiocModuleが参照するグローバルコンテナ
 import { container } from '../../infrastructure/di/container';
 import { TYPES } from '../../infrastructure/di/types';
-import { CustomerController, ProductController, OrderController } from '../../presentation/controllers';
+import { CustomerController, OrderController, ProductController } from '../../presentation/controllers';
 import { errorHandler } from '../../presentation/middlewares';
 
 export interface MockRepositories {

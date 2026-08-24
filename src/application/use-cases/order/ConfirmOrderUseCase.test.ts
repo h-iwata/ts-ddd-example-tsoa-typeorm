@@ -1,6 +1,6 @@
+import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
 import { type IOrderRepository } from '../../../domain/repositories';
 import { type OrderDomainService } from '../../../domain/services';
-import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
 import { orderFactory } from '../../../test/factories';
 import { ConfirmOrderUseCase } from './ConfirmOrderUseCase';
 

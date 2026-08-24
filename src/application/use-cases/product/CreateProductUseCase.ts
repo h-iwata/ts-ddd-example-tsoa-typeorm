@@ -1,9 +1,9 @@
-import { injectable, inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { Product } from '../../../domain/aggregates/product';
-import { IProductRepository } from '../../../domain/repositories';
+import { type IProductRepository } from '../../../domain/repositories';
 import { Money, Quantity } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
-import { CreateProductDto, ProductResponseDto, toProductResponseDto } from '../../dtos';
+import { type CreateProductDto, type ProductResponseDto, toProductResponseDto } from '../../dtos';
 
 @injectable()
 export class CreateProductUseCase {

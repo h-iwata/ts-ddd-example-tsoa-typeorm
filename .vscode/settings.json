@@ -1,4 +1,15 @@
 {
   // このプロジェクトではスペルチェック（Code Spell Checker / cspell）を使用しない
-  "cSpell.enabled": false
+  "cSpell.enabled": false,
+
+  // Lint・フォーマットはBiomeに統一（ESLint / Prettierは使用しない）
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
+  },
+  "[typescript]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[json]": { "editor.defaultFormatter": "biomejs.biome" },
+  "[javascript]": { "editor.defaultFormatter": "biomejs.biome" }
 }

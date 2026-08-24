@@ -1,3 +1,3 @@
 export { CustomerRepository } from './CustomerRepository';
-export { ProductRepository } from './ProductRepository';
 export { OrderRepository } from './OrderRepository';
+export { ProductRepository } from './ProductRepository';

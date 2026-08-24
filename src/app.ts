@@ -8,7 +8,7 @@ import { errorHandler } from './presentation/middlewares';
 /**
  * Expressアプリケーションを作成
  */
-// eslint-disable-next-line max-lines-per-function -- アプリ初期化は分割不要
+// biome-ignore lint/complexity/noExcessiveLinesPerFunction: アプリ初期化は分割不要
 export function createApp(): Express {
   // DIコンテナの設定
   setupContainer();

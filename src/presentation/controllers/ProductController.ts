@@ -1,9 +1,9 @@
-import { injectable, inject } from 'inversify';
-import { Controller, Get, Post, Route, Path, Body, SuccessResponse, Response, Tags } from 'tsoa';
-import { CreateProductDto, ProductResponseDto } from '../../application/dtos';
-import { CreateProductUseCase, GetProductUseCase, GetAllProductsUseCase } from '../../application/use-cases/product';
+import { inject, injectable } from 'inversify';
+import { Body, Controller, Get, Path, Post, Response, Route, SuccessResponse, Tags } from 'tsoa';
+import { type CreateProductDto, type ProductResponseDto } from '../../application/dtos';
+import { type CreateProductUseCase, type GetAllProductsUseCase, type GetProductUseCase } from '../../application/use-cases/product';
 import { TYPES } from '../../infrastructure/di/types';
-import { ErrorResponse } from '../types';
+import { type ErrorResponse } from '../types';
 
 @Route('api/products')
 @Tags('Products')

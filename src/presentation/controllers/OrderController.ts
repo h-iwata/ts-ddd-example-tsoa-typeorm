@@ -1,16 +1,16 @@
-import { injectable, inject } from 'inversify';
-import { Controller, Get, Post, Route, Path, Body, SuccessResponse, Response, Tags } from 'tsoa';
-import { CreateOrderDto, AddOrderItemDto, OrderResponseDto } from '../../application/dtos';
+import { inject, injectable } from 'inversify';
+import { Body, Controller, Get, Path, Post, Response, Route, SuccessResponse, Tags } from 'tsoa';
+import { type AddOrderItemDto, type CreateOrderDto, type OrderResponseDto } from '../../application/dtos';
 import {
-  CreateOrderUseCase,
-  GetOrderUseCase,
-  AddOrderItemUseCase,
-  ConfirmOrderUseCase,
-  CancelOrderUseCase,
-  GetCustomerOrdersUseCase,
+  type AddOrderItemUseCase,
+  type CancelOrderUseCase,
+  type ConfirmOrderUseCase,
+  type CreateOrderUseCase,
+  type GetCustomerOrdersUseCase,
+  type GetOrderUseCase,
 } from '../../application/use-cases/order';
 import { TYPES } from '../../infrastructure/di/types';
-import { ErrorResponse } from '../types';
+import { type ErrorResponse } from '../types';
 
 @Route('api/orders')
 @Tags('Orders')

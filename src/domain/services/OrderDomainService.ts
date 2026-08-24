@@ -1,11 +1,11 @@
-import { injectable, inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { TYPES } from '../../infrastructure/di/types';
-import { Order, type OrderItem } from '../aggregates/order';
+import { type Order, type OrderItem } from '../aggregates/order';
 import { InsufficientStockError } from '../aggregates/order/errors';
 import { type Product } from '../aggregates/product';
 import { ProductNotFoundError } from '../aggregates/product/errors';
 import { type IProductRepository } from '../repositories';
-import { ProductId, Quantity } from '../value-objects';
+import { type ProductId, type Quantity } from '../value-objects';
 
 type ProductMap = Map<string, Product>;
 

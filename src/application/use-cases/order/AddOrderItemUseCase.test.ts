@@ -1,6 +1,6 @@
-import { type IOrderRepository, type IProductRepository } from '../../../domain/repositories';
 import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
 import { ProductNotFoundError } from '../../../domain/aggregates/product/errors';
+import { type IOrderRepository, type IProductRepository } from '../../../domain/repositories';
 import { orderFactory, productFactory } from '../../../test/factories';
 import { AddOrderItemUseCase } from './AddOrderItemUseCase';
 

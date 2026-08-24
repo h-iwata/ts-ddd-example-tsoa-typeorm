@@ -18,8 +18,7 @@ services:
       - ./generated:/app/generated
       - ./tsconfig.json:/app/tsconfig.json
       - ./tsoa.json:/app/tsoa.json
-      - ./eslint.config.mjs:/app/eslint.config.mjs
-      - ./.prettierrc:/app/.prettierrc
+      - ./biome.json:/app/biome.json
 
   mysql:
     image: mysql:8.0

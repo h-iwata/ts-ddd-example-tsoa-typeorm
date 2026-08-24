@@ -1,7 +1,7 @@
-import { Money, Quantity, Address } from '../../shared/value-objects';
+import { Address, Money, Quantity } from '../../shared/value-objects';
 import { CustomerId } from '../customer/CustomerId';
 import { ProductId } from '../product/ProductId';
-import { InvalidOrderStateError, EmptyOrderError } from './errors';
+import { EmptyOrderError, InvalidOrderStateError } from './errors';
 import { Order } from './Order';
 import { OrderStatus } from './OrderStatus';
 

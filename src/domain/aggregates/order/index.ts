@@ -1,6 +1,6 @@
-export { Order } from './Order';
-export { OrderItem } from './OrderItem';
-export { OrderStatus, canTransitionTo } from './OrderStatus';
-export { OrderId } from './OrderId';
-export { OrderItemId } from './OrderItemId';
 export * from './errors';
+export { Order } from './Order';
+export { OrderId } from './OrderId';
+export { OrderItem } from './OrderItem';
+export { OrderItemId } from './OrderItemId';
+export { canTransitionTo, OrderStatus } from './OrderStatus';

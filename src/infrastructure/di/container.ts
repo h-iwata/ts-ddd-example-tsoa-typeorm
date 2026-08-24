@@ -11,20 +11,20 @@ import { CreateCustomerUseCase, GetCustomerUseCase, SetCustomerAddressUseCase } 
 
 // Use Cases - Order
 import {
-  CreateOrderUseCase,
-  GetOrderUseCase,
   AddOrderItemUseCase,
-  ConfirmOrderUseCase,
   CancelOrderUseCase,
+  ConfirmOrderUseCase,
+  CreateOrderUseCase,
   GetCustomerOrdersUseCase,
+  GetOrderUseCase,
 } from '../../application/use-cases/order';
-import { CreateProductUseCase, GetProductUseCase, GetAllProductsUseCase } from '../../application/use-cases/product';
-import { type IProductRepository, type ICustomerRepository, type IOrderRepository } from '../../domain/repositories';
+import { CreateProductUseCase, GetAllProductsUseCase, GetProductUseCase } from '../../application/use-cases/product';
+import { type ICustomerRepository, type IOrderRepository, type IProductRepository } from '../../domain/repositories';
 import { OrderDomainService } from '../../domain/services';
 
 // Controllers
-import { ProductController, CustomerController, OrderController } from '../../presentation/controllers';
-import { ProductRepository, CustomerRepository, OrderRepository } from '../repositories';
+import { CustomerController, OrderController, ProductController } from '../../presentation/controllers';
+import { CustomerRepository, OrderRepository, ProductRepository } from '../repositories';
 import { TYPES } from './types';
 
 /**

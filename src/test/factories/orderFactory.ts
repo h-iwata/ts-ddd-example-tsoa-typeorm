@@ -1,6 +1,6 @@
 import { Factory } from 'fishery';
 import { CustomerId } from '../../domain/aggregates/customer/CustomerId';
-import { Order, OrderStatus, OrderItem } from '../../domain/aggregates/order';
+import { Order, OrderItem, OrderStatus } from '../../domain/aggregates/order';
 import { OrderId } from '../../domain/aggregates/order/OrderId';
 import { ProductId } from '../../domain/aggregates/product/ProductId';
 import { Address, Money, Quantity } from '../../domain/shared/value-objects';

@@ -1,0 +1,160 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "files": {
+    "includes": ["src/**/*.ts", "jest.config.js", "!**/node_modules/**", "!generated/**", "!dist/**", "!coverage/**"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 140,
+    "lineEnding": "lf"
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "es5",
+      "arrowParentheses": "always",
+      "bracketSpacing": true
+    },
+    "parser": {
+      "unsafeParameterDecoratorsEnabled": true
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "preset": "recommended",
+      "complexity": {
+        "noExcessiveCognitiveComplexity": { "level": "error", "options": { "maxAllowedComplexity": 7 } },
+        "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 10, "skipBlankLines": true } },
+        "useMaxParams": { "level": "error", "options": { "max": 5 } }
+      },
+      "nursery": {
+        "noExcessiveNestedCallbacks": { "level": "error", "options": { "max": 3 } },
+        "noFloatingPromises": "error",
+        "noImpliedEval": "error",
+        "noMisusedPromises": "error",
+        "useAwaitThenable": "error",
+        "useExplicitReturnType": "error"
+      },
+      "style": {
+        "useConsistentMemberAccessibility": { "level": "error", "options": { "accessibility": "noPublic" } },
+        "useConst": "error",
+        "useImportType": { "level": "error", "options": { "style": "inlineType" } },
+        "useSpreadOverApply": "error",
+        "useTemplate": "error",
+        "useNamingConvention": {
+          "level": "error",
+          "options": {
+            "strictCase": false,
+            "conventions": [
+              { "selector": { "kind": "class" }, "formats": ["PascalCase"] },
+              { "selector": { "kind": "interface" }, "formats": ["PascalCase"] },
+              { "selector": { "kind": "typeAlias" }, "formats": ["PascalCase"] },
+              { "selector": { "kind": "enum" }, "formats": ["PascalCase"] },
+              { "selector": { "kind": "enumMember" }, "formats": ["CONSTANT_CASE"] },
+              { "selector": { "kind": "function" }, "formats": ["camelCase"] },
+              { "selector": { "kind": "classMember", "modifiers": ["private"] }, "formats": ["camelCase"] },
+              { "selector": { "kind": "variable" }, "formats": ["camelCase", "CONSTANT_CASE", "PascalCase"] },
+              { "selector": { "kind": "objectLiteralProperty" }, "formats": ["camelCase", "CONSTANT_CASE", "PascalCase"] }
+            ]
+          }
+        }
+      },
+      "suspicious": {
+        "noConsole": "warn",
+        "noDebugger": "error",
+        "noDoubleEquals": "error",
+        "noExplicitAny": "error",
+        "noVar": "error"
+      },
+      "security": { "noGlobalEval": "error" },
+      "correctness": { "noUnusedImports": "error", "noUnusedVariables": "error" }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/di/**/*.ts", "**/database/dataSource.ts", "**/migrations/**/*.ts"],
+      "linter": { "rules": { "complexity": { "noExcessiveLinesPerFunction": "off" } } }
+    },
+    {
+      "includes": ["**/middlewares/**/*.ts"],
+      "linter": {
+        "rules": {
+          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 40, "skipBlankLines": true } } },
+          "suspicious": { "noConsole": "off" }
+        }
+      }
+    },
+    {
+      "includes": ["src/index.ts"],
+      "linter": { "rules": { "suspicious": { "noConsole": "off" } } }
+    },
+    {
+      "includes": ["**/repositories/**/*.ts"],
+      "linter": {
+        "rules": {
+          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 25, "skipBlankLines": true } } }
+        }
+      }
+    },
+    {
+      "includes": ["**/dtos/**/*.ts", "**/use-cases/**/*.ts"],
+      "linter": {
+        "rules": {
+          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 15, "skipBlankLines": true } } }
+        }
+      }
+    },
+    {
+      "includes": ["**/aggregates/**/*.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 15, "skipBlankLines": true } },
+            "useMaxParams": { "level": "error", "options": { "max": 7 } }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/controllers/**/*.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 20, "skipBlankLines": true } },
+            "useMaxParams": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/*.test.ts", "**/test/**/*.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noExcessiveCognitiveComplexity": "off",
+            "noExcessiveLinesPerFunction": "off",
+            "useMaxParams": "off"
+          },
+          "nursery": {
+            "noExcessiveNestedCallbacks": "off",
+            "noFloatingPromises": "off",
+            "useExplicitReturnType": "off"
+          },
+          "style": { "noNonNullAssertion": "off", "useNamingConvention": "off" }
+        }
+      }
+    }
+  ]
+}

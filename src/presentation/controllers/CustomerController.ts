@@ -1,9 +1,9 @@
-import { injectable, inject } from 'inversify';
-import { Controller, Get, Post, Put, Route, Path, Body, SuccessResponse, Response, Tags } from 'tsoa';
-import { CreateCustomerDto, SetAddressDto, CustomerResponseDto } from '../../application/dtos';
-import { CreateCustomerUseCase, GetCustomerUseCase, SetCustomerAddressUseCase } from '../../application/use-cases/customer';
+import { inject, injectable } from 'inversify';
+import { Body, Controller, Get, Path, Post, Put, Response, Route, SuccessResponse, Tags } from 'tsoa';
+import { type CreateCustomerDto, type CustomerResponseDto, type SetAddressDto } from '../../application/dtos';
+import { type CreateCustomerUseCase, type GetCustomerUseCase, type SetCustomerAddressUseCase } from '../../application/use-cases/customer';
 import { TYPES } from '../../infrastructure/di/types';
-import { ErrorResponse } from '../types';
+import { type ErrorResponse } from '../types';
 
 @Route('api/customers')
 @Tags('Customers')

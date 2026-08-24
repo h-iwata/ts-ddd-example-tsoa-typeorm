@@ -1,14 +1,14 @@
 import 'reflect-metadata';
 import 'dotenv/config';
 import { DataSource } from 'typeorm';
-import { ProductEntity, CustomerEntity, OrderEntity, OrderItemEntity } from './entities';
+import { CustomerEntity, OrderEntity, OrderItemEntity, ProductEntity } from './entities';
 
 const isTest = process.env.NODE_ENV === 'test';
 
 export const AppDataSource = new DataSource({
   type: 'mysql',
   host: process.env.DB_HOST ?? 'localhost',
-  port: parseInt(process.env.DB_PORT ?? '3307'),
+  port: parseInt(process.env.DB_PORT ?? '3307', 10),
   username: process.env.DB_USERNAME ?? 'root',
   password: process.env.DB_PASSWORD ?? 'password',
   database: isTest ? 'ddd_example_test' : (process.env.DB_DATABASE ?? 'ddd_example'),

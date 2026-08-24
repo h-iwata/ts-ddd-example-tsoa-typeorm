@@ -5,7 +5,7 @@ import { Product } from '../aggregates/product';
 import { ProductNotFoundError } from '../aggregates/product/errors';
 import { ProductId } from '../aggregates/product/ProductId';
 import { type IProductRepository } from '../repositories';
-import { Money, Quantity, Address } from '../shared/value-objects';
+import { Address, Money, Quantity } from '../shared/value-objects';
 import { OrderDomainService } from './OrderDomainService';
 
 describe('OrderDomainService', () => {
@@ -19,7 +19,15 @@ describe('OrderDomainService', () => {
 
   const createProduct = (id: string, stock: number) => {
     const now = new Date();
-    return Product.reconstruct({ id: ProductId.fromString(id), name: 'テスト商品', description: '説明', price: Money.create(1000), stock: Quantity.create(stock), createdAt: now, updatedAt: now });
+    return Product.reconstruct({
+      id: ProductId.fromString(id),
+      name: 'テスト商品',
+      description: '説明',
+      price: Money.create(1000),
+      stock: Quantity.create(stock),
+      createdAt: now,
+      updatedAt: now,
+    });
   };
 
   const createOrder = () => {

@@ -21,9 +21,11 @@ make test-integration  # 統合テスト（DB必要）
 make test-all          # 全テスト
 
 # Lint・フォーマット
-make lint              # ESLint実行
-make lint-fix          # ESLint自動修正
-make format            # コードフォーマット
+make check             # lint・フォーマット・import整列をまとめて検査
+make check-fix         # まとめて自動修正
+make lint              # lintのみ
+make lint-fix          # lintのみ自動修正
+make format            # フォーマットのみ
 
 # マイグレーション
 make migrate           # マイグレーション実行
@@ -53,25 +55,33 @@ src/
 
 ## コーディング規約
 
-### ESLint設定（RuboCop相当の厳格ルール）
+### Biome設定（`biome.json`）
 
-| メトリクス | デフォルト | 説明 |
+lint・フォーマット・import整列をBiomeに統一。ESLint・Prettierは使用しない。
+
+| ルール | デフォルト | 説明 |
 |-----------|-----------|------|
-| complexity | 7 | 循環的複雑度 |
-| max-depth | 3 | ネストの深さ |
-| max-lines-per-function | 10 | 関数の行数 |
-| max-params | 5 | パラメータ数 |
-| max-statements | 15 | 文の数 |
+| noExcessiveLinesPerFunction | 10 | 関数の行数 |
+| useMaxParams | 5 | パラメータ数 |
+| noExcessiveCognitiveComplexity | 7 | 認知的複雑度 |
+| noExcessiveNestedCallbacks | 3 | コールバックのネスト |
 
-### レイヤー別の緩和ルール
+### レイヤー別の緩和ルール（`overrides`）
 
-- **aggregates**: max-lines 15, max-params 7
-- **use-cases**: max-lines 15
-- **dtos**: max-lines 15
-- **controllers**: max-lines 20, max-params off
-- **repositories**: max-lines 25
-- **middlewares**: max-lines 40, no-console off
-- **migrations/DI/tests**: 制限なし
+- **aggregates**: 行数 15, パラメータ 7
+- **use-cases / dtos**: 行数 15
+- **controllers**: 行数 20, パラメータ制限なし
+- **repositories**: 行数 25
+- **middlewares**: 行数 40, noConsole off
+- **migrations / DI / tests**: 行数制限なし
+
+`overrides` は後方の定義が優先されるため、テスト向けの緩和は必ず配列の最後に置く。
+
+### Biome移行時の注意点
+
+- `@inject()` のパースに `javascript.parser.unsafeParameterDecoratorsEnabled: true` が必須
+- 抑制コメントは `// biome-ignore lint/<group>/<rule>: 理由` 形式（`eslint-disable` は無効）
+- ESLintから引き継げなかったルール: `max-depth`、`max-statements`、循環的複雑度、`strict-boolean-expressions`、`no-unsafe-*`、`restrict-template-expressions`
 
 ### 集約のreconstructパターン
 

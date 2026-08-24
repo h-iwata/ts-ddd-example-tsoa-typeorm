@@ -1,7 +1,6 @@
 import { createApp } from './app';
 import { AppDataSource } from './infrastructure/database';
 
-// eslint-disable-next-line max-lines-per-function -- エントリポイントは分割不要
 async function bootstrap(): Promise<void> {
   // データベース接続
   await AppDataSource.initialize();

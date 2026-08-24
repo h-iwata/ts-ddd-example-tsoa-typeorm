@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { CustomerEntity } from './CustomerEntity';
 import { OrderItemEntity } from './OrderItemEntity';
 
@@ -25,10 +25,17 @@ export class OrderEntity {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
-  @ManyToOne(() => CustomerEntity, (customer) => customer.orders)
+  @ManyToOne(
+    () => CustomerEntity,
+    (customer) => customer.orders
+  )
   @JoinColumn({ name: 'customer_id' })
   customer?: CustomerEntity;
 
-  @OneToMany(() => OrderItemEntity, (item) => item.order, { cascade: true })
+  @OneToMany(
+    () => OrderItemEntity,
+    (item) => item.order,
+    { cascade: true }
+  )
   items?: OrderItemEntity[];
 }

@@ -1,4 +1,4 @@
-import { type Request, type Response, type NextFunction } from 'express';
+import { type NextFunction, type Request, type Response } from 'express';
 import { ValidateError } from 'tsoa';
 import { DomainError } from '../../domain/shared/errors';
 

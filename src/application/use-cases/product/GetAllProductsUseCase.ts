@@ -1,7 +1,7 @@
-import { injectable, inject } from 'inversify';
-import { IProductRepository } from '../../../domain/repositories';
+import { inject, injectable } from 'inversify';
+import { type IProductRepository } from '../../../domain/repositories';
 import { TYPES } from '../../../infrastructure/di/types';
-import { ProductResponseDto, toProductResponseDto } from '../../dtos';
+import { type ProductResponseDto, toProductResponseDto } from '../../dtos';
 
 @injectable()
 export class GetAllProductsUseCase {

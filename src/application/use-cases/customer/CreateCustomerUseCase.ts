@@ -1,10 +1,10 @@
-import { injectable, inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { Customer } from '../../../domain/aggregates/customer';
 import { EmailAlreadyExistsError } from '../../../domain/aggregates/customer/errors';
-import { ICustomerRepository } from '../../../domain/repositories';
+import { type ICustomerRepository } from '../../../domain/repositories';
 import { Email } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
-import { CreateCustomerDto, CustomerResponseDto, toCustomerResponseDto } from '../../dtos';
+import { type CreateCustomerDto, type CustomerResponseDto, toCustomerResponseDto } from '../../dtos';
 
 @injectable()
 export class CreateCustomerUseCase {

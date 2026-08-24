@@ -1,2 +1,2 @@
-export { setupContainer, container } from './container';
+export { container, setupContainer } from './container';
 export { TYPES } from './types';

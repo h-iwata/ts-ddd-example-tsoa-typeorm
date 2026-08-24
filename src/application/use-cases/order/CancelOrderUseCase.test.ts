@@ -1,7 +1,7 @@
+import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
 import { type IOrderRepository } from '../../../domain/repositories';
 import { type OrderDomainService } from '../../../domain/services';
-import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
-import { orderFactory, confirmedOrderFactory, paidOrderFactory } from '../../../test/factories';
+import { confirmedOrderFactory, orderFactory, paidOrderFactory } from '../../../test/factories';
 import { CancelOrderUseCase } from './CancelOrderUseCase';
 
 describe('CancelOrderUseCase', () => {

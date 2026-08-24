@@ -1,3 +1,3 @@
 export { CustomerNotFoundError } from './CustomerNotFoundError';
-export { InvalidEmailError } from './InvalidEmailError';
 export { EmailAlreadyExistsError } from './EmailAlreadyExistsError';
+export { InvalidEmailError } from './InvalidEmailError';

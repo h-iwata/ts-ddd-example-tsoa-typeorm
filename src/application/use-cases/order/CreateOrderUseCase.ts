@@ -1,10 +1,10 @@
-import { injectable, inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { CustomerNotFoundError } from '../../../domain/aggregates/customer/errors';
 import { Order } from '../../../domain/aggregates/order';
-import { IOrderRepository, ICustomerRepository } from '../../../domain/repositories';
+import { type ICustomerRepository, type IOrderRepository } from '../../../domain/repositories';
 import { CustomerId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
-import { CreateOrderDto, OrderResponseDto, toOrderResponseDto } from '../../dtos';
+import { type CreateOrderDto, type OrderResponseDto, toOrderResponseDto } from '../../dtos';
 
 @injectable()
 export class CreateOrderUseCase {

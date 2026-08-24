@@ -1,9 +1,9 @@
-import { injectable, inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { ProductNotFoundError } from '../../../domain/aggregates/product/errors';
-import { IProductRepository } from '../../../domain/repositories';
+import { type IProductRepository } from '../../../domain/repositories';
 import { ProductId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
-import { ProductResponseDto, toProductResponseDto } from '../../dtos';
+import { type ProductResponseDto, toProductResponseDto } from '../../dtos';
 
 @injectable()
 export class GetProductUseCase {

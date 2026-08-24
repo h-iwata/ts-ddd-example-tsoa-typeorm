@@ -1,8 +1,8 @@
-import { injectable, inject } from 'inversify';
-import { IOrderRepository } from '../../../domain/repositories';
+import { inject, injectable } from 'inversify';
+import { type IOrderRepository } from '../../../domain/repositories';
 import { CustomerId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
-import { OrderResponseDto, toOrderResponseDto } from '../../dtos';
+import { type OrderResponseDto, toOrderResponseDto } from '../../dtos';
 
 @injectable()
 export class GetCustomerOrdersUseCase {

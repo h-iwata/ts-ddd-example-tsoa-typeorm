@@ -1,8 +1,8 @@
 import { type Customer } from '../../domain/aggregates/customer';
 import { type Order, OrderId } from '../../domain/aggregates/order';
 import { type Product } from '../../domain/aggregates/product';
-import { Quantity, Address } from '../../domain/shared/value-objects';
-import { newCustomerFactory, newProductFactory, newOrderFactory } from '../../test/factories';
+import { Address, Quantity } from '../../domain/shared/value-objects';
+import { newCustomerFactory, newOrderFactory, newProductFactory } from '../../test/factories';
 import { CustomerRepository } from './CustomerRepository';
 import { OrderRepository } from './OrderRepository';
 import { ProductRepository } from './ProductRepository';

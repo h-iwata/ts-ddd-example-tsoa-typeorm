@@ -165,8 +165,10 @@ make down     # コンテナ停止
 | `make test-coverage` | カバレッジ付きでテスト |
 | `make test-integration` | 統合テストを実行 |
 | `make test-all` | 全テストを実行 |
-| `make lint` | ESLint実行 |
-| `make lint-fix` | ESLint自動修正 |
+| `make lint` | Biomeでlint |
+| `make lint-fix` | lintエラーを自動修正 |
+| `make check` | lint・フォーマット・import整列をまとめて検査 |
+| `make check-fix` | 上記をまとめて自動修正 |
 | `make format` | コードフォーマット |
 
 ### Docker構成
@@ -289,32 +291,37 @@ make test-coverage
 
 ## コード品質
 
-### Lint
+### Lint・フォーマット
 
-ESLint + Prettierで厳格なコード品質チェックを行っています。
+[Biome](https://biomejs.dev/) に統一しています（ESLint・Prettierは使用していません）。lint、フォーマット、import整列を単一の設定ファイル `biome.json` で扱います。
 
 ```bash
-# Lint実行
+# lint・フォーマット・import整列をまとめて検査
+make check
+
+# まとめて自動修正
+make check-fix
+
+# 個別に実行
 make lint
-
-# 自動修正
 make lint-fix
-
-# フォーマット
 make format
 ```
 
-### 主要なLintルール（RuboCop相当の厳格設定）
+### 主要なメトリクスルール
 
 | ルール | 閾値 | 説明 |
 |--------|------|------|
-| `complexity` | 7 | 循環的複雑度 |
-| `max-depth` | 3 | ネストの深さ |
-| `max-lines-per-function` | 10 | 関数の行数 |
-| `max-params` | 5 | パラメータ数 |
-| `max-statements` | 15 | 文の数 |
+| `noExcessiveLinesPerFunction` | 10 | 関数の行数 |
+| `useMaxParams` | 5 | パラメータ数 |
+| `noExcessiveCognitiveComplexity` | 7 | 認知的複雑度 |
+| `noExcessiveNestedCallbacks` | 3 | コールバックのネスト |
 
-レイヤー別に緩和ルールが適用されます（詳細は `CLAUDE.md` 参照）。
+関数の行数はレイヤー別に緩和されます（集約・DTO・ユースケース 15、コントローラー 20、リポジトリ 25、ミドルウェア 40、DI・マイグレーション・テストは無制限）。設定は `biome.json` の `overrides` を参照してください。
+
+型情報を要する厳格ルールは `nursery` グループから `noFloatingPromises` / `noMisusedPromises` / `useAwaitThenable` / `useExplicitReturnType` を有効化しています。
+
+> **補足**: InversifyJSの `@inject()` を解析するため `javascript.parser.unsafeParameterDecoratorsEnabled` を有効にしています。
 
 ### アクセス
 

@@ -1,4 +1,4 @@
-import { OrderStatus, canTransitionTo } from './OrderStatus';
+import { canTransitionTo, OrderStatus } from './OrderStatus';
 
 describe('OrderStatus', () => {
   describe('canTransitionTo', () => {

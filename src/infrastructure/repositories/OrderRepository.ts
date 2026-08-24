@@ -1,9 +1,9 @@
 import { injectable } from 'inversify';
-import { Repository } from 'typeorm';
+import { type Repository } from 'typeorm';
 import { CustomerId } from '../../domain/aggregates/customer';
-import { Order, OrderItem, OrderStatus, OrderId, OrderItemId } from '../../domain/aggregates/order';
+import { Order, OrderId, OrderItem, OrderItemId, type OrderStatus } from '../../domain/aggregates/order';
 import { ProductId } from '../../domain/aggregates/product';
-import { IOrderRepository } from '../../domain/repositories';
+import { type IOrderRepository } from '../../domain/repositories';
 import { Money, Quantity } from '../../domain/shared/value-objects';
 import { AppDataSource } from '../database';
 import { OrderEntity, OrderItemEntity } from '../database/entities';

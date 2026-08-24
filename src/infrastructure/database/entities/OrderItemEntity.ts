@@ -1,4 +1,4 @@
-import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 import { OrderEntity } from './OrderEntity';
 import { ProductEntity } from './ProductEntity';
 
@@ -25,11 +25,18 @@ export class OrderItemEntity {
   @Column({ type: 'varchar', length: 3, default: 'JPY' })
   currency!: string;
 
-  @ManyToOne(() => OrderEntity, (order) => order.items, { onDelete: 'CASCADE' })
+  @ManyToOne(
+    () => OrderEntity,
+    (order) => order.items,
+    { onDelete: 'CASCADE' }
+  )
   @JoinColumn({ name: 'order_id' })
   order?: OrderEntity;
 
-  @ManyToOne(() => ProductEntity, (product) => product.orderItems)
+  @ManyToOne(
+    () => ProductEntity,
+    (product) => product.orderItems
+  )
   @JoinColumn({ name: 'product_id' })
   product?: ProductEntity;
 }
