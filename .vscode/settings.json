@@ -1,0 +1,4 @@
+{
+  // このプロジェクトではスペルチェック（Code Spell Checker / cspell）を使用しない
+  "cSpell.enabled": false
+}
