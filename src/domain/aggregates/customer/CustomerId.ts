@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 /**
  * 顧客IDを表す値オブジェクト
@@ -7,7 +7,7 @@ export class CustomerId {
   private constructor(private readonly value: string) {}
 
   static generate(): CustomerId {
-    return new CustomerId(uuidv4());
+    return new CustomerId(randomUUID());
   }
 
   static fromString(id: string): CustomerId {

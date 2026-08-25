@@ -17,7 +17,7 @@ export class OrderRepository implements IOrderRepository {
   async findById(id: OrderId): Promise<Order | null> {
     const entity = await this.repository.findOne({
       where: { id: id.getValue() },
-      relations: ['items'],
+      relations: { items: true },
     });
     return entity ? this.toDomain(entity) : null;
   }
@@ -25,7 +25,7 @@ export class OrderRepository implements IOrderRepository {
   async findByCustomerId(customerId: CustomerId): Promise<Order[]> {
     const entities = await this.repository.find({
       where: { customerId: customerId.getValue() },
-      relations: ['items'],
+      relations: { items: true },
       order: { createdAt: 'DESC' },
     });
     return entities.map((e) => this.toDomain(e));
@@ -33,7 +33,7 @@ export class OrderRepository implements IOrderRepository {
 
   async findAll(): Promise<Order[]> {
     const entities = await this.repository.find({
-      relations: ['items'],
+      relations: { items: true },
       order: { createdAt: 'DESC' },
     });
     return entities.map((e) => this.toDomain(e));
