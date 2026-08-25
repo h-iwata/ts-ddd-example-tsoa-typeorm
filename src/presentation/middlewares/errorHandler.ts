@@ -1,5 +1,5 @@
+import { ValidateError } from '@tsoa/runtime';
 import { type NextFunction, type Request, type Response } from 'express';
-import { ValidateError } from 'tsoa';
 import { DomainError } from '../../domain/shared/errors';
 
 export function errorHandler(error: unknown, _req: Request, res: Response, next: NextFunction): void {

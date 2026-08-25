@@ -27,13 +27,13 @@
     "check:fix": "biome check src --write"
   },
   "dependencies": {
+    "@tsoa/runtime": "^6.6.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "inversify": "^7.11.0",
     "mysql2": "^3.24.2",
     "reflect-metadata": "^0.2.2",
     "swagger-ui-express": "^5.0.1",
-    "tsoa": "^6.6.0",
     "typeorm": "^1.1.0"
   },
   "devDependencies": {
@@ -50,6 +50,7 @@
     "ts-jest": "^29.4.12",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsoa": "^6.6.0",
     "typescript": "^5.7.3"
   }
 }

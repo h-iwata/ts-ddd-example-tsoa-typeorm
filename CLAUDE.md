@@ -168,6 +168,15 @@ return this.transactionManager.run(async () => {
 });
 ```
 
+## tsoa の依存構成
+
+`tsoa`（CLI本体）は **devDependencies**、`@tsoa/runtime` が **dependencies**。
+
+- アプリのコードは `@tsoa/runtime` から import する（`from 'tsoa'` は使わない）
+- CLIはコード生成時（`npm run tsoa:generate`）にしか使わないため本番ツリーに載せない
+- この分離により、`@tsoa/cli` が引く脆弱性（`@hapi/*`、`yaml`、`ts-deepmerge` など）が
+  本番依存から外れる
+
 ## CI
 
 GitHub Actions（`.github/workflows/ci.yml`）。`make` は `docker compose exec` を前提とするため、

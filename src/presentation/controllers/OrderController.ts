@@ -1,5 +1,5 @@
+import { Body, Controller, Get, Path, Post, Response, Route, SuccessResponse, Tags } from '@tsoa/runtime';
 import { inject, injectable } from 'inversify';
-import { Body, Controller, Get, Path, Post, Response, Route, SuccessResponse, Tags } from 'tsoa';
 import { type AddOrderItemDto, type CreateOrderDto, type OrderResponseDto } from '../../application/dtos';
 import {
   type AddOrderItemUseCase,
