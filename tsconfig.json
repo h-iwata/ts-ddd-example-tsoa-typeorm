@@ -14,7 +14,11 @@
     "declarationMap": false,
     "sourceMap": false,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    // グローバル型を明示する。TypeScript 6以降は @types 配下を自動取り込みしないため、
+    // 指定が無いとエディタ側だけ describe / jest が解決できなくなる。
+    // モジュールとしてimportする型（express, supertest等）はここに書かなくてよい
+    "types": ["jest", "node"]
   },
   "include": ["src/**/*", "generated/**/*"],
   "exclude": ["node_modules", "dist"]

@@ -9,6 +9,11 @@
     "source.fixAll.biome": "explicit",
     "source.organizeImports.biome": "explicit"
   },
+  // エディタもプロジェクトのTypeScript（node_modules配下）を使う。
+  // VSCode同梱版とバージョンがズレると、CIでは通るのにエディタだけエラーが出る
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+
   "[typescript]": { "editor.defaultFormatter": "biomejs.biome" },
   "[json]": { "editor.defaultFormatter": "biomejs.biome" },
   "[javascript]": { "editor.defaultFormatter": "biomejs.biome" }
