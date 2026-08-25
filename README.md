@@ -137,7 +137,7 @@ make up
 make migrate
 
 # 3. 動作確認
-curl http://localhost:3000/api/products
+curl http://localhost:3007/api/products
 # [] が返れば成功
 ```
 
@@ -173,7 +173,7 @@ make down     # コンテナ停止
 
 ### Docker構成
 
-- `app`: Node.jsアプリケーション（ポート3000）
+- `app`: Node.jsアプリケーション（ポート3007）
 - `mysql`: MySQL 8.0（ポート3307）
 
 ソースコードはボリュームマウントされているため、変更がリアルタイムで反映されます。
@@ -193,9 +193,11 @@ make down     # コンテナ停止
 
 | 種類 | コマンド | 説明 |
 |------|---------|------|
-| ユニットテスト | `make test` | ドメイン層・アプリケーション層のテスト（202件） |
-| 統合テスト | `make test-integration` | リポジトリ層のDBアクセステスト（29件） |
-| 全テスト | `make test-all` | 上記すべてを実行（231件） |
+| ユニットテスト | `make test` | ドメイン層・アプリケーション層のテスト（204件） |
+| 統合テスト | `make test-integration` | リポジトリ層のDBアクセス・APIのE2Eテスト（43件） |
+| 全テスト | `make test-all` | 上記すべてを実行（247件） |
+
+E2Eテスト（`src/test/e2e/`）は本番と同じ経路（tsoa生成ルート → DIコンテナ → ユースケース → TypeORMリポジトリ → MySQL）を通します。ユニットテストはDIコンテナを経由しないため、`@inject()` の解決やtsoaのルーティングが壊れた場合はE2Eテストだけが検知できます。
 
 統合テストはアプリ本体とは別の `ddd_example_test` に接続し、実行のたびにスキーマを再作成します（`src/infrastructure/database/dataSource.ts` の `synchronize` / `dropSchema`）。そのため `make migrate` は不要で、アプリ側のデータにも影響しません。
 
@@ -325,8 +327,8 @@ make format
 
 ### アクセス
 
-- API: http://localhost:3000
-- Swagger UI: http://localhost:3000/docs
+- API: http://localhost:3007
+- Swagger UI: http://localhost:3007/docs
 
 ## API一覧
 

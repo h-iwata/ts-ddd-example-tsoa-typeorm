@@ -4,14 +4,14 @@ import { CustomerId } from '../../domain/aggregates/customer';
 import { Order, OrderId, OrderItem, OrderItemId, type OrderStatus } from '../../domain/aggregates/order';
 import { ProductId } from '../../domain/aggregates/product';
 import { type IOrderRepository } from '../../domain/repositories';
-import { Money, Quantity } from '../../domain/shared/value-objects';
-import { AppDataSource } from '../database';
+import { Address, Money, Quantity } from '../../domain/shared/value-objects';
 import { OrderEntity, OrderItemEntity } from '../database/entities';
+import { getEntityManager } from '../database/transactionContext';
 
 @injectable()
 export class OrderRepository implements IOrderRepository {
   private get repository(): Repository<OrderEntity> {
-    return AppDataSource.getRepository(OrderEntity);
+    return getEntityManager().getRepository(OrderEntity);
   }
 
   async findById(id: OrderId): Promise<Order | null> {
@@ -64,10 +64,24 @@ export class OrderRepository implements IOrderRepository {
       customerId: CustomerId.fromString(entity.customerId),
       items,
       status: entity.status as OrderStatus,
-      shippingAddress: null, // OrderEntityには保存していないためnull
+      shippingAddress: this.toAddress(entity),
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     });
+  }
+
+  private toAddress(entity: OrderEntity): Address | null {
+    if (!(entity.shippingPostalCode && entity.shippingPrefecture && entity.shippingCity && entity.shippingStreet)) {
+      return null;
+    }
+
+    return Address.create(
+      entity.shippingPostalCode,
+      entity.shippingPrefecture,
+      entity.shippingCity,
+      entity.shippingStreet,
+      entity.shippingBuilding
+    );
   }
 
   private toEntity(order: Order): OrderEntity {
@@ -80,18 +94,33 @@ export class OrderRepository implements IOrderRepository {
     entity.createdAt = order.getCreatedAt();
     entity.updatedAt = order.getUpdatedAt();
 
-    entity.items = order.getItems().map((item) => {
-      const itemEntity = new OrderItemEntity();
-      itemEntity.id = item.getId().getValue();
-      itemEntity.orderId = order.getId().getValue();
-      itemEntity.productId = item.getProductId().getValue();
-      itemEntity.productName = item.getProductName();
-      itemEntity.quantity = item.getQuantity().getValue();
-      itemEntity.unitPrice = item.getUnitPrice().getAmount();
-      itemEntity.currency = item.getUnitPrice().getCurrency();
-      return itemEntity;
-    });
+    this.applyShippingAddress(entity, order.getShippingAddress());
+    entity.items = order.getItems().map((item) => this.toItemEntity(order.getId().getValue(), item));
 
     return entity;
+  }
+
+  private applyShippingAddress(entity: OrderEntity, address: Address | null): void {
+    if (!address) {
+      return;
+    }
+
+    entity.shippingPostalCode = address.getPostalCode();
+    entity.shippingPrefecture = address.getPrefecture();
+    entity.shippingCity = address.getCity();
+    entity.shippingStreet = address.getStreet();
+    entity.shippingBuilding = address.getBuilding();
+  }
+
+  private toItemEntity(orderId: string, item: OrderItem): OrderItemEntity {
+    const itemEntity = new OrderItemEntity();
+    itemEntity.id = item.getId().getValue();
+    itemEntity.orderId = orderId;
+    itemEntity.productId = item.getProductId().getValue();
+    itemEntity.productName = item.getProductName();
+    itemEntity.quantity = item.getQuantity().getValue();
+    itemEntity.unitPrice = item.getUnitPrice().getAmount();
+    itemEntity.currency = item.getUnitPrice().getCurrency();
+    return itemEntity;
   }
 }

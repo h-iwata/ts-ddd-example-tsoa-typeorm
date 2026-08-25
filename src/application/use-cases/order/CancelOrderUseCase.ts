@@ -1,7 +1,7 @@
 import { inject, injectable } from 'inversify';
 import { OrderStatus } from '../../../domain/aggregates/order';
 import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
-import { type IOrderRepository } from '../../../domain/repositories';
+import { type IOrderRepository, type ITransactionManager } from '../../../domain/repositories';
 import { type OrderDomainService } from '../../../domain/services';
 import { OrderId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
@@ -17,28 +17,31 @@ export class CancelOrderUseCase {
     @inject(TYPES.IOrderRepository)
     private readonly orderRepository: IOrderRepository,
     @inject(TYPES.OrderDomainService)
-    private readonly orderDomainService: OrderDomainService
+    private readonly orderDomainService: OrderDomainService,
+    @inject(TYPES.ITransactionManager)
+    private readonly transactionManager: ITransactionManager
   ) {}
 
   async execute(orderId: string): Promise<OrderResponseDto> {
     const id = OrderId.fromString(orderId);
 
-    const order = await this.orderRepository.findById(id);
-    if (!order) {
-      throw new OrderNotFoundError(orderId);
-    }
+    // 在庫の戻しと注文のキャンセルは同一トランザクションで行う
+    return this.transactionManager.run(async () => {
+      const order = await this.orderRepository.findById(id);
+      if (!order) {
+        throw new OrderNotFoundError(orderId);
+      }
 
-    // 確定後のキャンセルは在庫を戻す
-    const needsStockRelease = order.getStatus() === OrderStatus.CONFIRMED || order.getStatus() === OrderStatus.PAID;
+      // 確定後のキャンセルは在庫を戻す
+      const needsStockRelease = order.getStatus() === OrderStatus.CONFIRMED || order.getStatus() === OrderStatus.PAID;
 
-    if (needsStockRelease) {
-      await this.orderDomainService.releaseStock(order);
-    }
+      order.cancel();
+      if (needsStockRelease) {
+        await this.orderDomainService.releaseStock(order);
+      }
+      await this.orderRepository.save(order);
 
-    order.cancel();
-
-    await this.orderRepository.save(order);
-
-    return toOrderResponseDto(order);
+      return toOrderResponseDto(order);
+    });
   }
 }

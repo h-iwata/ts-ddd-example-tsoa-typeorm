@@ -2,13 +2,14 @@ services:
   app:
     build: .
     ports:
-      - "3000:3000"
+      - "3007:3007"
     environment:
       - DB_HOST=mysql
       - DB_PORT=3306
       - DB_USERNAME=root
       - DB_PASSWORD=password
       - DB_DATABASE=ddd_example
+      - PORT=3007
       - NODE_ENV=development
     depends_on:
       mysql:

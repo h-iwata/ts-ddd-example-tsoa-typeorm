@@ -19,12 +19,17 @@ import {
   GetOrderUseCase,
 } from '../../application/use-cases/order';
 import { CreateProductUseCase, GetAllProductsUseCase, GetProductUseCase } from '../../application/use-cases/product';
-import { type ICustomerRepository, type IOrderRepository, type IProductRepository } from '../../domain/repositories';
+import {
+  type ICustomerRepository,
+  type IOrderRepository,
+  type IProductRepository,
+  type ITransactionManager,
+} from '../../domain/repositories';
 import { OrderDomainService } from '../../domain/services';
 
 // Controllers
 import { CustomerController, OrderController, ProductController } from '../../presentation/controllers';
-import { CustomerRepository, OrderRepository, ProductRepository } from '../repositories';
+import { CustomerRepository, OrderRepository, ProductRepository, TransactionManager } from '../repositories';
 import { TYPES } from './types';
 
 /**
@@ -42,6 +47,8 @@ export function setupContainer(): Container {
   container.bind<ICustomerRepository>(TYPES.ICustomerRepository).to(CustomerRepository).inSingletonScope();
 
   container.bind<IOrderRepository>(TYPES.IOrderRepository).to(OrderRepository).inSingletonScope();
+
+  container.bind<ITransactionManager>(TYPES.ITransactionManager).to(TransactionManager).inSingletonScope();
 
   // ドメインサービスの登録
   container.bind<OrderDomainService>(TYPES.OrderDomainService).to(OrderDomainService).inSingletonScope();

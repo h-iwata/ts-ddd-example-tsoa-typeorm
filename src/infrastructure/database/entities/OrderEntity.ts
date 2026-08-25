@@ -19,6 +19,21 @@ export class OrderEntity {
   @Column({ type: 'varchar', length: 3, default: 'JPY' })
   currency!: string;
 
+  @Column({ name: 'shipping_postal_code', type: 'varchar', length: 10, nullable: true })
+  shippingPostalCode?: string;
+
+  @Column({ name: 'shipping_prefecture', type: 'varchar', length: 50, nullable: true })
+  shippingPrefecture?: string;
+
+  @Column({ name: 'shipping_city', type: 'varchar', length: 100, nullable: true })
+  shippingCity?: string;
+
+  @Column({ name: 'shipping_street', type: 'varchar', length: 255, nullable: true })
+  shippingStreet?: string;
+
+  @Column({ name: 'shipping_building', type: 'varchar', length: 255, nullable: true })
+  shippingBuilding?: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

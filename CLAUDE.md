@@ -132,7 +132,7 @@ export class InvalidOrderStatusError extends Error { ... }
 ## テスト
 
 - ユニットテスト: `*.test.ts`
-- 統合テスト: `*.integration.test.ts`
+- 統合テスト・E2Eテスト: `*.integration.test.ts`（DBが必要。E2Eは `src/test/e2e/`）
 - テストファクトリ: `src/test/factories/`（fishery使用）
 - RSpecスタイルの`context`ヘルパー: `src/test/helpers/context.ts`
 
@@ -142,6 +142,29 @@ describe('#methodName', () => {
   context('when 条件', () => {
     it('期待する動作', () => { ... });
   });
+});
+```
+
+## マイグレーション
+
+`make migrate-generate` が生成するファイルはTypeORMの既定スタイルなので、以下を手で直す。
+
+- `public async up` / `public async down` の `public` を削除（`useConsistentMemberAccessibility` に抵触）
+- `make check-fix` でフォーマットとimport整列を適用
+
+## トランザクション
+
+複数の集約をまたぐ更新は `ITransactionManager`（`src/domain/repositories/ITransactionManager.ts`）を注入して囲む。
+実装は `AsyncLocalStorage` で `EntityManager` を伝播させるため、リポジトリ側は
+`getEntityManager().getRepository(X)` を使うだけでトランザクションに参加する。
+
+```typescript
+return this.transactionManager.run(async () => {
+  const order = await this.orderRepository.findById(id);
+  order.confirm();                                       // 書き込み前にドメインルールを検証
+  await this.orderDomainService.validateAndReserveStock(order);
+  await this.orderRepository.save(order);
+  return toOrderResponseDto(order);
 });
 ```
 

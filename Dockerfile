@@ -12,6 +12,6 @@ COPY . .
 # tsoaでルートを生成
 RUN npm run tsoa:generate
 
-EXPOSE 3000
+EXPOSE 3007
 
 CMD ["npm", "run", "dev"]

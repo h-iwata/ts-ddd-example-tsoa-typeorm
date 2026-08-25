@@ -3,13 +3,13 @@ import { type Repository } from 'typeorm';
 import { Product, ProductId } from '../../domain/aggregates/product';
 import { type IProductRepository } from '../../domain/repositories';
 import { Money, Quantity } from '../../domain/shared/value-objects';
-import { AppDataSource } from '../database';
 import { ProductEntity } from '../database/entities';
+import { getEntityManager } from '../database/transactionContext';
 
 @injectable()
 export class ProductRepository implements IProductRepository {
   private get repository(): Repository<ProductEntity> {
-    return AppDataSource.getRepository(ProductEntity);
+    return getEntityManager().getRepository(ProductEntity);
   }
 
   async findById(id: ProductId): Promise<Product | null> {
