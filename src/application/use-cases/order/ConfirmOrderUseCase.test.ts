@@ -2,6 +2,7 @@ import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
 import { type IOrderRepository } from '../../../domain/repositories';
 import { type OrderDomainService } from '../../../domain/services';
 import { orderFactory } from '../../../test/factories';
+import { stubTransactionManager } from '../../../test/helpers';
 import { ConfirmOrderUseCase } from './ConfirmOrderUseCase';
 
 describe('ConfirmOrderUseCase', () => {
@@ -25,7 +26,7 @@ describe('ConfirmOrderUseCase', () => {
     const order = orderFactory.build({}, { transient: { withItems: true, withAddress: true } });
     repo.findById.mockResolvedValue(order);
 
-    const result = await new ConfirmOrderUseCase(repo, service).execute(order.getId().getValue());
+    const result = await new ConfirmOrderUseCase(repo, service, stubTransactionManager()).execute(order.getId().getValue());
 
     expect(result.status).toBe('CONFIRMED');
     expect(service.validateAndReserveStock).toHaveBeenCalledWith(order);
@@ -37,7 +38,7 @@ describe('ConfirmOrderUseCase', () => {
       const repo = mockRepo();
       repo.findById.mockResolvedValue(null);
 
-      await expect(new ConfirmOrderUseCase(repo, mockService()).execute('x')).rejects.toThrow(OrderNotFoundError);
+      await expect(new ConfirmOrderUseCase(repo, mockService(), stubTransactionManager()).execute('x')).rejects.toThrow(OrderNotFoundError);
     });
   });
 
@@ -49,7 +50,9 @@ describe('ConfirmOrderUseCase', () => {
       repo.findById.mockResolvedValue(order);
       service.validateAndReserveStock.mockRejectedValue(new Error('在庫不足'));
 
-      await expect(new ConfirmOrderUseCase(repo, service).execute(order.getId().getValue())).rejects.toThrow('在庫不足');
+      await expect(new ConfirmOrderUseCase(repo, service, stubTransactionManager()).execute(order.getId().getValue())).rejects.toThrow(
+        '在庫不足'
+      );
     });
   });
 });

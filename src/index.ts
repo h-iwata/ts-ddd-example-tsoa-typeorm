@@ -10,7 +10,7 @@ async function bootstrap(): Promise<void> {
   const app = createApp();
 
   // サーバー起動
-  const PORT = process.env.PORT ?? 3000;
+  const PORT = process.env.PORT ?? 3007;
   app.listen(PORT, () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════╗

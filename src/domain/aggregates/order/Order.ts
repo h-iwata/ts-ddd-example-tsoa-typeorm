@@ -1,7 +1,7 @@
 import { type Address, Money, type Quantity } from '../../shared/value-objects';
 import { type CustomerId } from '../customer/CustomerId';
 import { type ProductId } from '../product/ProductId';
-import { EmptyOrderError, InvalidOrderStateError } from './errors';
+import { EmptyOrderError, InvalidOrderStateError, ShippingAddressRequiredError } from './errors';
 import { OrderId } from './OrderId';
 import { OrderItem } from './OrderItem';
 import { canTransitionTo, OrderStatus } from './OrderStatus';
@@ -175,7 +175,7 @@ export class Order {
     }
 
     if (!this.shippingAddress) {
-      throw new Error('注文を確定するには配送先の設定が必要です');
+      throw new ShippingAddressRequiredError();
     }
 
     this.status = OrderStatus.CONFIRMED;

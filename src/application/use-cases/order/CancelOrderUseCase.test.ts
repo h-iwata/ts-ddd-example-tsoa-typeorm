@@ -2,6 +2,7 @@ import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
 import { type IOrderRepository } from '../../../domain/repositories';
 import { type OrderDomainService } from '../../../domain/services';
 import { confirmedOrderFactory, orderFactory, paidOrderFactory } from '../../../test/factories';
+import { stubTransactionManager } from '../../../test/helpers';
 import { CancelOrderUseCase } from './CancelOrderUseCase';
 
 describe('CancelOrderUseCase', () => {
@@ -25,7 +26,7 @@ describe('CancelOrderUseCase', () => {
       const service = mockService();
       repo.findById.mockResolvedValue(orderFactory.build());
 
-      const result = await new CancelOrderUseCase(repo, service).execute('order-1');
+      const result = await new CancelOrderUseCase(repo, service, stubTransactionManager()).execute('order-1');
 
       expect(result.status).toBe('CANCELLED');
       expect(service.releaseStock).not.toHaveBeenCalled();
@@ -40,7 +41,7 @@ describe('CancelOrderUseCase', () => {
       const order = confirmedOrderFactory.build();
       repo.findById.mockResolvedValue(order);
 
-      const result = await new CancelOrderUseCase(repo, service).execute(order.getId().getValue());
+      const result = await new CancelOrderUseCase(repo, service, stubTransactionManager()).execute(order.getId().getValue());
 
       expect(result.status).toBe('CANCELLED');
       expect(service.releaseStock).toHaveBeenCalledWith(order);
@@ -54,7 +55,7 @@ describe('CancelOrderUseCase', () => {
       const order = paidOrderFactory.build();
       repo.findById.mockResolvedValue(order);
 
-      const result = await new CancelOrderUseCase(repo, service).execute(order.getId().getValue());
+      const result = await new CancelOrderUseCase(repo, service, stubTransactionManager()).execute(order.getId().getValue());
 
       expect(result.status).toBe('CANCELLED');
       expect(service.releaseStock).toHaveBeenCalledWith(order);
@@ -66,7 +67,7 @@ describe('CancelOrderUseCase', () => {
       const repo = mockRepo();
       repo.findById.mockResolvedValue(null);
 
-      await expect(new CancelOrderUseCase(repo, mockService()).execute('x')).rejects.toThrow(OrderNotFoundError);
+      await expect(new CancelOrderUseCase(repo, mockService(), stubTransactionManager()).execute('x')).rejects.toThrow(OrderNotFoundError);
     });
   });
 });

@@ -1,6 +1,40 @@
 # DDD Example - ECサイト注文システム
 
+[![CI](https://github.com/h-iwata/ts-ddd-example-tsoa-typeorm/actions/workflows/ci.yml/badge.svg)](https://github.com/h-iwata/ts-ddd-example-tsoa-typeorm/actions/workflows/ci.yml)
+
 TypeScript + tsoa + InversifyJS + TypeORMを使用したドメイン駆動設計（DDD）のサンプル実装です。
+
+## 目次
+
+- [技術スタック](#技術スタック)
+- [アプリケーションの流れ](#アプリケーションの流れ)
+- [構成の概要](#構成の概要)
+- [依存関係の方向](#依存関係の方向)
+- [フォルダ構成](#フォルダ構成)
+- [起動方法](#起動方法)
+- [API一覧](#api一覧)
+- [テスト](#テスト)
+- [コード品質](#コード品質)
+
+## 技術スタック
+
+| ライブラリ | バージョン | 役割 |
+|-----------|-----------|------|
+| **Node.js** | 24 | JavaScript実行環境（`.nvmrc` で固定） |
+| **TypeScript** | ^5.7.3 | 型安全な開発 |
+| **Express** | ^5.2.1 | HTTPサーバー |
+| **tsoa** | ^6.6.0 | OpenAPI仕様の自動生成とルーティング（`@tsoa/runtime` が実行時依存） |
+| **InversifyJS** | ^7.11.0 | DIコンテナ（依存性注入） |
+| **TypeORM** | ^1.1.0 | ORM（Object-Relational Mapping） |
+| **MySQL2** | ^3.24.2 | MySQLドライバ |
+| **Jest** | ^30.4.2 | テストフレームワーク |
+| **ts-jest** | ^29.4.12 | TypeScriptのテスト実行 |
+| **supertest** | ^7.2.2 | HTTPレベルのE2Eテスト |
+| **fishery** | ^2.4.0 | テストファクトリ（FactoryBot相当） |
+| **Biome** | 2.5.10 | lint・フォーマット・import整列 |
+| **swagger-ui-express** | ^5.0.1 | Swagger UIの提供 |
+
+ID生成は外部ライブラリを使わず、Node標準の `node:crypto` の `randomUUID()` を利用しています。
 
 ## アプリケーションの流れ
 
@@ -119,6 +153,80 @@ PENDING → CONFIRMED → PAID → SHIPPED → DELIVERED
     └─────────┴────────┴──→ CANCELLED
 ```
 
+## 依存関係の方向
+
+```
+Presentation → Application → Domain（Interface）
+                                    ↑ implements
+                              Infrastructure
+```
+
+**例: リポジトリの依存関係**
+```
+Application層                Domain層                    Infrastructure層
+     │                          │                              │
+CreateOrderUseCase ───→ IOrderRepository ←─────────── OrderRepository
+     │                    (interface)                   (implements)
+     └──────────────────→ Order, OrderItem
+```
+
+- **Domain層**は何にも依存しない（純粋なビジネスロジック）
+- **Domain層**にインターフェース（`IOrderRepository`等）を定義
+- **Infrastructure層**がそのインターフェースを実装（依存性逆転）
+- **Application層**はインターフェースに依存し、実行時にDIで実装を注入
+
+## フォルダ構成
+
+```
+src/
+├── domain/                    # ドメイン層（ビジネスロジックの中核）
+│   ├── aggregates/            # 集約
+│   │   ├── customer/          # Customer集約
+│   │   │   └── errors/        # 顧客ドメインエラー
+│   │   ├── order/             # Order集約（OrderItem含む）
+│   │   │   └── errors/        # 注文ドメインエラー
+│   │   └── product/           # Product集約
+│   │       └── errors/        # 商品ドメインエラー
+│   ├── shared/                # 共有ドメインオブジェクト
+│   │   ├── value-objects/     # 値オブジェクト（Money, Quantity, Address）
+│   │   └── errors/            # 共通ドメインエラー
+│   ├── repositories/          # リポジトリインターフェース
+│   └── services/              # ドメインサービス
+│
+├── application/               # アプリケーション層（ユースケース）
+│   ├── use-cases/             # ユースケース（11個）
+│   │   ├── customer/          # 顧客関連（3個）
+│   │   ├── order/             # 注文関連（6個）
+│   │   └── product/           # 商品関連（3個）
+│   └── dtos/                  # データ転送オブジェクト
+│
+├── infrastructure/            # インフラストラクチャ層
+│   ├── repositories/          # リポジトリ実装（MySQL）
+│   ├── database/              # TypeORM設定・エンティティ
+│   │   ├── dataSource.ts      # DB接続設定
+│   │   └── entities/          # ORMエンティティ
+│   └── di/                    # DIコンテナ設定（InversifyJS）
+│
+├── presentation/              # プレゼンテーション層
+│   ├── controllers/           # tsoaコントローラー
+│   ├── middlewares/           # エラーハンドラー等
+│   └── types/                 # レスポンス型定義
+│
+└── test/                      # テスト設定
+    ├── factories/             # テストファクトリ（fishery）
+    ├── helpers/               # テストヘルパー
+    ├── setup.ts               # ユニットテスト用セットアップ
+    └── integration/           # 統合テスト用セットアップ
+
+generated/                     # tsoa自動生成ファイル（.gitignore対象）
+├── routes.ts                  # ルーティング定義
+└── swagger.json               # OpenAPI仕様
+
+.local/                        # 作業用の一時ファイル置き場（.gitignore対象）
+```
+
+`.local/` は調査メモや生成物などの一時ファイルを置くためのディレクトリです。コミット対象外のため、リポジトリを汚さずに作業できます。
+
 ## 起動方法
 
 ### 必要な環境
@@ -126,6 +234,8 @@ PENDING → CONFIRMED → PAID → SHIPPED → DELIVERED
 - Docker
 - Docker Compose
 - make
+
+Docker外で直接動かす場合は Node.js 24 以上が必要です（`.nvmrc` を参照）。
 
 ### 初回セットアップ
 
@@ -137,7 +247,7 @@ make up
 make migrate
 
 # 3. 動作確認
-curl http://localhost:3000/api/products
+curl http://localhost:3007/api/products
 # [] が返れば成功
 ```
 
@@ -169,11 +279,17 @@ make down     # コンテナ停止
 | `make lint-fix` | lintエラーを自動修正 |
 | `make check` | lint・フォーマット・import整列をまとめて検査 |
 | `make check-fix` | 上記をまとめて自動修正 |
+| `make typecheck` | 型チェック（テストを含む） |
 | `make format` | コードフォーマット |
+
+### アクセス
+
+- API: http://localhost:3007
+- Swagger UI: http://localhost:3007/docs
 
 ### Docker構成
 
-- `app`: Node.jsアプリケーション（ポート3000）
+- `app`: Node.jsアプリケーション（ポート3007）
 - `mysql`: MySQL 8.0（ポート3307）
 
 ソースコードはボリュームマウントされているため、変更がリアルタイムで反映されます。
@@ -187,15 +303,46 @@ make down     # コンテナ停止
 
 `docker/mysql/init/` 配下のSQLは MySQL のデータディレクトリが空のとき、つまりボリュームを新規作成したときにのみ実行されます。
 
+## API一覧
+
+### 商品（Product）
+
+| HTTP | エンドポイント | 説明 |
+|------|---------------|------|
+| POST | `/api/products` | 商品作成 |
+| GET | `/api/products` | 全商品取得 |
+| GET | `/api/products/:id` | 商品取得 |
+
+### 顧客（Customer）
+
+| HTTP | エンドポイント | 説明 |
+|------|---------------|------|
+| POST | `/api/customers` | 顧客作成 |
+| GET | `/api/customers/:id` | 顧客取得 |
+| PUT | `/api/customers/:id/address` | 配送先設定 |
+
+### 注文（Order）
+
+| HTTP | エンドポイント | 説明 |
+|------|---------------|------|
+| POST | `/api/orders` | 注文作成 |
+| GET | `/api/orders/:id` | 注文取得 |
+| GET | `/api/orders/customer/:customerId` | 顧客の注文一覧 |
+| POST | `/api/orders/:id/items` | 商品追加 |
+| POST | `/api/orders/:id/confirm` | 注文確定（在庫引当） |
+| POST | `/api/orders/:id/cancel` | キャンセル（在庫戻し） |
+
 ## テスト
 
 ### テストの種類
 
 | 種類 | コマンド | 説明 |
 |------|---------|------|
-| ユニットテスト | `make test` | ドメイン層・アプリケーション層のテスト（202件） |
-| 統合テスト | `make test-integration` | リポジトリ層のDBアクセステスト（29件） |
-| 全テスト | `make test-all` | 上記すべてを実行（231件） |
+| ユニットテスト | `make test` | ドメイン層・アプリケーション層のテスト（204件） |
+| 統合テスト | `make test-integration` | リポジトリ層のDBアクセス・APIのE2Eテスト（43件） |
+| 全テスト | `make test-all` | 上記すべてを実行（247件） |
+
+E2Eテスト（`src/test/e2e/`）は本番と同じ経路（tsoa生成ルート → DIコンテナ → ユースケース → TypeORMリポジトリ → MySQL）を通します。ユニットテストはDIコンテナを経由しないため、`@inject()` の解決やtsoaのルーティングが壊れた場合はE2Eテストだけが検知できます。
 
 統合テストはアプリ本体とは別の `ddd_example_test` に接続し、実行のたびにスキーマを再作成します（`src/infrastructure/database/dataSource.ts` の `synchronize` / `dropSchema`）。そのため `make migrate` は不要で、アプリ側のデータにも影響しません。
 
@@ -323,126 +470,19 @@ make format
 
 > **補足**: InversifyJSの `@inject()` を解析するため `javascript.parser.unsafeParameterDecoratorsEnabled` を有効にしています。
 
-### アクセス
+### CI
 
-- API: http://localhost:3000
-- Swagger UI: http://localhost:3000/docs
+GitHub Actions（[.github/workflows/ci.yml](.github/workflows/ci.yml)）で、`master` へのpushとPRごとに以下を実行します。
 
-## API一覧
+| ステップ | 内容 |
+|---|---|
+| `npm run tsoa:generate` | `generated/` はgit管理外のため最初に生成 |
+| `npm run check` | Biomeでlint・フォーマット・import整列 |
+| `npm run typecheck` | テストを含めた型チェック |
+| `npm run build` | 本番ビルド |
+| `npm run migration:run` | マイグレーションが適用できることを確認 |
+| `npm run test:coverage` | ユニットテスト（カバレッジ閾値つき） |
+| `npm run test:integration` | 統合テスト・E2Eテスト |
+| `npm start` | ビルド成果物が起動しAPIを返せることを確認 |
 
-### 商品（Product）
-
-| HTTP | エンドポイント | 説明 |
-|------|---------------|------|
-| POST | `/api/products` | 商品作成 |
-| GET | `/api/products` | 全商品取得 |
-| GET | `/api/products/:id` | 商品取得 |
-
-### 顧客（Customer）
-
-| HTTP | エンドポイント | 説明 |
-|------|---------------|------|
-| POST | `/api/customers` | 顧客作成 |
-| GET | `/api/customers/:id` | 顧客取得 |
-| PUT | `/api/customers/:id/address` | 配送先設定 |
-
-### 注文（Order）
-
-| HTTP | エンドポイント | 説明 |
-|------|---------------|------|
-| POST | `/api/orders` | 注文作成 |
-| GET | `/api/orders/:id` | 注文取得 |
-| GET | `/api/orders/customer/:customerId` | 顧客の注文一覧 |
-| POST | `/api/orders/:id/items` | 商品追加 |
-| POST | `/api/orders/:id/confirm` | 注文確定（在庫引当） |
-| POST | `/api/orders/:id/cancel` | キャンセル（在庫戻し） |
-
-## フォルダ構成
-
-```
-src/
-├── domain/                    # ドメイン層（ビジネスロジックの中核）
-│   ├── aggregates/            # 集約
-│   │   ├── customer/          # Customer集約
-│   │   │   └── errors/        # 顧客ドメインエラー
-│   │   ├── order/             # Order集約（OrderItem含む）
-│   │   │   └── errors/        # 注文ドメインエラー
-│   │   └── product/           # Product集約
-│   │       └── errors/        # 商品ドメインエラー
-│   ├── shared/                # 共有ドメインオブジェクト
-│   │   ├── value-objects/     # 値オブジェクト（Money, Quantity, Address）
-│   │   └── errors/            # 共通ドメインエラー
-│   ├── repositories/          # リポジトリインターフェース
-│   └── services/              # ドメインサービス
-│
-├── application/               # アプリケーション層（ユースケース）
-│   ├── use-cases/             # ユースケース（11個）
-│   │   ├── customer/          # 顧客関連（3個）
-│   │   ├── order/             # 注文関連（6個）
-│   │   └── product/           # 商品関連（3個）
-│   └── dtos/                  # データ転送オブジェクト
-│
-├── infrastructure/            # インフラストラクチャ層
-│   ├── repositories/          # リポジトリ実装（MySQL）
-│   ├── database/              # TypeORM設定・エンティティ
-│   │   ├── dataSource.ts      # DB接続設定
-│   │   └── entities/          # ORMエンティティ
-│   └── di/                    # DIコンテナ設定（InversifyJS）
-│
-├── presentation/              # プレゼンテーション層
-│   ├── controllers/           # tsoaコントローラー
-│   ├── middlewares/           # エラーハンドラー等
-│   └── types/                 # レスポンス型定義
-│
-└── test/                      # テスト設定
-    ├── factories/             # テストファクトリ（fishery）
-    ├── helpers/               # テストヘルパー
-    ├── setup.ts               # ユニットテスト用セットアップ
-    └── integration/           # 統合テスト用セットアップ
-
-generated/                     # tsoa自動生成ファイル（.gitignore対象）
-├── routes.ts                  # ルーティング定義
-└── swagger.json               # OpenAPI仕様
-
-.local/                        # 作業用の一時ファイル置き場（.gitignore対象）
-```
-
-`.local/` は調査メモや生成物などの一時ファイルを置くためのディレクトリです。コミット対象外のため、リポジトリを汚さずに作業できます。
-
-## 依存関係の方向
-
-```
-Presentation → Application → Domain（Interface）
-                                    ↑ implements
-                              Infrastructure
-```
-
-**例: リポジトリの依存関係**
-```
-Application層                Domain層                    Infrastructure層
-     │                          │                              │
-CreateOrderUseCase ───→ IOrderRepository ←─────────── OrderRepository
-     │                    (interface)                   (implements)
-     └──────────────────→ Order, OrderItem
-```
-
-- **Domain層**は何にも依存しない（純粋なビジネスロジック）
-- **Domain層**にインターフェース（`IOrderRepository`等）を定義
-- **Infrastructure層**がそのインターフェースを実装（依存性逆転）
-- **Application層**はインターフェースに依存し、実行時にDIで実装を注入
-
-## 技術スタック
-
-| ライブラリ | バージョン | 役割 |
-|-----------|-----------|------|
-| **Node.js** | 22 | JavaScript実行環境 |
-| **TypeScript** | ^5.7.3 | 型安全な開発 |
-| **Express** | ^4.21.2 | HTTPサーバー |
-| **tsoa** | ^6.6.0 | OpenAPI仕様の自動生成とルーティング |
-| **InversifyJS** | ^7.0.1 | DIコンテナ（依存性注入） |
-| **TypeORM** | ^0.3.20 | ORM（Object-Relational Mapping） |
-| **MySQL2** | ^3.12.0 | MySQLドライバ |
-| **Jest** | ^29.7.0 | テストフレームワーク |
-| **fishery** | ^2.2.2 | テストファクトリ（FactoryBot相当） |
-| **swagger-ui-express** | ^5.0.1 | Swagger UIの提供 |
-| **uuid** | ^11.0.5 | UUID生成 |
+MySQLはサービスコンテナとして起動します。`make` コマンドは `docker compose exec` を前提とするため、CIではnpmスクリプトを直接呼びます。Nodeのバージョンは [.nvmrc](.nvmrc) から読み込むので、ローカル・Docker・CIで揃います。

@@ -1,5 +1,5 @@
+import { ValidateError } from '@tsoa/runtime';
 import { type NextFunction, type Request, type Response } from 'express';
-import { ValidateError } from 'tsoa';
 import { DomainError } from '../../domain/shared/errors';
 
 export function errorHandler(error: unknown, _req: Request, res: Response, next: NextFunction): void {
@@ -50,6 +50,7 @@ function getStatusCodeForDomainError(code: string): number {
     INSUFFICIENT_STOCK: 400,
     INVALID_ORDER_STATE: 400,
     EMPTY_ORDER: 400,
+    SHIPPING_ADDRESS_REQUIRED: 400,
     INVALID_PRICE: 400,
     INVALID_EMAIL: 400,
     INVALID_QUANTITY: 400,

@@ -132,7 +132,7 @@ export class InvalidOrderStatusError extends Error { ... }
 ## テスト
 
 - ユニットテスト: `*.test.ts`
-- 統合テスト: `*.integration.test.ts`
+- 統合テスト・E2Eテスト: `*.integration.test.ts`（DBが必要。E2Eは `src/test/e2e/`）
 - テストファクトリ: `src/test/factories/`（fishery使用）
 - RSpecスタイルの`context`ヘルパー: `src/test/helpers/context.ts`
 
@@ -144,6 +144,60 @@ describe('#methodName', () => {
   });
 });
 ```
+
+## マイグレーション
+
+`make migrate-generate` が生成するファイルはTypeORMの既定スタイルなので、以下を手で直す。
+
+- `public async up` / `public async down` の `public` を削除（`useConsistentMemberAccessibility` に抵触）
+- `make check-fix` でフォーマットとimport整列を適用
+
+## トランザクション
+
+複数の集約をまたぐ更新は `ITransactionManager`（`src/domain/repositories/ITransactionManager.ts`）を注入して囲む。
+実装は `AsyncLocalStorage` で `EntityManager` を伝播させるため、リポジトリ側は
+`getEntityManager().getRepository(X)` を使うだけでトランザクションに参加する。
+
+```typescript
+return this.transactionManager.run(async () => {
+  const order = await this.orderRepository.findById(id);
+  order.confirm();                                       // 書き込み前にドメインルールを検証
+  await this.orderDomainService.validateAndReserveStock(order);
+  await this.orderRepository.save(order);
+  return toOrderResponseDto(order);
+});
+```
+
+## ビルド
+
+`tsconfig.json` は型チェック用（テストを含む）、`tsconfig.build.json` はビルド用（テストを除外）。
+
+| コマンド | 用途 |
+|---|---|
+| `npm run typecheck` | `tsc --noEmit`。テストも含めて型チェック |
+| `npm run build` | `tsconfig.build.json` でビルド。`postbuild` で `swagger.json` を dist へコピー |
+| `npm start` | `node dist/src/index.js` |
+
+`tsconfig.json` の `rootDir` は `"."`。`src/` と `generated/` が相互参照するため両方を含む必要があり、
+出力は `dist/src/` と `dist/generated/` になる。`main` と `start` はこの構造に合わせること。
+
+`generated/swagger.json` は tsc がコピーしないため `postbuild` で明示的に配置している
+（`src/app.ts` が `dist/generated/swagger.json` を `res.sendFile` する）。
+
+## tsoa の依存構成
+
+`tsoa`（CLI本体）は **devDependencies**、`@tsoa/runtime` が **dependencies**。
+
+- アプリのコードは `@tsoa/runtime` から import する（`from 'tsoa'` は使わない）
+- CLIはコード生成時（`npm run tsoa:generate`）にしか使わないため本番ツリーに載せない
+- この分離により、`@tsoa/cli` が引く脆弱性（`@hapi/*`、`yaml`、`ts-deepmerge` など）が
+  本番依存から外れる
+
+## CI
+
+GitHub Actions（`.github/workflows/ci.yml`）。`make` は `docker compose exec` を前提とするため、
+CIでは npm スクリプトを直接呼ぶ。`generated/` はgit管理外なので `npm run tsoa:generate` を最初に実行する。
+Nodeのバージョンは `.nvmrc` を単一の情報源とする（Dockerfileの `node:24-alpine` と揃える）。
 
 ## DI（依存性注入）
 

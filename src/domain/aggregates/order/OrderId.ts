@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'node:crypto';
 
 /**
  * 注文IDを表す値オブジェクト
@@ -7,7 +7,7 @@ export class OrderId {
   private constructor(private readonly value: string) {}
 
   static generate(): OrderId {
-    return new OrderId(uuidv4());
+    return new OrderId(randomUUID());
   }
 
   static fromString(id: string): OrderId {

@@ -3,13 +3,13 @@ import { type Repository } from 'typeorm';
 import { Customer, CustomerId, Email } from '../../domain/aggregates/customer';
 import { type ICustomerRepository } from '../../domain/repositories';
 import { Address } from '../../domain/shared/value-objects';
-import { AppDataSource } from '../database';
 import { CustomerEntity } from '../database/entities';
+import { getEntityManager } from '../database/transactionContext';
 
 @injectable()
 export class CustomerRepository implements ICustomerRepository {
   private get repository(): Repository<CustomerEntity> {
-    return AppDataSource.getRepository(CustomerEntity);
+    return getEntityManager().getRepository(CustomerEntity);
   }
 
   async findById(id: CustomerId): Promise<Customer | null> {

@@ -3,6 +3,7 @@ import { EmptyOrderError } from './EmptyOrderError';
 import { InsufficientStockError } from './InsufficientStockError';
 import { InvalidOrderStateError } from './InvalidOrderStateError';
 import { OrderNotFoundError } from './OrderNotFoundError';
+import { ShippingAddressRequiredError } from './ShippingAddressRequiredError';
 
 describe('Order Errors', () => {
   describe('InvalidOrderStateError', () => {
@@ -50,6 +51,19 @@ describe('Order Errors', () => {
     it('正しいメッセージとコードを持つ', () => {
       expect(error().message).toBe('注文が見つかりません: order-456');
       expect(error().code).toBe('ORDER_NOT_FOUND');
+    });
+
+    it('DomainErrorを継承している', () => {
+      expect(error()).toBeInstanceOf(DomainError);
+    });
+  });
+
+  describe('ShippingAddressRequiredError', () => {
+    const error = () => new ShippingAddressRequiredError();
+
+    it('正しいメッセージとコードを持つ', () => {
+      expect(error().message).toBe('注文を確定するには配送先の設定が必要です');
+      expect(error().code).toBe('SHIPPING_ADDRESS_REQUIRED');
     });
 
     it('DomainErrorを継承している', () => {

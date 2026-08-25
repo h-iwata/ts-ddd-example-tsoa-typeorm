@@ -7,6 +7,7 @@ export const TYPES = {
   IProductRepository: Symbol.for('IProductRepository'),
   ICustomerRepository: Symbol.for('ICustomerRepository'),
   IOrderRepository: Symbol.for('IOrderRepository'),
+  ITransactionManager: Symbol.for('ITransactionManager'),
 
   // Domain Services
   OrderDomainService: Symbol.for('OrderDomainService'),
