@@ -66,7 +66,11 @@ jobs:
       - name: Lint・フォーマット・import整列
         run: npm run check
 
-      - name: 型チェックとビルド
+      # ビルドはテストを除外するため、型チェックは別途フルで実行する
+      - name: 型チェック
+        run: npm run typecheck
+
+      - name: ビルド
         run: npm run build
 
       - name: マイグレーション
@@ -77,3 +81,17 @@ jobs:
 
       - name: 統合テスト・E2Eテスト
         run: npm run test:integration
+
+      # ビルド成果物が実際に起動し、APIとOpenAPI仕様を返せることを確認する。
+      # マイグレーション適用後でないとテーブルが無いため最後に実行する
+      - name: 本番ビルドの起動確認
+        run: |
+          npm start &
+          APP_PID=$!
+          for _ in $(seq 1 30); do
+            curl -sf http://localhost:3007/api/products > /dev/null && break
+            sleep 1
+          done
+          curl -sf http://localhost:3007/api/products > /dev/null
+          curl -sf http://localhost:3007/swagger.json > /dev/null
+          kill "$APP_PID"

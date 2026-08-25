@@ -335,10 +335,12 @@ GitHub Actions（[.github/workflows/ci.yml](.github/workflows/ci.yml)）で、`m
 |---|---|
 | `npm run tsoa:generate` | `generated/` はgit管理外のため最初に生成 |
 | `npm run check` | Biomeでlint・フォーマット・import整列 |
-| `npm run build` | 型チェックとビルド |
+| `npm run typecheck` | テストを含めた型チェック |
+| `npm run build` | 本番ビルド |
 | `npm run migration:run` | マイグレーションが適用できることを確認 |
 | `npm run test:coverage` | ユニットテスト（カバレッジ閾値つき） |
 | `npm run test:integration` | 統合テスト・E2Eテスト |
+| `npm start` | ビルド成果物が起動しAPIを返せることを確認 |
 
 MySQLはサービスコンテナとして起動します。`make` コマンドは `docker compose exec` を前提とするため、CIではnpmスクリプトを直接呼びます。Nodeのバージョンは [.nvmrc](.nvmrc) から読み込むので、ローカル・Docker・CIで揃います。
 

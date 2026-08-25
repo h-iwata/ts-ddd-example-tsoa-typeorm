@@ -168,6 +168,22 @@ return this.transactionManager.run(async () => {
 });
 ```
 
+## ビルド
+
+`tsconfig.json` は型チェック用（テストを含む）、`tsconfig.build.json` はビルド用（テストを除外）。
+
+| コマンド | 用途 |
+|---|---|
+| `npm run typecheck` | `tsc --noEmit`。テストも含めて型チェック |
+| `npm run build` | `tsconfig.build.json` でビルド。`postbuild` で `swagger.json` を dist へコピー |
+| `npm start` | `node dist/src/index.js` |
+
+`tsconfig.json` の `rootDir` は `"."`。`src/` と `generated/` が相互参照するため両方を含む必要があり、
+出力は `dist/src/` と `dist/generated/` になる。`main` と `start` はこの構造に合わせること。
+
+`generated/swagger.json` は tsc がコピーしないため `postbuild` で明示的に配置している
+（`src/app.ts` が `dist/generated/swagger.json` を `res.sendFile` する）。
+
 ## tsoa の依存構成
 
 `tsoa`（CLI本体）は **devDependencies**、`@tsoa/runtime` が **dependencies**。
