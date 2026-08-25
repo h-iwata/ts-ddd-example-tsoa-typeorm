@@ -168,6 +168,12 @@ return this.transactionManager.run(async () => {
 });
 ```
 
+## CI
+
+GitHub Actions（`.github/workflows/ci.yml`）。`make` は `docker compose exec` を前提とするため、
+CIでは npm スクリプトを直接呼ぶ。`generated/` はgit管理外なので `npm run tsoa:generate` を最初に実行する。
+Nodeのバージョンは `.nvmrc` を単一の情報源とする（Dockerfileの `node:24-alpine` と揃える）。
+
 ## DI（依存性注入）
 
 InversifyJSを使用。コンテナ設定は `src/infrastructure/di/container.ts`。

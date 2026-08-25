@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+# 同一ブランチで新しいpushがあれば古い実行を打ち切る
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: password
+          MYSQL_DATABASE: ddd_example
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h localhost"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_USERNAME: root
+      DB_PASSWORD: password
+      DB_DATABASE: ddd_example
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: 依存関係をインストール
+        run: npm ci
+
+      # docker-compose環境では docker/mysql/init が自動実行されるが、
+      # CIのサービスコンテナには初期化スクリプトを渡せないため同じSQLを流す
+      - name: 統合テスト用データベースを作成
+        run: |
+          node -e "
+          const fs = require('node:fs');
+          const mysql = require('mysql2/promise');
+          const sql = fs.readFileSync('docker/mysql/init/01-create-test-database.sql', 'utf8');
+          mysql
+            .createConnection({ host: '127.0.0.1', user: 'root', password: 'password', multipleStatements: true })
+            .then((c) => c.query(sql).then(() => c.end()));
+          "
+
+      # generated/ はgit管理外のため、型チェックより先に生成する
+      - name: tsoaのルートとOpenAPI仕様を生成
+        run: npm run tsoa:generate
+
+      - name: Lint・フォーマット・import整列
+        run: npm run check
+
+      - name: 型チェックとビルド
+        run: npm run build
+
+      - name: マイグレーション
+        run: npm run migration:run
+
+      - name: ユニットテスト（カバレッジ閾値つき）
+        run: npm run test:coverage
+
+      - name: 統合テスト・E2Eテスト
+        run: npm run test:integration

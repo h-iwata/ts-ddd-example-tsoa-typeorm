@@ -1,5 +1,7 @@
 # DDD Example - ECサイト注文システム
 
+[![CI](https://github.com/h-iwata/ts-ddd-example-tsoa-typeorm/actions/workflows/ci.yml/badge.svg)](https://github.com/h-iwata/ts-ddd-example-tsoa-typeorm/actions/workflows/ci.yml)
+
 TypeScript + tsoa + InversifyJS + TypeORMを使用したドメイン駆動設計（DDD）のサンプル実装です。
 
 ## アプリケーションの流れ
@@ -324,6 +326,21 @@ make format
 型情報を要する厳格ルールは `nursery` グループから `noFloatingPromises` / `noMisusedPromises` / `useAwaitThenable` / `useExplicitReturnType` を有効化しています。
 
 > **補足**: InversifyJSの `@inject()` を解析するため `javascript.parser.unsafeParameterDecoratorsEnabled` を有効にしています。
+
+### CI
+
+GitHub Actions（[.github/workflows/ci.yml](.github/workflows/ci.yml)）で、`master` へのpushとPRごとに以下を実行します。
+
+| ステップ | 内容 |
+|---|---|
+| `npm run tsoa:generate` | `generated/` はgit管理外のため最初に生成 |
+| `npm run check` | Biomeでlint・フォーマット・import整列 |
+| `npm run build` | 型チェックとビルド |
+| `npm run migration:run` | マイグレーションが適用できることを確認 |
+| `npm run test:coverage` | ユニットテスト（カバレッジ閾値つき） |
+| `npm run test:integration` | 統合テスト・E2Eテスト |
+
+MySQLはサービスコンテナとして起動します。`make` コマンドは `docker compose exec` を前提とするため、CIではnpmスクリプトを直接呼びます。Nodeのバージョンは [.nvmrc](.nvmrc) から読み込むので、ローカル・Docker・CIで揃います。
 
 ### アクセス
 
