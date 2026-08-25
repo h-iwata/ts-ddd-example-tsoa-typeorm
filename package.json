@@ -1,7 +1,26 @@
 {
   "name": "ddd-example",
   "version": "1.0.0",
-  "description": "DDD example with TypeScript, tsoa, and InversifyJS",
+  "description": "TypeScript + tsoa + InversifyJS + TypeORM によるドメイン駆動設計（DDD）のサンプル実装",
+  "keywords": [
+    "ddd",
+    "domain-driven-design",
+    "typescript",
+    "tsoa",
+    "inversifyjs",
+    "typeorm",
+    "clean-architecture",
+    "express"
+  ],
+  "license": "MIT",
+  "author": "h-iwata (https://github.com/h-iwata)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/h-iwata/ts-ddd-example-tsoa-typeorm.git"
+  },
+  "engines": {
+    "node": ">=24"
+  },
   "main": "dist/src/index.js",
   "scripts": {
     "build": "tsoa spec-and-routes && tsc -p tsconfig.build.json",

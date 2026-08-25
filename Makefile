@@ -1,4 +1,4 @@
-.PHONY: help up down logs build ps migrate migrate-generate clean test test-coverage test-watch test-integration test-all lint lint-fix format check check-fix
+.PHONY: help up down logs build ps migrate migrate-generate clean test test-coverage test-watch test-integration test-all lint lint-fix format check check-fix typecheck
 
 help: ## ヘルプを表示
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
@@ -57,3 +57,6 @@ check: ## Lint・フォーマット・import整列をまとめて検査
 
 check-fix: ## Lint・フォーマット・import整列をまとめて自動修正
 	docker compose exec app npm run check:fix
+
+typecheck: ## 型チェック（テストを含む）
+	docker compose exec app npm run typecheck
