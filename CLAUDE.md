@@ -134,7 +134,7 @@ export class InvalidOrderStatusError extends Error { ... }
 - ユニットテスト: `*.test.ts`
 - 統合テスト・E2Eテスト: `*.integration.test.ts`（DBが必要。E2Eは `src/test/e2e/`）
 - テストファクトリ: `src/test/factories/`（fishery使用）
-- RSpecスタイルの`context`ヘルパー: `src/test/helpers/context.ts`
+- RSpecスタイルの`context`ヘルパー: `src/test/setup.ts` / `src/test/integration/setup.ts` で `global.context` を定義
 
 ```typescript
 // contextヘルパーの使用例
