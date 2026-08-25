@@ -472,7 +472,7 @@ make format
 
 ### CI
 
-GitHub Actions（[.github/workflows/ci.yml](.github/workflows/ci.yml)）で、`master` へのpushとPRごとに以下を実行します。
+GitHub Actions（[.github/workflows/ci.yml](.github/workflows/ci.yml)）で、`main` へのpushとPRごとに以下を実行します。
 
 | ステップ | 内容 |
 |---|---|

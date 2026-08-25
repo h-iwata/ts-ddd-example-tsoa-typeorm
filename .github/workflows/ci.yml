@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
 
 # 同一ブランチで新しいpushがあれば古い実行を打ち切る
