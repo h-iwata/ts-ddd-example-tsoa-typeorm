@@ -149,6 +149,20 @@ describe('API E2E', () => {
       expect(response.body.code).toBe('EMAIL_ALREADY_EXISTS');
     });
 
+    // 事前チェックと保存の間には隙間があり、同時実行では両方がチェックを通過しうる
+    it('同じメールアドレスで同時に登録しても500にならず409を返す', async () => {
+      const [first, second] = await Promise.all([
+        createCustomer({ email: 'race@example.com' }),
+        createCustomer({ email: 'race@example.com' }),
+      ]);
+
+      const statuses = [first.status, second.status].sort();
+      expect(statuses).toEqual([201, 409]);
+
+      const conflict = first.status === 409 ? first : second;
+      expect(conflict.body.code).toBe('EMAIL_ALREADY_EXISTS');
+    });
+
     it('在庫を超える数量で確定すると400を返す', async () => {
       const product = await createProduct({ initialStock: 1 });
       const customer = await createCustomerWithAddress();

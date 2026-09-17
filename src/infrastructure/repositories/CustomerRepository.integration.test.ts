@@ -1,4 +1,5 @@
-import { CustomerId } from '../../domain/aggregates/customer';
+import { Customer, CustomerId, Email } from '../../domain/aggregates/customer';
+import { EmailAlreadyExistsError } from '../../domain/aggregates/customer/errors';
 import { Address } from '../../domain/shared/value-objects';
 import { newCustomerFactory } from '../../test/factories';
 import { CustomerRepository } from './CustomerRepository';
@@ -122,6 +123,25 @@ describe('CustomerRepository Integration', () => {
 
       const found = await repository.findById(customer.getId());
       expect(found!.getName()).toBe('更新後の名前');
+    });
+  });
+
+  describe('一意制約違反の翻訳', () => {
+    const duplicated = () => Customer.create('別の顧客', Email.create('duplicate@example.com'));
+
+    context('同じメールアドレスの顧客を保存したとき', () => {
+      it('EmailAlreadyExistsErrorに翻訳される', async () => {
+        await repository.save(duplicated());
+
+        await expect(repository.save(duplicated())).rejects.toThrow(EmailAlreadyExistsError);
+      });
+
+      it('TypeORMのQueryFailedErrorが外へ漏れない', async () => {
+        await repository.save(duplicated());
+
+        const error = await repository.save(duplicated()).catch((e: unknown) => e);
+        expect((error as Error).constructor.name).toBe('EmailAlreadyExistsError');
+      });
     });
   });
 });

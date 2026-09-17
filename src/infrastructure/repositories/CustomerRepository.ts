@@ -1,9 +1,11 @@
 import { injectable } from 'inversify';
 import { type Repository } from 'typeorm';
 import { Customer, CustomerId, Email } from '../../domain/aggregates/customer';
+import { EmailAlreadyExistsError } from '../../domain/aggregates/customer/errors';
 import { type ICustomerRepository } from '../../domain/repositories';
 import { Address } from '../../domain/shared/value-objects';
-import { CustomerEntity } from '../database/entities';
+import { CustomerEntity, UQ_CUSTOMERS_EMAIL } from '../database/entities';
+import { isUniqueViolation } from '../database/mysqlErrors';
 import { getEntityManager } from '../database/transactionContext';
 
 @injectable()
@@ -33,7 +35,15 @@ export class CustomerRepository implements ICustomerRepository {
 
   async save(customer: Customer): Promise<void> {
     const entity = this.toEntity(customer);
-    await this.repository.save(entity);
+    try {
+      await this.repository.save(entity);
+    } catch (error) {
+      // existsByEmail の確認と保存の間に、別のリクエストが同じメールを登録した場合に起きる
+      if (isUniqueViolation(error, UQ_CUSTOMERS_EMAIL)) {
+        throw new EmailAlreadyExistsError(customer.getEmail().getValue());
+      }
+      throw error;
+    }
   }
 
   async delete(id: CustomerId): Promise<void> {

@@ -1,5 +1,8 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, OneToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { OrderEntity } from './OrderEntity';
+
+// TypeORMの自動生成名（IDX_<ハッシュ>）はカラム構成から導出されるため、スキーマ変更で黙って変わる
+export const UQ_CUSTOMERS_EMAIL = 'UQ_customers_email';
 
 @Entity('customers')
 export class CustomerEntity {
@@ -9,7 +12,8 @@ export class CustomerEntity {
   @Column({ type: 'varchar', length: 255 })
   name!: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
+  @Index(UQ_CUSTOMERS_EMAIL, { unique: true })
+  @Column({ type: 'varchar', length: 255 })
   email!: string;
 
   @Column({ name: 'shipping_postal_code', type: 'varchar', length: 10, nullable: true })
