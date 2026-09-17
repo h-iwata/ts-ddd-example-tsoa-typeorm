@@ -13,8 +13,7 @@ export class GetProductUseCase {
   ) {}
 
   async execute(productId: string): Promise<ProductResponseDto> {
-    const id = ProductId.fromString(productId);
-    const product = await this.productRepository.findById(id);
+    const product = await this.productRepository.findById(ProductId.fromString(productId));
     if (!product) {
       throw new ProductNotFoundError(productId);
     }

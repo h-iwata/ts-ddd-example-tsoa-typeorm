@@ -13,11 +13,7 @@ export class CreateProductUseCase {
   ) {}
 
   async execute(dto: CreateProductDto): Promise<ProductResponseDto> {
-    const price = Money.create(dto.price, dto.currency ?? 'JPY');
-    const stock = Quantity.create(dto.initialStock);
-
-    const product = Product.create(dto.name, dto.description, price, stock);
-
+    const product = Product.create(dto.name, dto.description, Money.create(dto.price, dto.currency), Quantity.create(dto.initialStock));
     await this.productRepository.save(product);
 
     return toProductResponseDto(product);

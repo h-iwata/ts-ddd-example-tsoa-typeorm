@@ -27,4 +27,11 @@ describe('CreateProductUseCase', () => {
 
     expect(result.currency).toBe('USD');
   });
+
+  // 既定通貨はMoneyが持つ。ユースケース側で既定値を補うとドメインと二重管理になる
+  it('通貨を省略するとMoneyの既定値になる', async () => {
+    const result = await new CreateProductUseCase(mockRepo()).execute({ ...dto, currency: undefined });
+
+    expect(result.currency).toBe('JPY');
+  });
 });

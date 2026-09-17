@@ -13,8 +13,7 @@ export class GetCustomerUseCase {
   ) {}
 
   async execute(customerId: string): Promise<CustomerResponseDto> {
-    const id = CustomerId.fromString(customerId);
-    const customer = await this.customerRepository.findById(id);
+    const customer = await this.customerRepository.findById(CustomerId.fromString(customerId));
     if (!customer) {
       throw new CustomerNotFoundError(customerId);
     }

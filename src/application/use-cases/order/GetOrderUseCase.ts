@@ -13,8 +13,7 @@ export class GetOrderUseCase {
   ) {}
 
   async execute(orderId: string): Promise<OrderResponseDto> {
-    const id = OrderId.fromString(orderId);
-    const order = await this.orderRepository.findById(id);
+    const order = await this.orderRepository.findById(OrderId.fromString(orderId));
     if (!order) {
       throw new OrderNotFoundError(orderId);
     }

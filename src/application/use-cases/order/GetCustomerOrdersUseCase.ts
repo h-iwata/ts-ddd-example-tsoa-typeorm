@@ -12,8 +12,7 @@ export class GetCustomerOrdersUseCase {
   ) {}
 
   async execute(customerId: string): Promise<OrderResponseDto[]> {
-    const id = CustomerId.fromString(customerId);
-    const orders = await this.orderRepository.findByCustomerId(id);
+    const orders = await this.orderRepository.findByCustomerId(CustomerId.fromString(customerId));
     return orders.map(toOrderResponseDto);
   }
 }
