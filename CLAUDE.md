@@ -210,6 +210,36 @@ export class OrderAlreadyShippedError extends BusinessRuleViolationError {
 ステータスの対応は `errorHandler.ts` の `STATUS_BY_KIND` に集約されている。
 エラーを追加しても `errorHandler.ts` は変更しない。
 
+#### 想定内と想定外の切り分け
+
+`DomainError`（4xx）は**業務ルール上の正しい拒否**なのでログを出さずアラートも鳴らさない。
+それ以外（5xx）は**バグかインフラ障害**なので、`incidentId` を採番して構造化ログに記録する。
+この2つを混ぜると「在庫不足」で夜中にアラートが鳴り、誰もアラートを見なくなる。
+
+| | `DomainError` | それ以外 |
+|---|---|---|
+| ステータス | 4xx | 500 |
+| ログ | 出さない | `logger.error` |
+| レスポンス本文 | `message` をそのまま返す | 内部情報は伏せ、`incidentId` のみ返す |
+
+```json
+{ "message": "サーバー内部エラーが発生しました", "code": "INTERNAL_ERROR", "incidentId": "018f..." }
+```
+
+同じ `incidentId` がログにも出るため、問い合わせを受けたら `incidentId` で検索して該当リクエストを特定できる。
+
+#### ログ
+
+`src/infrastructure/logging/logger.ts` が**アプリ唯一のconsole出力口**。他の場所で `console.*` を使わない
+（`src/index.ts` の起動バナーと migrations を除く）。1行1JSONで出力する。
+
+```typescript
+logger.error({ incidentId, method, path, err: serializeError(error) }, '予期しないエラー');
+```
+
+`Error` は列挙可能なプロパティを持たず `JSON.stringify` すると `{}` になるため、必ず `serializeError()` を通す。
+引数の順序は pino に合わせてあるので、将来 pino を導入するときは logger.ts の実装だけを差し替えればよい。
+
 #### 置き場所
 
 - 集約固有: `src/domain/aggregates/<集約>/errors/`

@@ -91,8 +91,7 @@
       "includes": ["**/middlewares/**/*.ts"],
       "linter": {
         "rules": {
-          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 40, "skipBlankLines": true } } },
-          "suspicious": { "noConsole": "off" }
+          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 40, "skipBlankLines": true } } }
         }
       }
     },

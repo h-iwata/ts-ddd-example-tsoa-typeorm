@@ -1,5 +1,6 @@
 import { createApp } from './app';
 import { AppDataSource } from './infrastructure/database';
+import { logger, serializeError } from './infrastructure/logging';
 
 async function bootstrap(): Promise<void> {
   await AppDataSource.initialize();
@@ -21,6 +22,6 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap().catch((error: unknown) => {
-  console.error('サーバーの起動に失敗しました:', error);
+  logger.error({ err: serializeError(error) }, 'サーバーの起動に失敗しました');
   process.exit(1);
 });

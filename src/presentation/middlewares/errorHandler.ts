@@ -1,8 +1,10 @@
+import { randomUUID } from 'node:crypto';
 import { ValidateError } from '@tsoa/runtime';
 import { type NextFunction, type Request, type Response } from 'express';
 import { DomainError, type DomainErrorKind } from '../../domain/shared/errors';
+import { logger, serializeError } from '../../infrastructure/logging';
 
-export function errorHandler(error: unknown, _req: Request, res: Response, next: NextFunction): void {
+export function errorHandler(error: unknown, req: Request, res: Response, next: NextFunction): void {
   if (res.headersSent) {
     next(error);
     return;
@@ -25,17 +27,29 @@ export function errorHandler(error: unknown, _req: Request, res: Response, next:
     return;
   }
 
-  // ここに来るのはドメインが想定していない事態＝バグかインフラ障害
-  if (error instanceof Error) {
-    console.error('予期しないエラー:', error);
-    res.status(500).json({
-      message: 'サーバー内部エラーが発生しました',
-      code: 'INTERNAL_ERROR',
-    });
-    return;
-  }
+  handleUnexpectedError(error, req, res);
+}
 
-  next(error);
+// ここに来るのはドメインが想定していない事態＝バグかインフラ障害
+function handleUnexpectedError(error: unknown, req: Request, res: Response): void {
+  const incidentId = randomUUID();
+
+  logger.error(
+    {
+      incidentId,
+      method: req.method,
+      path: req.path,
+      err: serializeError(error),
+    },
+    '予期しないエラー'
+  );
+
+  // 内部構造を晒さずに調査できるよう、本文にはincidentIdだけを載せてログと突き合わせる
+  res.status(500).json({
+    message: 'サーバー内部エラーが発生しました',
+    code: 'INTERNAL_ERROR',
+    incidentId,
+  });
 }
 
 // 分類が増えたらRecordの網羅性チェックでコンパイルエラーになる
