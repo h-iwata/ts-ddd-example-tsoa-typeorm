@@ -6,10 +6,6 @@ import { OrderId, ProductId, Quantity } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
 import { type AddOrderItemDto, type OrderResponseDto, toOrderResponseDto } from '../../dtos';
 
-/**
- * 注文に商品を追加するユースケース
- * Order集約とProduct集約の両方を操作する
- */
 @injectable()
 export class AddOrderItemUseCase {
   constructor(

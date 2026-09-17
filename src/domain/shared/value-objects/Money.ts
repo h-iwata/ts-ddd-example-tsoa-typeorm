@@ -1,9 +1,5 @@
 import { InvalidPriceError } from '../errors';
 
-/**
- * 金額を表す値オブジェクト
- * 通貨と金額を不変として扱う
- */
 export class Money {
   private constructor(
     private readonly amount: number,

@@ -1,7 +1,5 @@
 import { type Product } from '../../../domain/aggregates/product';
 
-// ========== Request DTOs ==========
-
 export interface CreateProductDto {
   name: string;
   description: string;
@@ -9,8 +7,6 @@ export interface CreateProductDto {
   currency?: string;
   initialStock: number;
 }
-
-// ========== Response DTOs ==========
 
 export interface ProductResponseDto {
   id: string;

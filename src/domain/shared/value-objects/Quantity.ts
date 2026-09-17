@@ -1,8 +1,5 @@
 import { InvalidQuantityError } from '../errors';
 
-/**
- * 数量を表す値オブジェクト
- */
 export class Quantity {
   private constructor(private readonly value: number) {}
 

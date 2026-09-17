@@ -16,7 +16,6 @@ export class CreateCustomerUseCase {
   async execute(dto: CreateCustomerDto): Promise<CustomerResponseDto> {
     const email = Email.create(dto.email);
 
-    // メールアドレスの重複チェック
     const exists = await this.customerRepository.existsByEmail(email);
     if (exists) {
       throw new EmailAlreadyExistsError(dto.email);

@@ -2,14 +2,11 @@ import { createApp } from './app';
 import { AppDataSource } from './infrastructure/database';
 
 async function bootstrap(): Promise<void> {
-  // データベース接続
   await AppDataSource.initialize();
   console.log('データベースに接続しました');
 
-  // アプリケーション作成
   const app = createApp();
 
-  // サーバー起動
   const PORT = process.env.PORT ?? 3007;
   app.listen(PORT, () => {
     console.log(`

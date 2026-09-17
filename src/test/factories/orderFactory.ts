@@ -17,8 +17,7 @@ export const orderFactory = Factory.define<Order, OrderTransientParams>(({ seque
   const status = transientParams.status ?? OrderStatus.PENDING;
   const address = transientParams.withAddress ? Address.create('100-0001', '東京都', '千代田区', '1-1-1') : null;
 
-  // CONFIRMED/PAID状態では直接アイテムを追加できないため、
-  // reconstruct時にアイテムを含める
+  // CONFIRMED/PAID状態ではaddItemが弾かれるため、reconstructで直接流し込む
   const items: OrderItem[] = transientParams.withItems
     ? [OrderItem.create(ProductId.fromString(`product-${sequence}`), `商品${sequence}`, Money.create(1000), Quantity.create(2))]
     : [];
@@ -34,25 +33,19 @@ export const orderFactory = Factory.define<Order, OrderTransientParams>(({ seque
   });
 });
 
-// 確定済み注文用のファクトリ
 export const confirmedOrderFactory = orderFactory.transient({
   status: OrderStatus.CONFIRMED,
   withItems: true,
   withAddress: true,
 });
 
-// 支払い済み注文用のファクトリ
 export const paidOrderFactory = orderFactory.transient({
   status: OrderStatus.PAID,
   withItems: true,
   withAddress: true,
 });
 
-/**
- * 新規注文作成用ファクトリ（統合テスト用）
- * Order.create() を使用してIDを自動生成
- * customerId は必須で transientParams から渡す
- */
+// 統合テスト用。reconstructではなくOrder.create()を通すのでIDは自動採番される
 export const newOrderFactory = Factory.define<Order, OrderTransientParams>(({ transientParams }) => {
   if (!transientParams.customerId) {
     throw new Error('newOrderFactory requires customerId in transientParams');

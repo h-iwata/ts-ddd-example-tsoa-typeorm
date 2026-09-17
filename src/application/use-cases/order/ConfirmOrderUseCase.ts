@@ -6,10 +6,6 @@ import { OrderId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
 import { type OrderResponseDto, toOrderResponseDto } from '../../dtos';
 
-/**
- * 注文を確定するユースケース
- * ドメインサービスを使って在庫の引き当てを行う
- */
 @injectable()
 export class ConfirmOrderUseCase {
   constructor(
@@ -24,8 +20,7 @@ export class ConfirmOrderUseCase {
   async execute(orderId: string): Promise<OrderResponseDto> {
     const id = OrderId.fromString(orderId);
 
-    // 在庫の引き当てと注文の確定は同一トランザクションで行う。
-    // 途中で失敗した場合に在庫だけが減った状態にならないようにする。
+    // 途中で失敗したときに在庫だけが減った状態にならないよう、確定と引き当てを同一トランザクションで囲む
     return this.transactionManager.run(async () => {
       const order = await this.orderRepository.findById(id);
       if (!order) {
@@ -35,7 +30,7 @@ export class ConfirmOrderUseCase {
       // 書き込みの前に注文側のルールを検証する
       order.confirm();
 
-      // 在庫チェック & 引き当て（Order集約とProduct集約の整合性を保つ）
+      // Order集約とProduct集約の整合性を保つ
       await this.orderDomainService.validateAndReserveStock(order);
       await this.orderRepository.save(order);
 

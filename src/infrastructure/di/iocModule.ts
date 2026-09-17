@@ -1,10 +1,6 @@
 import { container } from './container';
 
-/**
- * tsoaのIoCコンテナアダプター
- * tsoaがコントローラーをインスタンス化する際に使用される
- */
-
+// tsoa.json の iocModule から参照され、生成されたルートがコントローラーを解決するときに使われる
 export const iocContainer = {
   get<T>(controller: new (...args: unknown[]) => T): T {
     return container.get<T>(controller);

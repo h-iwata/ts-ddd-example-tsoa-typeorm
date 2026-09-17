@@ -2,9 +2,6 @@ import { type Money, type Quantity } from '../../shared/value-objects';
 import { InsufficientStockError } from '../order/errors';
 import { ProductId } from './ProductId';
 
-/**
- * 商品再構築用パラメータ
- */
 export interface ProductReconstructParams {
   id: ProductId;
   name: string;
@@ -15,10 +12,6 @@ export interface ProductReconstructParams {
   updatedAt: Date;
 }
 
-/**
- * 商品集約ルート
- * 商品の在庫管理を含む
- */
 export class Product {
   private constructor(
     private readonly id: ProductId,
@@ -67,16 +60,10 @@ export class Product {
     return this.updatedAt;
   }
 
-  /**
-   * 在庫があるかチェック
-   */
   hasStock(quantity: Quantity): boolean {
     return this.stock.isGreaterThanOrEqual(quantity);
   }
 
-  /**
-   * 在庫を減らす（注文時）
-   */
   decreaseStock(quantity: Quantity): void {
     if (!this.hasStock(quantity)) {
       throw new InsufficientStockError(this.id.getValue(), quantity.getValue(), this.stock.getValue());
@@ -85,25 +72,16 @@ export class Product {
     this.updatedAt = new Date();
   }
 
-  /**
-   * 在庫を増やす（入荷時、キャンセル時）
-   */
   increaseStock(quantity: Quantity): void {
     this.stock = this.stock.add(quantity);
     this.updatedAt = new Date();
   }
 
-  /**
-   * 価格を更新
-   */
   updatePrice(newPrice: Money): void {
     this.price = newPrice;
     this.updatedAt = new Date();
   }
 
-  /**
-   * 商品情報を更新
-   */
   updateInfo(name: string, description: string): void {
     this.name = name;
     this.description = description;

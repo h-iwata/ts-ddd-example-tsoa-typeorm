@@ -1,8 +1,6 @@
 import { type Order, type OrderItem } from '../../../domain/aggregates/order';
 import { type Address } from '../../../domain/shared';
 
-// ========== Request DTOs ==========
-
 export interface CreateOrderDto {
   customerId: string;
 }
@@ -19,8 +17,6 @@ export interface SetShippingAddressDto {
   street: string;
   building?: string;
 }
-
-// ========== Response DTOs ==========
 
 export interface OrderItemResponseDto {
   id: string;

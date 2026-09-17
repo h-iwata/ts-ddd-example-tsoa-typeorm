@@ -2,9 +2,6 @@ import { type Address } from '../../shared/value-objects';
 import { CustomerId } from './CustomerId';
 import { type Email } from './Email';
 
-/**
- * 顧客再構築用パラメータ
- */
 export interface CustomerReconstructParams {
   id: CustomerId;
   name: string;
@@ -14,9 +11,6 @@ export interface CustomerReconstructParams {
   updatedAt: Date;
 }
 
-/**
- * 顧客集約ルート
- */
 export class Customer {
   private constructor(private props: CustomerReconstructParams) {}
 
@@ -53,26 +47,17 @@ export class Customer {
     return this.props.updatedAt;
   }
 
-  /**
-   * 配送先住所を設定
-   */
   setShippingAddress(address: Address): void {
     this.props.shippingAddress = address;
     this.props.updatedAt = new Date();
   }
 
-  /**
-   * プロフィールを更新
-   */
   updateProfile(name: string, email: Email): void {
     this.props.name = name;
     this.props.email = email;
     this.props.updatedAt = new Date();
   }
 
-  /**
-   * 配送先が設定されているか
-   */
   hasShippingAddress(): boolean {
     return this.props.shippingAddress !== null;
   }

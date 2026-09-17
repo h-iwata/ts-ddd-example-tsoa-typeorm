@@ -1,10 +1,6 @@
 import { type ITransactionManager } from '../../domain/repositories';
 
-/**
- * トランザクションを張らずにコールバックをそのまま実行するスタブ。
- * ユニットテストではDBを使わないため、境界の有無は検証対象にしない
- * （原子性は src/test/e2e のE2Eテストで検証している）。
- */
+// ユニットテストではDBを使わないためトランザクション境界は検証しない（原子性は src/test/e2e で検証）
 export function stubTransactionManager(): ITransactionManager {
   return { run: <T>(fn: () => Promise<T>): Promise<T> => fn() };
 }

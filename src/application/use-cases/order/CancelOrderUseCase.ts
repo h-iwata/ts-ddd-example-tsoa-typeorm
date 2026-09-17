@@ -7,10 +7,6 @@ import { OrderId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
 import { type OrderResponseDto, toOrderResponseDto } from '../../dtos';
 
-/**
- * 注文をキャンセルするユースケース
- * 確定後のキャンセルは在庫を戻す
- */
 @injectable()
 export class CancelOrderUseCase {
   constructor(
@@ -25,14 +21,14 @@ export class CancelOrderUseCase {
   async execute(orderId: string): Promise<OrderResponseDto> {
     const id = OrderId.fromString(orderId);
 
-    // 在庫の戻しと注文のキャンセルは同一トランザクションで行う
+    // 途中で失敗したときに在庫だけが戻った状態にならないよう、同一トランザクションで囲む
     return this.transactionManager.run(async () => {
       const order = await this.orderRepository.findById(id);
       if (!order) {
         throw new OrderNotFoundError(orderId);
       }
 
-      // 確定後のキャンセルは在庫を戻す
+      // PENDINGはまだ引き当てていないので戻す在庫がない
       const needsStockRelease = order.getStatus() === OrderStatus.CONFIRMED || order.getStatus() === OrderStatus.PAID;
 
       order.cancel();

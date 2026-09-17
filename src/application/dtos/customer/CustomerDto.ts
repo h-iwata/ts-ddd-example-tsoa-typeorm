@@ -1,8 +1,6 @@
 import { type Customer } from '../../../domain/aggregates/customer';
 import { type Address } from '../../../domain/shared';
 
-// ========== Request DTOs ==========
-
 export interface CreateCustomerDto {
   name: string;
   email: string;
@@ -15,8 +13,6 @@ export interface SetAddressDto {
   street: string;
   building?: string;
 }
-
-// ========== Response DTOs ==========
 
 export interface AddressResponseDto {
   postalCode: string;

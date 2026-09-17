@@ -1,8 +1,5 @@
 import { InvalidEmailError } from './errors';
 
-/**
- * メールアドレスを表す値オブジェクト
- */
 export class Email {
   private constructor(private readonly value: string) {}
 

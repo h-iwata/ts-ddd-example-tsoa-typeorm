@@ -1,8 +1,5 @@
 import { randomUUID } from 'node:crypto';
 
-/**
- * 商品IDを表す値オブジェクト
- */
 export class ProductId {
   private constructor(private readonly value: string) {}
 

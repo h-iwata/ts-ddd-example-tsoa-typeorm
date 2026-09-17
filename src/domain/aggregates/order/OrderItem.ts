@@ -2,10 +2,7 @@ import { type Money, type Quantity } from '../../shared/value-objects';
 import { type ProductId } from '../product/ProductId';
 import { OrderItemId } from './OrderItemId';
 
-/**
- * 注文明細（エンティティ）
- * Order集約の一部として管理される
- */
+// 集約ルートではなくOrder集約の一部。OrderItemRepositoryは作らない
 export class OrderItem {
   private constructor(
     private readonly id: OrderItemId,
@@ -43,16 +40,10 @@ export class OrderItem {
     return this.quantity;
   }
 
-  /**
-   * 明細の小計を計算
-   */
   getSubtotal(): Money {
     return this.unitPrice.multiply(this.quantity.getValue());
   }
 
-  /**
-   * 数量を変更
-   */
   changeQuantity(newQuantity: Quantity): void {
     this.quantity = newQuantity;
   }

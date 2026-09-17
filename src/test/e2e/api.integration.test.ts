@@ -45,41 +45,34 @@ describe('API E2E', () => {
 
   context('注文の基本フロー', () => {
     it('商品登録から注文確定まで一連の操作が成功し、在庫が引き当てられる', async () => {
-      // ① 商品登録
       const product = await createProduct({ price: 1200, initialStock: 10 });
       expect(product.status).toBe(201);
       expect(product.body.stock).toBe(10);
 
-      // ② 顧客登録
       const customer = await createCustomer();
       expect(customer.status).toBe(201);
       expect(customer.body.shippingAddress).toBeNull();
 
-      // ③ 配送先設定
       const address = await request(app)
         .put(`/api/customers/${customer.body.id}/address`)
         .send({ postalCode: '150-0001', prefecture: '東京都', city: '渋谷区', street: '神宮前1-1-1' });
       expect(address.status).toBe(200);
       expect(address.body.shippingAddress.fullAddress).toContain('渋谷区');
 
-      // ④ 注文作成
       const order = await request(app).post('/api/orders').send({ customerId: customer.body.id });
       expect(order.status).toBe(201);
       expect(order.body.status).toBe('PENDING');
       expect(order.body.items).toHaveLength(0);
 
-      // ⑤ 商品追加
       const withItem = await request(app).post(`/api/orders/${order.body.id}/items`).send({ productId: product.body.id, quantity: 2 });
       expect(withItem.status).toBe(200);
       expect(withItem.body.items).toHaveLength(1);
       expect(withItem.body.totalAmount).toBe(2400);
 
-      // ⑥ 注文確定
       const confirmed = await request(app).post(`/api/orders/${order.body.id}/confirm`).send();
       expect(confirmed.status).toBe(200);
       expect(confirmed.body.status).toBe('CONFIRMED');
 
-      // 在庫が引き当てられている
       const afterConfirm = await request(app).get(`/api/products/${product.body.id}`);
       expect(afterConfirm.body.stock).toBe(8);
     });
@@ -196,8 +189,7 @@ describe('API E2E', () => {
   });
 
   context('確定処理の原子性', () => {
-    // 在庫の引き当てと注文の確定が同一トランザクションで行われることを検証する。
-    // 確定が失敗した場合に在庫だけが減っていてはならない。
+    // 確定が失敗した場合に在庫だけが減っていてはならない
     it('確定に失敗した場合は在庫が変化しない', async () => {
       const product = await createProduct({ initialStock: 10 });
       const customer = await createCustomer(); // 配送先なし → 確定は失敗する

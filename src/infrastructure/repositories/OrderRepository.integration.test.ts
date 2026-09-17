@@ -16,7 +16,6 @@ describe('OrderRepository Integration', () => {
   let savedProduct: Product;
 
   beforeEach(async () => {
-    // 注文に必要な顧客と商品を事前に作成
     savedCustomer = newCustomerFactory.build();
     await customerRepository.save(savedCustomer);
 
@@ -150,7 +149,6 @@ describe('OrderRepository Integration', () => {
       addItemToOrder(order);
       await orderRepository.save(order);
 
-      // 別商品を追加
       const anotherProduct = newProductFactory.build({}, { transient: { price: 500, stock: 50 } });
       await productRepository.save(anotherProduct);
       order.addItem(anotherProduct.getId(), anotherProduct.getName(), anotherProduct.getPrice(), Quantity.create(3));

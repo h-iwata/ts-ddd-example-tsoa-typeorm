@@ -23,10 +23,7 @@ export const productFactory = Factory.define<Product, ProductTransientParams>(({
   });
 });
 
-/**
- * 新規商品作成用ファクトリ（統合テスト用）
- * Product.create() を使用してIDを自動生成
- */
+// 統合テスト用。reconstructではなくProduct.create()を通すのでIDは自動採番される
 export const newProductFactory = Factory.define<Product, ProductTransientParams>(({ sequence, transientParams }) => {
   const stock = transientParams.stock ?? 10;
   const price = transientParams.price ?? 1000;

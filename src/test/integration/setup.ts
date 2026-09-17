@@ -9,21 +9,18 @@ declare global {
 global.context = describe;
 
 beforeAll(async () => {
-  // テスト用データベースに接続
   if (!AppDataSource.isInitialized) {
     await AppDataSource.initialize();
   }
 });
 
 afterAll(async () => {
-  // 接続をクローズ
   if (AppDataSource.isInitialized) {
     await AppDataSource.destroy();
   }
 });
 
 beforeEach(async () => {
-  // 各テスト前にテーブルをクリア
   const queryRunner = AppDataSource.createQueryRunner();
   await queryRunner.query('SET FOREIGN_KEY_CHECKS = 0');
   await queryRunner.query('TRUNCATE TABLE order_items');

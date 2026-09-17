@@ -83,6 +83,65 @@ lint・フォーマット・import整列をBiomeに統一。ESLint・Prettierは
 - 抑制コメントは `// biome-ignore lint/<group>/<rule>: 理由` 形式（`eslint-disable` は無効）
 - ESLintから引き継げなかったルール: `max-depth`、`max-statements`、循環的複雑度、`strict-boolean-expressions`、`no-unsafe-*`、`restrict-template-expressions`
 
+### コメント
+
+**コメントは失敗の表明**（Clean Code 第4章）。まずコードで語り、それでも伝わらないものだけをコメントにする。
+書きたくなったら、その前に「関数に切り出して名前を付けられないか」「変数名で表現できないか」を考える。
+悪いコードをコメントで補わない ── 直すべきはコードのほう。
+
+#### 残してよいコメント
+
+| 種類 | 例 |
+|---|---|
+| **意図の説明**（なぜそうしたか） | `// existsByEmail の確認と保存の間に、別のリクエストが同じメールを登録した場合に起きる` |
+| **情報**（コードから導けない外部仕様） | `// sqlMessage の形式: Duplicate entry '<値>' for key '<テーブル>.<インデックス名>'` |
+| **結果の警告**（変えると壊れるもの） | `// 注文は作成時に顧客の配送先を引き継ぐため、注文を作る前に顧客側へ設定する` |
+| **強調**（自明に見えて重要な処理） | `// 書き込みの前に注文側のルールを検証する` |
+| **TODO** | `// TODO: 〜`（放置しない。残す理由を書く） |
+| **生成物の入力**（後述） | tsoaコントローラーのJSDoc、`biome-ignore` |
+
+テストでは、テスト名に収まらない**前提条件や、そのテストが何を守っているか**を書いてよい。
+
+#### 書いてはいけないコメント
+
+- **冗長** ── 名前の言い換え。`/** 注文をキャンセル */ cancel()`、`/** 金額を表す値オブジェクト */ class Money`
+- **バナー・位置マーカー** ── `// ========== Getters ==========`、`// Repositories`
+  （区切りが欲しくなるのはクラス/ファイルが大きすぎるサイン。空行で足りる）
+- **手順のラベル** ── 直後の1行を言い換えるだけのもの。`// 顧客の存在確認` → `findById(...)`
+  （順序に意味があるなら関数へ切り出す）
+- **コメントアウトされたコード** ── 消す。gitが覚えている
+- **変更履歴・署名** ── `// 2026-01-01 追加 by ◯◯`。git blameで足りる
+- **閉じ括弧コメント** ── `} // end of for`
+- **規則で強制されたJSDoc** ── 「全publicメソッドにJSDoc」のような機械的な付与
+- **対象を失ったコメント** ── import整列やリファクタで指す先がなくなったもの。最も有害
+
+#### JSDocを書く場所（このプロジェクト固有）
+
+**tsoaが読むJSDocは削除しない。** OpenAPI仕様の生成元であり、Swagger UIに表示される。
+対象はコントローラーのメソッドだけでなく、**そこから参照される型（DTO・レスポンス型）も含む**。
+
+```typescript
+// コントローラー
+/**
+ * 商品を取得              ← swagger.json の description になる
+ * @param productId 商品ID  ← パラメータの description になる
+ */
+@Get('{productId}')
+async getProduct(@Path() productId: string): Promise<ProductResponseDto> {
+
+// 参照される型
+/**
+ * APIエラーレスポンスの共通型   ← schemas の description になる
+ */
+export interface ErrorResponse {
+```
+
+一見すると「名前の言い換え」に見えても、これらは**生成物の入力なので消してはいけない**。
+判断に迷ったら `npm run tsoa:generate` を実行し、`generated/swagger.json` に差分が出ないか確認する。
+
+上記以外でJSDoc形式（`/** */`）を使うのは、「残してよいコメント」に該当する場合のみ。
+説明的な要約JSDocは付けない。
+
 ### 集約のreconstructパターン
 
 集約の再構築にはパラメータオブジェクトパターンを使用:
@@ -121,13 +180,64 @@ import { CustomerId } from './CustomerId';  // 値として使う場合はtype�
 
 ### エラーハンドリング
 
-ドメイン固有のエラークラスを使用:
+例外は「判断できない場所」で投げ、「判断できる場所」で1回だけ捕まえる。
+domain が投げ、application は素通しし、presentation の `errorHandler` だけが捕まえる。
+**use-case に `try/catch` は書かない**（握りつぶすと型情報が失われ、4xxが5xxになる）。
+
+#### ドメインエラーの分類
+
+すべての具象エラーは `src/domain/shared/errors/base/` の4分類のいずれかを継承する。
+`DomainError.kind` が `abstract` なので、分類しないとコンパイルが通らない。
+
+| 分類 | 意味 | HTTPステータス |
+|---|---|---|
+| `NotFoundError` | 対象が存在しない | 404 |
+| `ConflictError` | 現在の状態と競合する | 409 |
+| `ValidationError` | 入力値が常に不正 | 400 |
+| `BusinessRuleViolationError` | 値は正しいが業務ルール上できない | 400 |
 
 ```typescript
-// 例: src/domain/aggregates/order/errors/
-export class EmptyOrderError extends Error { ... }
-export class InvalidOrderStatusError extends Error { ... }
+import { BusinessRuleViolationError } from '../../../shared/errors';
+
+export class OrderAlreadyShippedError extends BusinessRuleViolationError {
+  readonly code = 'ORDER_ALREADY_SHIPPED';
+  constructor() {
+    super('発送済みの注文は変更できません');
+  }
+}
 ```
+
+ステータスの対応は `errorHandler.ts` の `STATUS_BY_KIND` に集約されている。
+エラーを追加しても `errorHandler.ts` は変更しない。
+
+#### 置き場所
+
+- 集約固有: `src/domain/aggregates/<集約>/errors/`
+- 集約に属さない共有の値オブジェクト由来: `src/domain/shared/errors/` 直下
+- `src/domain/shared/errors/base/` は分類の定義のみ。触らない
+
+#### インフラ例外の翻訳
+
+TypeORMの例外をそのまま上げない。リポジトリでドメインエラーへ翻訳し、
+翻訳できないものは `throw error` で素通しする（ここが `try/catch` を書いてよい唯一の場所）。
+
+```typescript
+try {
+  await this.repository.save(entity);
+} catch (error) {
+  if (isUniqueViolation(error, UQ_CUSTOMERS_EMAIL)) {
+    throw new EmailAlreadyExistsError(customer.getEmail().getValue());
+  }
+  throw error;
+}
+```
+
+MySQL固有の判定は `src/infrastructure/database/mysqlErrors.ts` に閉じ込める。
+一意制約名は `@Index('UQ_<テーブル>_<カラム>', { unique: true })` で明示的に命名する
+（TypeORMの自動生成名はスキーマ変更で変わるため、コードから参照してはいけない）。
+
+なお、use-case 側の事前チェック（`existsByEmail` 等）は削除しない。
+事前チェックは分かりやすいエラーのため、DB制約は正しさの担保のためで、役割が異なる。
 
 ## テスト
 

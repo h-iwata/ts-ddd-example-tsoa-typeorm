@@ -1,6 +1,3 @@
-/**
- * 注文ステータス
- */
 export const OrderStatus = {
   PENDING: 'PENDING', // 注文受付
   CONFIRMED: 'CONFIRMED', // 確定
@@ -12,9 +9,6 @@ export const OrderStatus = {
 
 export type OrderStatus = (typeof OrderStatus)[keyof typeof OrderStatus];
 
-/**
- * 注文ステータスの遷移ルール
- */
 export const OrderStatusTransitions: Record<OrderStatus, OrderStatus[]> = {
   [OrderStatus.PENDING]: [OrderStatus.CONFIRMED, OrderStatus.CANCELLED],
   [OrderStatus.CONFIRMED]: [OrderStatus.PAID, OrderStatus.CANCELLED],
@@ -24,9 +18,6 @@ export const OrderStatusTransitions: Record<OrderStatus, OrderStatus[]> = {
   [OrderStatus.CANCELLED]: [],
 };
 
-/**
- * ステータス遷移が可能かチェック
- */
 export function canTransitionTo(currentStatus: OrderStatus, newStatus: OrderStatus): boolean {
   return OrderStatusTransitions[currentStatus].includes(newStatus);
 }

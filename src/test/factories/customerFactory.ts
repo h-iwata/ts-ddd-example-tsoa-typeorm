@@ -21,10 +21,7 @@ export const customerFactory = Factory.define<Customer, CustomerTransientParams>
   });
 });
 
-/**
- * 新規顧客作成用ファクトリ（統合テスト用）
- * Customer.create() を使用してIDを自動生成
- */
+// 統合テスト用。reconstructではなくCustomer.create()を通すのでIDは自動採番される
 export const newCustomerFactory = Factory.define<Customer, CustomerTransientParams>(({ sequence, transientParams }) => {
   const customer = Customer.create(`テスト太郎${sequence}`, Email.create(`test${sequence}@example.com`));
 

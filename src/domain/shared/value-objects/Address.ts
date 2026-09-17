@@ -1,6 +1,3 @@
-/**
- * 住所を表す値オブジェクト
- */
 export class Address {
   private constructor(
     private readonly postalCode: string,

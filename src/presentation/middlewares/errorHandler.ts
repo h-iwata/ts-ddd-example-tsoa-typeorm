@@ -8,7 +8,6 @@ export function errorHandler(error: unknown, _req: Request, res: Response, next:
     return;
   }
 
-  // tsoa バリデーションエラー
   if (error instanceof ValidateError) {
     res.status(400).json({
       message: 'バリデーションエラー',
@@ -18,7 +17,6 @@ export function errorHandler(error: unknown, _req: Request, res: Response, next:
     return;
   }
 
-  // ドメインエラー
   if (error instanceof DomainError) {
     res.status(toStatusCode(error)).json({
       message: error.message,
@@ -27,7 +25,7 @@ export function errorHandler(error: unknown, _req: Request, res: Response, next:
     return;
   }
 
-  // その他のエラー
+  // ここに来るのはドメインが想定していない事態＝バグかインフラ障害
   if (error instanceof Error) {
     console.error('予期しないエラー:', error);
     res.status(500).json({
@@ -40,13 +38,7 @@ export function errorHandler(error: unknown, _req: Request, res: Response, next:
   next(error);
 }
 
-/**
- * ドメインエラーの分類をHTTPステータスへ写す
- *
- * 個々のエラーではなく分類だけを見るため、新しいエラーを追加しても
- * この対応表を更新する必要はない。分類そのものが増えた場合は
- * Record の網羅性チェックによりコンパイルエラーになる。
- */
+// 分類が増えたらRecordの網羅性チェックでコンパイルエラーになる
 const STATUS_BY_KIND: Record<DomainErrorKind, number> = {
   notFound: 404,
   conflict: 409,

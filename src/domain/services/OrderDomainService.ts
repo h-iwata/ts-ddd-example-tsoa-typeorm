@@ -19,10 +19,7 @@ function validateStock(items: readonly OrderItem[], productMap: ProductMap): voi
   }
 }
 
-/**
- * 注文ドメインサービス
- * 複数の集約をまたぐビジネスルールを実装
- */
+// Order集約とProduct集約をまたぐため、どちらの集約にも置けないルールを扱う
 @injectable()
 export class OrderDomainService {
   constructor(
@@ -49,9 +46,6 @@ export class OrderDomainService {
     }
   }
 
-  /**
-   * 注文キャンセル時の在庫戻し
-   */
   async releaseStock(order: Order): Promise<void> {
     const items = order.getItems();
 
@@ -64,9 +58,6 @@ export class OrderDomainService {
     }
   }
 
-  /**
-   * 商品の在庫が十分かチェック
-   */
   async checkStockAvailability(productId: ProductId, quantity: Quantity): Promise<boolean> {
     const product = await this.productRepository.findById(productId);
     if (!product) {

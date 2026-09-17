@@ -6,9 +6,6 @@ import { OrderId } from './OrderId';
 import { OrderItem } from './OrderItem';
 import { canTransitionTo, OrderStatus } from './OrderStatus';
 
-/**
- * 注文再構築用パラメータ
- */
 export interface OrderReconstructParams {
   id: OrderId;
   customerId: CustomerId;
@@ -19,10 +16,7 @@ export interface OrderReconstructParams {
   updatedAt: Date;
 }
 
-/**
- * 注文集約ルート
- * 注文明細（OrderItem）を内包し、整合性を保証する
- */
+// OrderItemを内包し、集約全体の整合性を保証する
 export class Order {
   private constructor(
     private readonly id: OrderId,
@@ -34,22 +28,14 @@ export class Order {
     private updatedAt: Date
   ) {}
 
-  /**
-   * 新規注文を作成
-   */
   static create(customerId: CustomerId): Order {
     const now = new Date();
     return new Order(OrderId.generate(), customerId, [], OrderStatus.PENDING, null, now, now);
   }
 
-  /**
-   * 永続化されたデータから復元
-   */
   static reconstruct(params: OrderReconstructParams): Order {
     return new Order(params.id, params.customerId, params.items, params.status, params.shippingAddress, params.createdAt, params.updatedAt);
   }
-
-  // ========== Getters ==========
 
   getId(): OrderId {
     return this.id;
@@ -79,35 +65,19 @@ export class Order {
     return this.updatedAt;
   }
 
-  // ========== 集計 ==========
-
-  /**
-   * 注文合計金額を計算
-   */
   getTotalAmount(): Money {
     return this.items.reduce((total, item) => total.add(item.getSubtotal()), Money.zero());
   }
 
-  /**
-   * 注文明細数を取得
-   */
   getItemCount(): number {
     return this.items.length;
   }
 
-  /**
-   * 注文が空かどうか
-   */
   isEmpty(): boolean {
     return this.items.length === 0;
   }
 
-  // ========== ビジネスロジック ==========
-
-  /**
-   * 商品を注文に追加
-   * 同じ商品が既にあれば数量を加算
-   */
+  // 同じ商品が既にあれば、明細を増やさず数量を加算する
   addItem(productId: ProductId, productName: string, unitPrice: Money, quantity: Quantity): void {
     this.assertCanModify();
 
@@ -124,9 +94,6 @@ export class Order {
     this.updatedAt = new Date();
   }
 
-  /**
-   * 注文明細を削除
-   */
   removeItem(productId: ProductId): void {
     this.assertCanModify();
 
@@ -134,9 +101,7 @@ export class Order {
     this.updatedAt = new Date();
   }
 
-  /**
-   * 明細の数量を変更
-   */
+  // 数量が0なら明細ごと削除する
   updateItemQuantity(productId: ProductId, newQuantity: Quantity): void {
     this.assertCanModify();
 
@@ -155,18 +120,12 @@ export class Order {
     this.updatedAt = new Date();
   }
 
-  /**
-   * 配送先を設定
-   */
   setShippingAddress(address: Address): void {
     this.assertCanModify();
     this.shippingAddress = address;
     this.updatedAt = new Date();
   }
 
-  /**
-   * 注文を確定
-   */
   confirm(): void {
     this.assertCanTransitionTo(OrderStatus.CONFIRMED);
 
@@ -182,50 +141,33 @@ export class Order {
     this.updatedAt = new Date();
   }
 
-  /**
-   * 支払い完了をマーク
-   */
   markAsPaid(): void {
     this.assertCanTransitionTo(OrderStatus.PAID);
     this.status = OrderStatus.PAID;
     this.updatedAt = new Date();
   }
 
-  /**
-   * 発送済みをマーク
-   */
   markAsShipped(): void {
     this.assertCanTransitionTo(OrderStatus.SHIPPED);
     this.status = OrderStatus.SHIPPED;
     this.updatedAt = new Date();
   }
 
-  /**
-   * 配達完了をマーク
-   */
   markAsDelivered(): void {
     this.assertCanTransitionTo(OrderStatus.DELIVERED);
     this.status = OrderStatus.DELIVERED;
     this.updatedAt = new Date();
   }
 
-  /**
-   * 注文をキャンセル
-   */
   cancel(): void {
     this.assertCanTransitionTo(OrderStatus.CANCELLED);
     this.status = OrderStatus.CANCELLED;
     this.updatedAt = new Date();
   }
 
-  /**
-   * キャンセル可能かどうか
-   */
   canBeCancelled(): boolean {
     return canTransitionTo(this.status, OrderStatus.CANCELLED);
   }
-
-  // ========== 内部ヘルパー ==========
 
   private assertCanModify(): void {
     if (this.status !== OrderStatus.PENDING) {
