@@ -19,7 +19,6 @@ export class ConfirmOrderUseCase {
 
   async execute(orderId: string): Promise<OrderResponseDto> {
     const id = OrderId.fromString(orderId);
-
     // 途中で失敗したときに在庫だけが減った状態にならないよう、確定と引き当てを同一トランザクションで囲む
     return this.transactionManager.run(async () => {
       const order = await this.orderRepository.findById(id);

@@ -93,7 +93,6 @@ export class OrderRepository implements IOrderRepository {
     entity.currency = order.getTotalAmount().getCurrency();
     entity.createdAt = order.getCreatedAt();
     entity.updatedAt = order.getUpdatedAt();
-
     this.applyShippingAddress(entity, order.getShippingAddress());
     entity.items = order.getItems().map((item) => this.toItemEntity(order.getId().getValue(), item));
 
@@ -104,7 +103,6 @@ export class OrderRepository implements IOrderRepository {
     if (!address) {
       return;
     }
-
     entity.shippingPostalCode = address.getPostalCode();
     entity.shippingPrefecture = address.getPrefecture();
     entity.shippingCity = address.getCity();

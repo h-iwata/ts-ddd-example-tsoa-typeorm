@@ -31,7 +31,6 @@ export class OrderDomainService {
     const items = order.getItems();
     const products = await this.productRepository.findByIds(items.map((item) => item.getProductId()));
     const productMap: ProductMap = new Map(products.map((p) => [p.getId().getValue(), p]));
-
     validateStock(items, productMap);
     await this.reserveStock(items, productMap);
   }
@@ -48,7 +47,6 @@ export class OrderDomainService {
 
   async releaseStock(order: Order): Promise<void> {
     const items = order.getItems();
-
     for (const item of items) {
       const product = await this.productRepository.findById(item.getProductId());
       if (product) {

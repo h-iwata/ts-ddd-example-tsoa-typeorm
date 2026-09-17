@@ -21,7 +21,6 @@ export class ProductRepository implements IProductRepository {
 
   async findByIds(ids: ProductId[]): Promise<Product[]> {
     if (ids.length === 0) return [];
-
     const entities = await this.repository.findBy(ids.map((id) => ({ id: id.getValue() })));
     return entities.map((e) => this.toDomain(e));
   }

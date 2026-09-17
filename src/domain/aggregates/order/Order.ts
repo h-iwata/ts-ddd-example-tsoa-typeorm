@@ -80,9 +80,7 @@ export class Order {
   // 同じ商品が既にあれば、明細を増やさず数量を加算する
   addItem(productId: ProductId, productName: string, unitPrice: Money, quantity: Quantity): void {
     this.assertCanModify();
-
     const existingItem = this.items.find((item) => item.getProductId().equals(productId));
-
     if (existingItem) {
       const newQuantity = existingItem.getQuantity().add(quantity);
       existingItem.changeQuantity(newQuantity);
@@ -96,7 +94,6 @@ export class Order {
 
   removeItem(productId: ProductId): void {
     this.assertCanModify();
-
     this.items = this.items.filter((item) => !item.getProductId().equals(productId));
     this.updatedAt = new Date();
   }
@@ -104,13 +101,10 @@ export class Order {
   // 数量が0なら明細ごと削除する
   updateItemQuantity(productId: ProductId, newQuantity: Quantity): void {
     this.assertCanModify();
-
     const item = this.items.find((item) => item.getProductId().equals(productId));
-
     if (!item) {
       throw new OrderItemNotFoundError(productId.getValue());
     }
-
     if (newQuantity.isZero()) {
       this.removeItem(productId);
     } else {
@@ -128,11 +122,9 @@ export class Order {
 
   confirm(): void {
     this.assertCanTransitionTo(OrderStatus.CONFIRMED);
-
     if (this.isEmpty()) {
       throw new EmptyOrderError();
     }
-
     if (!this.shippingAddress) {
       throw new ShippingAddressRequiredError();
     }

@@ -36,7 +36,7 @@
       "preset": "recommended",
       "complexity": {
         "noExcessiveCognitiveComplexity": { "level": "error", "options": { "maxAllowedComplexity": 7 } },
-        "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 10, "skipBlankLines": true } },
+        "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 10, "skipBlankLines": false } },
         "useMaxParams": { "level": "error", "options": { "max": 5 } }
       },
       "nursery": {
@@ -91,7 +91,7 @@
       "includes": ["**/middlewares/**/*.ts"],
       "linter": {
         "rules": {
-          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 40, "skipBlankLines": true } } }
+          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 40, "skipBlankLines": false } } }
         }
       }
     },
@@ -103,7 +103,7 @@
       "includes": ["**/repositories/**/*.ts"],
       "linter": {
         "rules": {
-          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 25, "skipBlankLines": true } } }
+          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 25, "skipBlankLines": false } } }
         }
       }
     },
@@ -111,7 +111,7 @@
       "includes": ["**/dtos/**/*.ts", "**/use-cases/**/*.ts"],
       "linter": {
         "rules": {
-          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 15, "skipBlankLines": true } } }
+          "complexity": { "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 15, "skipBlankLines": false } } }
         }
       }
     },
@@ -120,7 +120,7 @@
       "linter": {
         "rules": {
           "complexity": {
-            "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 15, "skipBlankLines": true } },
+            "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 15, "skipBlankLines": false } },
             "useMaxParams": { "level": "error", "options": { "max": 7 } }
           }
         }
@@ -131,7 +131,7 @@
       "linter": {
         "rules": {
           "complexity": {
-            "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 20, "skipBlankLines": true } },
+            "noExcessiveLinesPerFunction": { "level": "error", "options": { "maxLines": 20, "skipBlankLines": false } },
             "useMaxParams": "off"
           }
         }

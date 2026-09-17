@@ -15,7 +15,6 @@ export class GetOrderUseCase {
   async execute(orderId: string): Promise<OrderResponseDto> {
     const id = OrderId.fromString(orderId);
     const order = await this.orderRepository.findById(id);
-
     if (!order) {
       throw new OrderNotFoundError(orderId);
     }

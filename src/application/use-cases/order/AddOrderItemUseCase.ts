@@ -17,10 +17,8 @@ export class AddOrderItemUseCase {
 
   async execute(orderId: string, dto: AddOrderItemDto): Promise<OrderResponseDto> {
     const productId = ProductId.fromString(dto.productId);
-
     const order = await this.orderRepository.findById(OrderId.fromString(orderId));
     if (!order) throw new OrderNotFoundError(orderId);
-
     const product = await this.productRepository.findById(productId);
     if (!product) throw new ProductNotFoundError(dto.productId);
 

@@ -20,7 +20,6 @@ export class CancelOrderUseCase {
 
   async execute(orderId: string): Promise<OrderResponseDto> {
     const id = OrderId.fromString(orderId);
-
     // 途中で失敗したときに在庫だけが戻った状態にならないよう、同一トランザクションで囲む
     return this.transactionManager.run(async () => {
       const order = await this.orderRepository.findById(id);
@@ -30,7 +29,6 @@ export class CancelOrderUseCase {
 
       // PENDINGはまだ引き当てていないので戻す在庫がない
       const needsStockRelease = order.getStatus() === OrderStatus.CONFIRMED || order.getStatus() === OrderStatus.PAID;
-
       order.cancel();
       if (needsStockRelease) {
         await this.orderDomainService.releaseStock(order);

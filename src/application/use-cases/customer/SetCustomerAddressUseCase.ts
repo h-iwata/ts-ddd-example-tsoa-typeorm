@@ -15,15 +15,11 @@ export class SetCustomerAddressUseCase {
   async execute(customerId: string, dto: SetAddressDto): Promise<CustomerResponseDto> {
     const id = CustomerId.fromString(customerId);
     const customer = await this.customerRepository.findById(id);
-
     if (!customer) {
       throw new CustomerNotFoundError(customerId);
     }
-
     const address = Address.create(dto.postalCode, dto.prefecture, dto.city, dto.street, dto.building);
-
     customer.setShippingAddress(address);
-
     await this.customerRepository.save(customer);
 
     return toCustomerResponseDto(customer);

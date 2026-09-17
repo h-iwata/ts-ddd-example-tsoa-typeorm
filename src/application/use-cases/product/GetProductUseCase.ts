@@ -15,7 +15,6 @@ export class GetProductUseCase {
   async execute(productId: string): Promise<ProductResponseDto> {
     const id = ProductId.fromString(productId);
     const product = await this.productRepository.findById(id);
-
     if (!product) {
       throw new ProductNotFoundError(productId);
     }

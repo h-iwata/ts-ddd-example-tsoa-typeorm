@@ -61,7 +61,7 @@ lint・フォーマット・import整列をBiomeに統一。ESLint・Prettierは
 
 | ルール | デフォルト | 説明 |
 |-----------|-----------|------|
-| noExcessiveLinesPerFunction | 10 | 関数の行数 |
+| noExcessiveLinesPerFunction | 10 | 関数の行数（`skipBlankLines: false` なので空行も数える） |
 | useMaxParams | 5 | パラメータ数 |
 | noExcessiveCognitiveComplexity | 7 | 認知的複雑度 |
 | noExcessiveNestedCallbacks | 3 | コールバックのネスト |
@@ -82,6 +82,37 @@ lint・フォーマット・import整列をBiomeに統一。ESLint・Prettierは
 - `@inject()` のパースに `javascript.parser.unsafeParameterDecoratorsEnabled: true` が必須
 - 抑制コメントは `// biome-ignore lint/<group>/<rule>: 理由` 形式（`eslint-disable` は無効）
 - ESLintから引き継げなかったルール: `max-depth`、`max-statements`、循環的複雑度、`strict-boolean-expressions`、`no-unsafe-*`、`restrict-template-expressions`
+
+### 空行
+
+空行は「意味の区切り」であって、文と文の間を空けるためのものではない。
+連続する処理は詰めて書き、**フェーズが変わるところにだけ**1行空ける。
+
+```typescript
+// ❌ 文ごとに空いていて、どこが区切りなのか分からない
+const id = CustomerId.fromString(customerId);
+
+const customer = await this.customerRepository.findById(id);
+
+if (!customer) {
+  throw new CustomerNotFoundError(customerId);
+}
+
+// ⭕️ 「取得して検証する」までが1つの塊
+const id = CustomerId.fromString(customerId);
+const customer = await this.customerRepository.findById(id);
+if (!customer) {
+  throw new CustomerNotFoundError(customerId);
+}
+```
+
+残す空行:
+
+- 最後の `return` の前（結果を返す行を独立させる）
+- フェーズを導入するコメントの前
+
+`noExcessiveLinesPerFunction` は `skipBlankLines: false` なので、**空行も行数を消費する**。
+ただしこれは禁止ではなく予算で、上限に余裕のある関数では検出されない。最終的な判断は書き手が行う。
 
 ### コメント
 

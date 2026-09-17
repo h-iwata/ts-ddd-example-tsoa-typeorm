@@ -59,7 +59,6 @@ export class CustomerRepository implements ICustomerRepository {
 
   private toDomain(entity: CustomerEntity): Customer {
     let address: Address | null = null;
-
     if (entity.shippingPostalCode && entity.shippingPrefecture && entity.shippingCity && entity.shippingStreet) {
       address = Address.create(
         entity.shippingPostalCode,
@@ -83,11 +82,9 @@ export class CustomerRepository implements ICustomerRepository {
   private toEntity(customer: Customer): CustomerEntity {
     const entity = new CustomerEntity();
     const address = customer.getShippingAddress();
-
     entity.id = customer.getId().getValue();
     entity.name = customer.getName();
     entity.email = customer.getEmail().getValue();
-
     if (address) {
       entity.shippingPostalCode = address.getPostalCode();
       entity.shippingPrefecture = address.getPrefecture();
@@ -95,7 +92,6 @@ export class CustomerRepository implements ICustomerRepository {
       entity.shippingStreet = address.getStreet();
       entity.shippingBuilding = address.getBuilding();
     }
-
     entity.createdAt = customer.getCreatedAt();
     entity.updatedAt = customer.getUpdatedAt();
 
