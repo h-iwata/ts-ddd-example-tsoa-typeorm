@@ -5,6 +5,7 @@ import { type CreateProductUseCase, type GetAllProductsUseCase, type GetProductU
 import { TYPES } from '../../infrastructure/di/types';
 import { type ErrorResponse } from '../types';
 
+@Response<ErrorResponse>(500, 'Internal server error')
 @Route('api/products')
 @Tags('Products')
 @injectable()
@@ -33,6 +34,7 @@ export class ProductController extends Controller {
    * @param productId 商品ID
    */
   @Get('{productId}')
+  @Response<ErrorResponse>(400, 'Validation error')
   @Response<ErrorResponse>(404, 'Product not found')
   async getProduct(@Path() productId: string): Promise<ProductResponseDto> {
     return this.getProductUseCase.execute(productId);

@@ -1,6 +1,8 @@
 import { type Express } from 'express';
 import request from 'supertest';
+import swagger from '../../../generated/swagger.json';
 import { createApp } from '../../app';
+import { findUndeclaredResponses, type OpenApiSpec, withResponseRecorder } from './specCoverage';
 
 /**
  * APIのE2Eテスト
@@ -16,7 +18,7 @@ describe('API E2E', () => {
   let app: Express;
 
   beforeAll(() => {
-    app = createApp();
+    app = withResponseRecorder(createApp());
   });
 
   const createProduct = async (overrides: Record<string, unknown> = {}) => {
@@ -233,6 +235,14 @@ describe('API E2E', () => {
       expect(response.status).toBe(200);
       expect(response.body.openapi ?? response.body.swagger).toBeDefined();
       expect(response.body.paths['/api/products']).toBeDefined();
+    });
+  });
+
+  // OpenAPIの宣言は手で書くため、実装が返すステータスと静かにずれていく。
+  // 上のテストで実際に観測したレスポンスが宣言に含まれているかを最後に突き合わせる。
+  describe('OpenAPI仕様と実装の整合', () => {
+    it('観測したレスポンスがすべてOpenAPIに宣言されている', () => {
+      expect(findUndeclaredResponses(swagger as OpenApiSpec)).toEqual([]);
     });
   });
 });

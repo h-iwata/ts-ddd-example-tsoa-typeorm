@@ -12,6 +12,8 @@ import {
 import { TYPES } from '../../infrastructure/di/types';
 import { type ErrorResponse } from '../types';
 
+@Response<ErrorResponse>(400, 'Validation error / business rule violation (詳細は code を参照)')
+@Response<ErrorResponse>(500, 'Internal server error')
 @Route('api/orders')
 @Tags('Orders')
 @injectable()
@@ -58,7 +60,6 @@ export class OrderController extends Controller {
    */
   @Post('/')
   @SuccessResponse(201, 'Created')
-  @Response<ErrorResponse>(400, 'Validation error')
   @Response<ErrorResponse>(404, 'Customer not found')
   async createOrder(@Body() requestBody: CreateOrderDto): Promise<OrderResponseDto> {
     this.setStatus(201);
@@ -71,7 +72,6 @@ export class OrderController extends Controller {
    * @param requestBody 商品情報
    */
   @Post('{orderId}/items')
-  @Response<ErrorResponse>(400, 'Invalid order state')
   @Response<ErrorResponse>(404, 'Order or Product not found')
   async addItem(@Path() orderId: string, @Body() requestBody: AddOrderItemDto): Promise<OrderResponseDto> {
     return this.addOrderItemUseCase.execute(orderId, requestBody);
@@ -79,11 +79,11 @@ export class OrderController extends Controller {
 
   /**
    * 注文を確定
-   * 在庫の引き当てを行い、注文を確定状態にする
+   * 在庫の引き当てを行い、注文を確定状態にする。
+   * 在庫不足は INSUFFICIENT_STOCK、確定できない状態は INVALID_ORDER_STATE として400を返す
    * @param orderId 注文ID
    */
   @Post('{orderId}/confirm')
-  @Response<ErrorResponse>(400, 'Invalid order state / Insufficient stock')
   @Response<ErrorResponse>(404, 'Order not found')
   async confirmOrder(@Path() orderId: string): Promise<OrderResponseDto> {
     return this.confirmOrderUseCase.execute(orderId);
@@ -91,11 +91,10 @@ export class OrderController extends Controller {
 
   /**
    * 注文をキャンセル
-   * 確定済みの場合は在庫を戻す
+   * 確定済みの場合は在庫を戻す。キャンセルできない状態は INVALID_ORDER_STATE として400を返す
    * @param orderId 注文ID
    */
   @Post('{orderId}/cancel')
-  @Response<ErrorResponse>(400, 'Invalid order state')
   @Response<ErrorResponse>(404, 'Order not found')
   async cancelOrder(@Path() orderId: string): Promise<OrderResponseDto> {
     return this.cancelOrderUseCase.execute(orderId);

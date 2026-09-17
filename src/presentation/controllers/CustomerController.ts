@@ -5,6 +5,8 @@ import { type CreateCustomerUseCase, type GetCustomerUseCase, type SetCustomerAd
 import { TYPES } from '../../infrastructure/di/types';
 import { type ErrorResponse } from '../types';
 
+@Response<ErrorResponse>(400, 'Validation error (詳細は code を参照)')
+@Response<ErrorResponse>(500, 'Internal server error')
 @Route('api/customers')
 @Tags('Customers')
 @injectable()
@@ -36,7 +38,6 @@ export class CustomerController extends Controller {
    */
   @Post('/')
   @SuccessResponse(201, 'Created')
-  @Response<ErrorResponse>(400, 'Validation error')
   @Response<ErrorResponse>(409, 'Email already exists')
   async createCustomer(@Body() requestBody: CreateCustomerDto): Promise<CustomerResponseDto> {
     this.setStatus(201);

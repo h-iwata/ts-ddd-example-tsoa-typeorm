@@ -246,6 +246,31 @@ logger.error({ incidentId, method, path, err: serializeError(error) }, '予期�
 - 集約に属さない共有の値オブジェクト由来: `src/domain/shared/errors/` 直下
 - `src/domain/shared/errors/base/` は分類の定義のみ。触らない
 
+#### @Response の宣言方針
+
+TypeScriptには検査例外が無いため、「実際に投げうるエラー」と「`@Response` の宣言」を結ぶ仕組みが無い。
+放置すると宣言は静かに実態からずれるので、**ズレを検出する側**で担保する。
+
+- **全メソッドで起こりうるものはクラスに1回だけ宣言する**（`@Response` は `ClassDecorator` でもある）
+  - `500` は全エンドポイント
+  - `400` は入力を受け取る全エンドポイント（入力が無い一覧APIなどは対象外）
+- **そのエンドポイント固有の意味を持つものだけメソッドに書く**（`404`、`409` など）
+- **どのエラーかの区別はレスポンス本文の `code` で表す**。ステータスごとに説明を細分化しない
+  （個別の事情はメソッドのJSDocに書く。JSDocはOpenAPIのdescriptionになる）
+
+```typescript
+@Response<ErrorResponse>(400, 'Validation error (詳細は code を参照)')
+@Response<ErrorResponse>(500, 'Internal server error')
+@Route('api/customers')
+export class CustomerController extends Controller {
+
+  @Post('/')
+  @Response<ErrorResponse>(409, 'Email already exists')   // ← ここ固有のものだけ
+```
+
+`src/test/e2e/specCoverage.ts` がE2E中の全レスポンスを観測し、
+未宣言のものがあればE2Eの最後のテストが落ちる。宣言を増やす前にまずテストを書けばよい。
+
 #### インフラ例外の翻訳
 
 TypeORMの例外をそのまま上げない。リポジトリでドメインエラーへ翻訳し、
