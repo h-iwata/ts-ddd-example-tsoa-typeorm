@@ -1,7 +1,7 @@
 import { type Address, Money, type Quantity } from '../../shared/value-objects';
 import { type CustomerId } from '../customer/CustomerId';
 import { type ProductId } from '../product/ProductId';
-import { EmptyOrderError, InvalidOrderStateError, ShippingAddressRequiredError } from './errors';
+import { EmptyOrderError, InvalidOrderStateError, OrderItemNotFoundError, ShippingAddressRequiredError } from './errors';
 import { OrderId } from './OrderId';
 import { OrderItem } from './OrderItem';
 import { canTransitionTo, OrderStatus } from './OrderStatus';
@@ -108,7 +108,7 @@ export class Order {
     const item = this.items.find((item) => item.getProductId().equals(productId));
 
     if (!item) {
-      throw new Error(`注文内に商品が見つかりません: ${productId.getValue()}`);
+      throw new OrderItemNotFoundError(productId.getValue());
     }
 
     if (newQuantity.isZero()) {

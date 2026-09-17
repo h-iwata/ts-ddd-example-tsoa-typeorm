@@ -1,4 +1,4 @@
-import { InvalidPriceError } from '../errors';
+import { CurrencyMismatchError, InvalidPriceError } from '../errors';
 
 export class Money {
   private constructor(
@@ -57,7 +57,7 @@ export class Money {
 
   private assertSameCurrency(other: Money): void {
     if (this.currency !== other.currency) {
-      throw new Error(`通貨が一致しません: ${this.currency} と ${other.currency}`);
+      throw new CurrencyMismatchError(this.currency, other.currency);
     }
   }
 

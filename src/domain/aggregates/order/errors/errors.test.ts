@@ -1,7 +1,8 @@
-import { DomainError } from '../../../shared/errors';
+import { DomainError, NotFoundError } from '../../../shared/errors';
 import { EmptyOrderError } from './EmptyOrderError';
 import { InsufficientStockError } from './InsufficientStockError';
 import { InvalidOrderStateError } from './InvalidOrderStateError';
+import { OrderItemNotFoundError } from './OrderItemNotFoundError';
 import { OrderNotFoundError } from './OrderNotFoundError';
 import { ShippingAddressRequiredError } from './ShippingAddressRequiredError';
 
@@ -68,6 +69,20 @@ describe('Order Errors', () => {
 
     it('DomainErrorを継承している', () => {
       expect(error()).toBeInstanceOf(DomainError);
+    });
+  });
+
+  describe('OrderItemNotFoundError', () => {
+    const error = () => new OrderItemNotFoundError('product-1');
+
+    it('正しいメッセージとコードを持つ', () => {
+      expect(error().message).toBe('注文内に商品が見つかりません: product-1');
+      expect(error().code).toBe('ORDER_ITEM_NOT_FOUND');
+    });
+
+    it('NotFoundErrorを継承している', () => {
+      expect(error()).toBeInstanceOf(NotFoundError);
+      expect(error().kind).toBe('notFound');
     });
   });
 });

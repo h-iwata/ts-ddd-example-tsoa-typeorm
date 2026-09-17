@@ -156,6 +156,14 @@ describe('API E2E', () => {
       expect(conflict.body.code).toBe('EMAIL_ALREADY_EXISTS');
     });
 
+    // 値オブジェクトが投げる検証エラーもドメインエラーとして扱われ、500にならない
+    it('空の顧客IDで注文すると400を返す', async () => {
+      const response = await request(app).post('/api/orders').send({ customerId: '' });
+
+      expect(response.status).toBe(400);
+      expect(response.body.code).toBe('INVALID_ID');
+    });
+
     it('在庫を超える数量で確定すると400を返す', async () => {
       const product = await createProduct({ initialStock: 1 });
       const customer = await createCustomerWithAddress();

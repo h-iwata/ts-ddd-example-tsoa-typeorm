@@ -1,3 +1,5 @@
+import { InvalidAddressError } from '../errors';
+
 export class Address {
   private constructor(
     private readonly postalCode: string,
@@ -9,7 +11,7 @@ export class Address {
 
   static create(postalCode: string, prefecture: string, city: string, street: string, building?: string): Address {
     if (!postalCode || !prefecture || !city || !street) {
-      throw new Error('住所の必須項目は空にできません');
+      throw new InvalidAddressError();
     }
     return new Address(postalCode, prefecture, city, street, building);
   }

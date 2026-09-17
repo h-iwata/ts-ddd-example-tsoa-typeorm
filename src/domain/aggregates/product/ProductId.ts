@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { InvalidIdError } from '../../shared/errors';
 
 export class ProductId {
   private constructor(private readonly value: string) {}
@@ -9,7 +10,7 @@ export class ProductId {
 
   static fromString(id: string): ProductId {
     if (!id || id.trim() === '') {
-      throw new Error('商品IDは空にできません');
+      throw new InvalidIdError('商品ID');
     }
     return new ProductId(id);
   }
