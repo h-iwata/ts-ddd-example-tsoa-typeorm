@@ -1,6 +1,6 @@
-import { DomainError } from '../../../shared/errors';
+import { ConflictError } from '../../../shared/errors';
 
-export class EmailAlreadyExistsError extends DomainError {
+export class EmailAlreadyExistsError extends ConflictError {
   readonly code = 'EMAIL_ALREADY_EXISTS';
   constructor(email: string) {
     super(`このメールアドレスは既に登録されています: ${email}`);

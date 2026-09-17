@@ -1,4 +1,4 @@
-import { DomainError } from './DomainError';
+import { DomainError } from './base';
 import { InvalidPriceError } from './InvalidPriceError';
 import { InvalidQuantityError } from './InvalidQuantityError';
 

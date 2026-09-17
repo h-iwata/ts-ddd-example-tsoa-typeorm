@@ -1,6 +1,6 @@
 import { ValidateError } from '@tsoa/runtime';
 import { type NextFunction, type Request, type Response } from 'express';
-import { DomainError } from '../../domain/shared/errors';
+import { DomainError, type DomainErrorKind } from '../../domain/shared/errors';
 
 export function errorHandler(error: unknown, _req: Request, res: Response, next: NextFunction): void {
   if (res.headersSent) {
@@ -20,8 +20,7 @@ export function errorHandler(error: unknown, _req: Request, res: Response, next:
 
   // ドメインエラー
   if (error instanceof DomainError) {
-    const statusCode = getStatusCodeForDomainError(error.code);
-    res.status(statusCode).json({
+    res.status(toStatusCode(error)).json({
       message: error.message,
       code: error.code,
     });
@@ -41,20 +40,21 @@ export function errorHandler(error: unknown, _req: Request, res: Response, next:
   next(error);
 }
 
-function getStatusCodeForDomainError(code: string): number {
-  const statusMap: Record<string, number> = {
-    ORDER_NOT_FOUND: 404,
-    PRODUCT_NOT_FOUND: 404,
-    CUSTOMER_NOT_FOUND: 404,
-    EMAIL_ALREADY_EXISTS: 409,
-    INSUFFICIENT_STOCK: 400,
-    INVALID_ORDER_STATE: 400,
-    EMPTY_ORDER: 400,
-    SHIPPING_ADDRESS_REQUIRED: 400,
-    INVALID_PRICE: 400,
-    INVALID_EMAIL: 400,
-    INVALID_QUANTITY: 400,
-  };
+/**
+ * ドメインエラーの分類をHTTPステータスへ写す
+ *
+ * 個々のエラーではなく分類だけを見るため、新しいエラーを追加しても
+ * この対応表を更新する必要はない。分類そのものが増えた場合は
+ * Record の網羅性チェックによりコンパイルエラーになる。
+ */
+const STATUS_BY_KIND: Record<DomainErrorKind, number> = {
+  notFound: 404,
+  conflict: 409,
+  validation: 400,
+  // 業務ルール違反は422も選択肢だが、既存のAPI契約に合わせて400を返す
+  businessRule: 400,
+};
 
-  return statusMap[code] ?? 500;
+function toStatusCode(error: DomainError): number {
+  return STATUS_BY_KIND[error.kind];
 }

@@ -1,3 +1,10 @@
-export { DomainError } from './DomainError';
+export {
+  BusinessRuleViolationError,
+  ConflictError,
+  DomainError,
+  type DomainErrorKind,
+  NotFoundError,
+  ValidationError,
+} from './base';
 export { InvalidPriceError } from './InvalidPriceError';
 export { InvalidQuantityError } from './InvalidQuantityError';
