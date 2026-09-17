@@ -10,5 +10,10 @@ export function getEntityManager(): EntityManager {
 }
 
 export async function runInTransaction<T>(fn: () => Promise<T>): Promise<T> {
+  // 既にトランザクション中に新しく張ると別コネクションの独立したトランザクションになり、
+  // 外側がロールバックしても内側だけコミットされてしまうため、外側があれば参加する
+  if (storage.getStore()) {
+    return fn();
+  }
   return AppDataSource.transaction((manager) => storage.run(manager, fn));
 }

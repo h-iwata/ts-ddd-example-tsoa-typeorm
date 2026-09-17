@@ -6,7 +6,7 @@ import { ProductId } from '../../domain/aggregates/product';
 import { type IOrderRepository } from '../../domain/repositories';
 import { Address, Money, Quantity } from '../../domain/shared/value-objects';
 import { OrderEntity, OrderItemEntity } from '../database/entities';
-import { getEntityManager } from '../database/transactionContext';
+import { getEntityManager, runInTransaction } from '../database/transactionContext';
 
 @injectable()
 export class OrderRepository implements IOrderRepository {
@@ -39,13 +39,17 @@ export class OrderRepository implements IOrderRepository {
     return entities.map((e) => this.toDomain(e));
   }
 
-  // insertは存在確認もリレーションのカスケードもしないので、明細は自分で挿入する
+  // insertは存在確認をしないので、主キーが衝突すれば例外になる
   async add(order: Order): Promise<void> {
-    const entity = this.toEntity(order);
-    await this.repository.insert(entity);
-    if (entity.items && entity.items.length > 0) {
-      await getEntityManager().getRepository(OrderItemEntity).insert(entity.items);
-    }
+    // 注文だけが残る中途半端な状態を防ぐため、集約1つの保存をトランザクションで束ねる
+    await runInTransaction(async () => {
+      const entity = this.toEntity(order);
+      await this.repository.insert(entity);
+      // insertはリレーションをカスケードしないので、明細は自分で挿入する
+      if (entity.items && entity.items.length > 0) {
+        await getEntityManager().getRepository(OrderItemEntity).insert(entity.items);
+      }
+    });
   }
 
   // TypeORMのsaveは存在確認付きのupsert。既存行があればUPDATEになる

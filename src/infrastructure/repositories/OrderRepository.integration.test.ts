@@ -1,7 +1,7 @@
 import { type Customer } from '../../domain/aggregates/customer';
 import { type Order, OrderId } from '../../domain/aggregates/order';
-import { type Product } from '../../domain/aggregates/product';
-import { Address, Quantity } from '../../domain/shared/value-objects';
+import { type Product, ProductId } from '../../domain/aggregates/product';
+import { Address, Money, Quantity } from '../../domain/shared/value-objects';
 import { newCustomerFactory, newOrderFactory, newProductFactory } from '../../test/factories';
 import { CustomerRepository } from './CustomerRepository';
 import { OrderRepository } from './OrderRepository';
@@ -168,6 +168,16 @@ describe('OrderRepository Integration', () => {
 
       const found = await orderRepository.findById(order.getId());
       expect(found!.getItems()).toHaveLength(1);
+    });
+
+    // 注文と明細が同一トランザクションで書かれることを検証する。
+    it('明細の保存に失敗したら注文も残らない', async () => {
+      const order = createOrder();
+      order.addItem(ProductId.fromString('missing-product'), '存在しない商品', Money.create(100), Quantity.create(1));
+
+      await expect(orderRepository.add(order)).rejects.toThrow();
+
+      expect(await orderRepository.findById(order.getId())).toBeNull();
     });
 
     context('同じIDの注文が既に存在するとき', () => {

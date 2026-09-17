@@ -377,9 +377,23 @@ await this.productRepository.save(product);  // ❌ 衝突時に既存商品を�
 
 ## トランザクション
 
-複数の集約をまたぐ更新は `ITransactionManager`（`src/domain/repositories/ITransactionManager.ts`）を注入して囲む。
+トランザクションの境界を決めるのは**ユースケース層**。複数の集約をまたぐ更新は
+`ITransactionManager`（`src/domain/repositories/ITransactionManager.ts`）を注入して囲む。
 実装は `AsyncLocalStorage` で `EntityManager` を伝播させるため、リポジトリ側は
 `getEntityManager().getRepository(X)` を使うだけでトランザクションに参加する。
+
+`runInTransaction` は**再入可能**で、既にトランザクション中なら新しく張らずに参加する。
+再入対応が無いと、内側が別コネクションの独立したトランザクションになり、
+**外側がロールバックしても内側だけコミットされる**。
+
+これにより、1つの集約の保存に複数のSQLが必要なリポジトリ（`OrderRepository.add()` は
+`orders` と `order_items` に書く）は、呼び出し側のトランザクションの有無によらず
+自分で原子性を保証できる。役割は次のように分かれる。
+
+| 責任 | 担当 |
+|---|---|
+| どこからどこまでが1つの業務操作か（境界） | ユースケース |
+| 1つの集約の保存が原子的であること | リポジトリ |
 
 ```typescript
 return this.transactionManager.run(async () => {
