@@ -10,6 +10,7 @@ describe('ConfirmOrderUseCase', () => {
     findById: jest.fn(),
     findByCustomerId: jest.fn(),
     findAll: jest.fn(),
+    add: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
   });

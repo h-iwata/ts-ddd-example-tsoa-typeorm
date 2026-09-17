@@ -9,6 +9,7 @@ describe('SetCustomerAddressUseCase', () => {
     findByEmail: jest.fn(),
     existsByEmail: jest.fn(),
     findAll: jest.fn(),
+    add: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
   });

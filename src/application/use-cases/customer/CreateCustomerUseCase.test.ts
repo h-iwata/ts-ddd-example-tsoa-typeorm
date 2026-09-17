@@ -7,6 +7,7 @@ describe('CreateCustomerUseCase', () => {
     findByEmail: jest.fn(),
     existsByEmail: jest.fn(),
     findAll: jest.fn(),
+    add: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
   });
@@ -20,7 +21,8 @@ describe('CreateCustomerUseCase', () => {
 
     expect(result.name).toBe('テスト太郎');
     expect(result.email).toBe('test@example.com');
-    expect(repo.save).toHaveBeenCalled();
+    expect(repo.add).toHaveBeenCalled();
+    expect(repo.save).not.toHaveBeenCalled();
   });
 
   context('when メール重複', () => {

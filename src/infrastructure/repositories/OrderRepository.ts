@@ -39,9 +39,18 @@ export class OrderRepository implements IOrderRepository {
     return entities.map((e) => this.toDomain(e));
   }
 
-  async save(order: Order): Promise<void> {
+  // insertは存在確認もリレーションのカスケードもしないので、明細は自分で挿入する
+  async add(order: Order): Promise<void> {
     const entity = this.toEntity(order);
-    await this.repository.save(entity);
+    await this.repository.insert(entity);
+    if (entity.items && entity.items.length > 0) {
+      await getEntityManager().getRepository(OrderItemEntity).insert(entity.items);
+    }
+  }
+
+  // TypeORMのsaveは存在確認付きのupsert。既存行があればUPDATEになる
+  async save(order: Order): Promise<void> {
+    await this.repository.save(this.toEntity(order));
   }
 
   async delete(id: OrderId): Promise<void> {

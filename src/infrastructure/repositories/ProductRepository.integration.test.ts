@@ -1,5 +1,5 @@
-import { ProductId } from '../../domain/aggregates/product';
-import { Quantity } from '../../domain/shared/value-objects';
+import { Product, ProductId } from '../../domain/aggregates/product';
+import { Money, Quantity } from '../../domain/shared/value-objects';
 import { newProductFactory } from '../../test/factories';
 import { ProductRepository } from './ProductRepository';
 
@@ -94,6 +94,40 @@ describe('ProductRepository Integration', () => {
 
       const found = await repository.findById(product.getId());
       expect(found!.getStock().getValue()).toBe(99); // 10 + 89
+    });
+  });
+
+  describe('#add', () => {
+    it('新規の商品を追加できる', async () => {
+      const product = newProductFactory.build();
+      await repository.add(product);
+
+      const found = await repository.findById(product.getId());
+      expect(found!.getName()).toBe(product.getName());
+    });
+
+    // saveはupsertなので既存行を静かに上書きしてしまう。addは主キー衝突を検出する
+    context('同じIDの商品が既に存在するとき', () => {
+      it('例外を投げ、既存データを上書きしない', async () => {
+        const existing = newProductFactory.build();
+        await repository.add(existing);
+
+        const conflicting = Product.reconstruct({
+          id: existing.getId(),
+          name: '上書きしようとする商品',
+          description: '',
+          price: Money.create(99999),
+          stock: Quantity.create(999),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        await expect(repository.add(conflicting)).rejects.toThrow();
+
+        const found = await repository.findById(existing.getId());
+        expect(found!.getName()).toBe(existing.getName());
+        expect(found!.getPrice().getAmount()).toBe(existing.getPrice().getAmount());
+      });
     });
   });
 });

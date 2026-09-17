@@ -9,6 +9,7 @@ describe('AddOrderItemUseCase', () => {
     findById: jest.fn(),
     findByCustomerId: jest.fn(),
     findAll: jest.fn(),
+    add: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
   });
@@ -16,6 +17,7 @@ describe('AddOrderItemUseCase', () => {
     findById: jest.fn(),
     findByIds: jest.fn(),
     findAll: jest.fn(),
+    add: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
   });

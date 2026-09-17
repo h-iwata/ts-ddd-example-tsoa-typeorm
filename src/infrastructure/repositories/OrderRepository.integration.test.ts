@@ -158,4 +158,25 @@ describe('OrderRepository Integration', () => {
       expect(found!.getItems()).toHaveLength(2);
     });
   });
+
+  describe('#add', () => {
+    // insertはリレーションをカスケードしないため、明細を明示的に挿入している
+    it('明細を持つ注文を追加しても明細が失われない', async () => {
+      const order = createOrder();
+      addItemToOrder(order);
+      await orderRepository.add(order);
+
+      const found = await orderRepository.findById(order.getId());
+      expect(found!.getItems()).toHaveLength(1);
+    });
+
+    context('同じIDの注文が既に存在するとき', () => {
+      it('例外を投げる', async () => {
+        const order = createOrder();
+        await orderRepository.add(order);
+
+        await expect(orderRepository.add(order)).rejects.toThrow();
+      });
+    });
+  });
 });

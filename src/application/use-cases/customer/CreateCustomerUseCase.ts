@@ -20,7 +20,7 @@ export class CreateCustomerUseCase {
       throw new EmailAlreadyExistsError(dto.email);
     }
     const customer = Customer.create(dto.name, email);
-    await this.customerRepository.save(customer);
+    await this.customerRepository.add(customer);
 
     return toCustomerResponseDto(customer);
   }

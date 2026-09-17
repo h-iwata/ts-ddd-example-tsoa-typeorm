@@ -33,10 +33,19 @@ export class CustomerRepository implements ICustomerRepository {
     return entities.map((e) => this.toDomain(e));
   }
 
+  // insertは存在確認をしないので、主キーが衝突すれば例外になる
+  async add(customer: Customer): Promise<void> {
+    await this.translateEmailConflict(customer, () => this.repository.insert(this.toEntity(customer)));
+  }
+
+  // TypeORMのsaveは存在確認付きのupsert。既存行があればUPDATEになる
   async save(customer: Customer): Promise<void> {
-    const entity = this.toEntity(customer);
+    await this.translateEmailConflict(customer, () => this.repository.save(this.toEntity(customer)));
+  }
+
+  private async translateEmailConflict(customer: Customer, write: () => Promise<unknown>): Promise<void> {
     try {
-      await this.repository.save(entity);
+      await write();
     } catch (error) {
       // existsByEmail の確認と保存の間に、別のリクエストが同じメールを登録した場合に起きる
       if (isUniqueViolation(error, UQ_CUSTOMERS_EMAIL)) {

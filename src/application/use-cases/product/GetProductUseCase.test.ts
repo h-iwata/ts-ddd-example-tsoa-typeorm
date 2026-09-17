@@ -8,6 +8,7 @@ describe('GetProductUseCase', () => {
     findById: jest.fn(),
     findByIds: jest.fn(),
     findAll: jest.fn(),
+    add: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
   });

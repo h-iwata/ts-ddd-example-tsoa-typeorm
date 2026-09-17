@@ -30,9 +30,14 @@ export class ProductRepository implements IProductRepository {
     return entities.map((e) => this.toDomain(e));
   }
 
+  // insertは存在確認をしないので、主キーが衝突すれば例外になる
+  async add(product: Product): Promise<void> {
+    await this.repository.insert(this.toEntity(product));
+  }
+
+  // TypeORMのsaveは存在確認付きのupsert。既存行があればUPDATEになる
   async save(product: Product): Promise<void> {
-    const entity = this.toEntity(product);
-    await this.repository.save(entity);
+    await this.repository.save(this.toEntity(product));
   }
 
   async delete(id: ProductId): Promise<void> {

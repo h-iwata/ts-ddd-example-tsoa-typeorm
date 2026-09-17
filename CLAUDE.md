@@ -348,6 +348,33 @@ describe('#methodName', () => {
 - `public async up` / `public async down` の `public` を削除（`useConsistentMemberAccessibility` に抵触）
 - `make check-fix` でフォーマットとimport整列を適用
 
+## リポジトリ
+
+新規追加と更新は別メソッドにする。
+
+| メソッド | 実装 | 既存IDのとき |
+|---|---|---|
+| `add(集約)` | `insert()` | **一意制約違反で例外** |
+| `save(集約)` | `save()` | UPDATE |
+
+TypeORMの `save()` は毎回 `SELECT` で存在を確認してから `INSERT` か `UPDATE` を選ぶ **upsert** なので、
+新規作成に使うと**主キーが衝突しても例外にならず既存行を静かに上書きする**。データ欠損に直結するため、
+新規作成のユースケースは必ず `add()` を使う。
+
+```typescript
+// CreateXxxUseCase
+await this.productRepository.add(product);   // ⭕️
+await this.productRepository.save(product);  // ❌ 衝突時に既存商品を上書きする
+```
+
+`findById` などで取得した集約の更新は `save()` を使う。
+
+`insert()` はリレーションを**カスケードしない**ため、子を持つ集約（`Order` と `OrderItem`）の `add()` では
+子を明示的に挿入する。カスケードに任せると子が黙って失われる。
+
+なお `save()` を「更新専用」にはしていない。MySQLの `affected` は既定で
+*一致した行数* ではなく *変更された行数* を返すため、値が変わらない更新を「該当なし」と誤判定するリスクがある。
+
 ## トランザクション
 
 複数の集約をまたぐ更新は `ITransactionManager`（`src/domain/repositories/ITransactionManager.ts`）を注入して囲む。

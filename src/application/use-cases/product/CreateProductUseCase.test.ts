@@ -6,6 +6,7 @@ describe('CreateProductUseCase', () => {
     findById: jest.fn(),
     findByIds: jest.fn(),
     findAll: jest.fn(),
+    add: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
   });
@@ -19,7 +20,8 @@ describe('CreateProductUseCase', () => {
     expect(result.name).toBe('テスト商品');
     expect(result.price).toBe(1000);
     expect(result.stock).toBe(10);
-    expect(repo.save).toHaveBeenCalled();
+    expect(repo.add).toHaveBeenCalled();
+    expect(repo.save).not.toHaveBeenCalled();
   });
 
   it('通貨を指定できる', async () => {

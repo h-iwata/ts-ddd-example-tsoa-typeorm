@@ -126,6 +126,37 @@ describe('CustomerRepository Integration', () => {
     });
   });
 
+  describe('#add', () => {
+    context('同じIDの顧客が既に存在するとき', () => {
+      it('例外を投げ、既存データを上書きしない', async () => {
+        const existing = newCustomerFactory.build();
+        await repository.add(existing);
+
+        const conflicting = Customer.reconstruct({
+          id: existing.getId(),
+          name: '上書きしようとする顧客',
+          email: Email.create('overwrite@example.com'),
+          shippingAddress: null,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+
+        await expect(repository.add(conflicting)).rejects.toThrow();
+
+        const found = await repository.findById(existing.getId());
+        expect(found!.getName()).toBe(existing.getName());
+      });
+    });
+
+    context('メールアドレスが重複するとき', () => {
+      it('EmailAlreadyExistsErrorに翻訳される', async () => {
+        await repository.add(Customer.create('先行', Email.create('add-dup@example.com')));
+
+        await expect(repository.add(Customer.create('後続', Email.create('add-dup@example.com')))).rejects.toThrow(EmailAlreadyExistsError);
+      });
+    });
+  });
+
   describe('一意制約違反の翻訳', () => {
     const duplicated = () => Customer.create('別の顧客', Email.create('duplicate@example.com'));
 

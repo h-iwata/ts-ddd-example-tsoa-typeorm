@@ -28,7 +28,7 @@ export class CreateOrderUseCase {
     if (shippingAddress) {
       order.setShippingAddress(shippingAddress);
     }
-    await this.orderRepository.save(order);
+    await this.orderRepository.add(order);
 
     return toOrderResponseDto(order);
   }

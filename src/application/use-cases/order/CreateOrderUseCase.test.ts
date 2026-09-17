@@ -8,6 +8,7 @@ describe('CreateOrderUseCase', () => {
     findById: jest.fn(),
     findByCustomerId: jest.fn(),
     findAll: jest.fn(),
+    add: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
   });
@@ -16,6 +17,7 @@ describe('CreateOrderUseCase', () => {
     findByEmail: jest.fn(),
     existsByEmail: jest.fn(),
     findAll: jest.fn(),
+    add: jest.fn(),
     save: jest.fn(),
     delete: jest.fn(),
   });
@@ -32,7 +34,8 @@ describe('CreateOrderUseCase', () => {
 
     expect(result.customerId).toBe(customer.getId().getValue());
     expect(result.status).toBe('PENDING');
-    expect(orderRepo.save).toHaveBeenCalled();
+    expect(orderRepo.add).toHaveBeenCalled();
+    expect(orderRepo.save).not.toHaveBeenCalled();
   });
 
   context('with 顧客の配送先', () => {
