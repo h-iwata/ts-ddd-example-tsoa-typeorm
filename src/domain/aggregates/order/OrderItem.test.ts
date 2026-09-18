@@ -46,12 +46,23 @@ describe('OrderItem', () => {
     });
   });
 
-  describe('#changeQuantity', () => {
-    it('数量を変更する', () => {
+  describe('#withQuantity', () => {
+    it('数量を変えた新しい明細を返す', () => {
+      const changed = createItem(1000, 2).withQuantity(Quantity.create(5));
+      expect(changed.getQuantity().getValue()).toBe(5);
+      expect(changed.getSubtotal().getAmount()).toBe(5000);
+    });
+
+    it('同じ明細として扱えるようIDを引き継ぐ', () => {
       const item = createItem(1000, 2);
-      item.changeQuantity(Quantity.create(5));
-      expect(item.getQuantity().getValue()).toBe(5);
-      expect(item.getSubtotal().getAmount()).toBe(5000);
+      expect(item.withQuantity(Quantity.create(5)).getId().getValue()).toBe(item.getId().getValue());
+    });
+
+    // 元の明細が変わってしまうと、Orderが握っている参照ごと書き換わってしまう
+    it('元の明細は変わらない', () => {
+      const item = createItem(1000, 2);
+      item.withQuantity(Quantity.create(5));
+      expect(item.getQuantity().getValue()).toBe(2);
     });
   });
 });

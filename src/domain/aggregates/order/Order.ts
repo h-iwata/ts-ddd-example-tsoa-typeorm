@@ -80,13 +80,12 @@ export class Order {
   // 同じ商品が既にあれば、明細を増やさず数量を加算する
   addItem(productId: ProductId, productName: string, unitPrice: Money, quantity: Quantity): void {
     this.assertCanModify();
-    const existingItem = this.items.find((item) => item.getProductId().equals(productId));
-    if (existingItem) {
-      const newQuantity = existingItem.getQuantity().add(quantity);
-      existingItem.changeQuantity(newQuantity);
+    const index = this.items.findIndex((item) => item.getProductId().equals(productId));
+    if (index >= 0) {
+      const existingItem = this.items[index];
+      this.items[index] = existingItem.withQuantity(existingItem.getQuantity().add(quantity));
     } else {
-      const newItem = OrderItem.create(productId, productName, unitPrice, quantity);
-      this.items.push(newItem);
+      this.items.push(OrderItem.create(productId, productName, unitPrice, quantity));
     }
 
     this.updatedAt = new Date();
@@ -101,14 +100,14 @@ export class Order {
   // 数量が0なら明細ごと削除する
   updateItemQuantity(productId: ProductId, newQuantity: Quantity): void {
     this.assertCanModify();
-    const item = this.items.find((item) => item.getProductId().equals(productId));
-    if (!item) {
+    const index = this.items.findIndex((item) => item.getProductId().equals(productId));
+    if (index < 0) {
       throw new OrderItemNotFoundError(productId.getValue());
     }
     if (newQuantity.isZero()) {
       this.removeItem(productId);
     } else {
-      item.changeQuantity(newQuantity);
+      this.items[index] = this.items[index].withQuantity(newQuantity);
     }
 
     this.updatedAt = new Date();

@@ -3,6 +3,7 @@ import { CustomerId } from '../customer/CustomerId';
 import { ProductId } from '../product/ProductId';
 import { EmptyOrderError, InvalidOrderStateError } from './errors';
 import { Order } from './Order';
+import { type OrderItem } from './OrderItem';
 import { OrderStatus } from './OrderStatus';
 
 describe('Order', () => {
@@ -218,6 +219,40 @@ describe('Order', () => {
       order.markAsPaid();
       order.markAsShipped();
       expect(order.canBeCancelled()).toBe(false);
+    });
+  });
+
+  // 明細への変更はOrderを経由しなければならない。
+  // getItems()で取り出した明細から注文の状態を変えられると、confirm後の変更禁止が迂回される
+  describe('集約の境界', () => {
+    context('確定済みの注文で取得した明細から数量を変えようとしたとき', () => {
+      it('注文の合計金額は変わらない', () => {
+        const order = createOrder();
+        prepareForConfirm(order);
+        order.confirm();
+        const before = order.getTotalAmount().getAmount();
+
+        order.getItems()[0].withQuantity(Quantity.create(999));
+
+        expect(order.getTotalAmount().getAmount()).toBe(before);
+      });
+
+      it('Order経由なら確定済みを理由に拒否される', () => {
+        const order = createOrder();
+        prepareForConfirm(order);
+        order.confirm();
+
+        expect(() => order.updateItemQuantity(productId(), Quantity.create(999))).toThrow(InvalidOrderStateError);
+      });
+    });
+
+    it('getItems()で得た配列に要素を足しても明細は増えない', () => {
+      const order = createOrder();
+      addItem(order);
+
+      (order.getItems() as OrderItem[]).push(order.getItems()[0]);
+
+      expect(order.getItems()).toHaveLength(1);
     });
   });
 });

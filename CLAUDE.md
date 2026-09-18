@@ -173,6 +173,36 @@ export interface ErrorResponse {
 上記以外でJSDoc形式（`/** */`）を使うのは、「残してよいコメント」に該当する場合のみ。
 説明的な要約JSDocは付けない。
 
+### 集約の境界
+
+集約の状態は**ルートを経由してしか変えられない**ようにする。ルートが持つ子エンティティを
+getterで外に出すと、ルートの検証（`assertCanModify` など）を迂回して書き換えられてしまう。
+
+対策は2つ。
+
+1. **配列はコピーして返す** — `return [...this.items]` で要素の追加・削除を防ぐ
+2. **子エンティティを不変にする** — 変更メソッドは新しいインスタンスを返し、ルートが要素ごと差し替える
+
+```typescript
+// OrderItem: 変更せず新しい明細を返す
+withQuantity(newQuantity: Quantity): OrderItem {
+  return new OrderItem(this.id, this.productId, this.productName, this.unitPrice, newQuantity);
+}
+
+// Order: 要素を差し替える。assertCanModify を必ず通る
+updateItemQuantity(productId: ProductId, newQuantity: Quantity): void {
+  this.assertCanModify();
+  const index = this.items.findIndex((item) => item.getProductId().equals(productId));
+  ...
+  this.items[index] = this.items[index].withQuantity(newQuantity);
+}
+```
+
+1だけでは不十分で、配列をコピーしても**要素は同じ参照**なので子に変更メソッドがあると迂回できる。
+
+なお `private` / `readonly` はコンパイル時の制約でしかなく、キャストによる実行時の書き換えは防げない。
+守れるのは「普通に書いたコードが不変条件を壊さないこと」までで、意図的な迂回は対象外。
+
 ### 集約のreconstructパターン
 
 集約の再構築にはパラメータオブジェクトパターンを使用:

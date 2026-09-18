@@ -9,7 +9,7 @@ export class OrderItem {
     private readonly productId: ProductId,
     private readonly productName: string,
     private readonly unitPrice: Money,
-    private quantity: Quantity
+    private readonly quantity: Quantity
   ) {}
 
   static create(productId: ProductId, productName: string, unitPrice: Money, quantity: Quantity): OrderItem {
@@ -44,7 +44,9 @@ export class OrderItem {
     return this.unitPrice.multiply(this.quantity.getValue());
   }
 
-  changeQuantity(newQuantity: Quantity): void {
-    this.quantity = newQuantity;
+  // 不変にすることで、getItems()で取り出した明細を外から書き換えられなくする。
+  // 数量の変更はOrderが要素ごと差し替える
+  withQuantity(newQuantity: Quantity): OrderItem {
+    return new OrderItem(this.id, this.productId, this.productName, this.unitPrice, newQuantity);
   }
 }
