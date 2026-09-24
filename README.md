@@ -38,7 +38,7 @@ ID生成は外部ライブラリを使わず、Node標準の `node:crypto` の `
 
 ## アプリケーションの流れ
 
-商品を購入するまでの基本フローです。
+商品を購入するまでの基本フローと、公開しているAPIの範囲です。
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -80,6 +80,14 @@ ID生成は外部ライブラリを使わず、Node標準の `node:crypto` の `
 │  │ Product │    │   Order   │                                       │
 │  │ 在庫:8  │◀───│ CONFIRMED │  ← 在庫引き当て完了                    │
 │  └────────┘    └───────────┘                                        │
+│       ▲             │                                               │
+│       │             │  ⑦ キャンセル（任意・PENDINGからでも可）       │
+│       │             │  POST /orders/:id/cancel                      │
+│       │             ▼                                               │
+│  ┌────────┐    ┌───────────┐                                        │
+│  │ Product │    │   Order   │                                       │
+│  │ 在庫:10 │◀───│ CANCELLED │  ← 引き当て済みなら在庫を戻す          │
+│  └────────┘    └───────────┘                                        │
 │                                                                     │
 └─────────────────────────────────────────────────────────────────────┘
 ```
@@ -92,6 +100,13 @@ ID生成は外部ライブラリを使わず、Node標準の `node:crypto` の `
 | ④ 注文作成 | `POST /api/orders` | 顧客IDを指定して注文を作成（PENDING状態） |
 | ⑤ 商品追加 | `POST /api/orders/:id/items` | 注文に商品と数量を追加 |
 | ⑥ 注文確定 | `POST /api/orders/:id/confirm` | 在庫を引き当てて注文を確定（CONFIRMED状態） |
+| ⑦ キャンセル | `POST /api/orders/:id/cancel` | 注文をキャンセル（CANCELLED状態）。確定後なら在庫を戻す |
+
+⑦はどの時点でも実行できます。`PENDING`（在庫未引き当て）ならそのまま、
+`CONFIRMED` 以降なら在庫を戻してからキャンセルします。
+
+参照系（`GET /api/products`、`GET /api/orders/:id` など）は上図に含めていません。
+全エンドポイントは[API一覧](#api一覧)を参照してください。
 
 ## 構成の概要
 
@@ -152,6 +167,22 @@ PENDING → CONFIRMED → PAID → SHIPPED → DELIVERED
     │         │        │
     └─────────┴────────┴──→ CANCELLED
 ```
+
+状態遷移のルールは `Order` 集約が全て持っていますが、**API を用意しているのは `CONFIRMED` と `CANCELLED` までです**。
+
+| 遷移 | API | 集約のメソッド |
+|---|---|---|
+| PENDING → CONFIRMED | `POST /api/orders/:id/confirm` | `confirm()` |
+| PENDING → CANCELLED | `POST /api/orders/:id/cancel` | `cancel()` |
+| CONFIRMED → CANCELLED | `POST /api/orders/:id/cancel` | `cancel()` |
+| CONFIRMED → PAID | **なし** | `markAsPaid()` |
+| PAID → SHIPPED | **なし** | `markAsShipped()` |
+| PAID → CANCELLED | **なし**（PAIDに到達できないため） | `cancel()` |
+| SHIPPED → DELIVERED | **なし** | `markAsDelivered()` |
+
+支払い・発送・配達完了は決済や配送業者との連携が本体であり、DDDの学習題材としては
+`confirm`（在庫引き当て）と `cancel`（在庫戻し）で十分なため、API は意図的に省略しています。
+`markAsPaid()` 以降は集約には実装済みで、ユニットテストからのみ検証しています。
 
 ## 依存関係の方向
 
