@@ -89,11 +89,12 @@ describe('ProductRepository Integration', () => {
       const product = newProductFactory.build();
       await repository.save(product);
 
+      const stockBefore = product.getStock().getValue();
       product.increaseStock(Quantity.create(89));
       await repository.save(product);
 
       const found = await repository.findById(product.getId());
-      expect(found!.getStock().getValue()).toBe(99); // 10 + 89
+      expect(found!.getStock().getValue()).toBe(stockBefore + 89);
     });
   });
 
@@ -106,7 +107,6 @@ describe('ProductRepository Integration', () => {
       expect(found!.getName()).toBe(product.getName());
     });
 
-    // saveはupsertなので既存行を静かに上書きしてしまう。addは主キー衝突を検出する
     context('同じIDの商品が既に存在するとき', () => {
       it('例外を投げ、既存データを上書きしない', async () => {
         const existing = newProductFactory.build();

@@ -7,6 +7,7 @@ describe('GetProductUseCase', () => {
   const mockRepo = (): jest.Mocked<IProductRepository> => ({
     findById: jest.fn(),
     findByIds: jest.fn(),
+    findByIdsForUpdate: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),
     save: jest.fn(),

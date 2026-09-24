@@ -29,7 +29,7 @@ export class OrderDomainService {
 
   async validateAndReserveStock(order: Order): Promise<void> {
     const items = order.getItems();
-    const products = await this.productRepository.findByIds(items.map((item) => item.getProductId()));
+    const products = await this.productRepository.findByIdsForUpdate(items.map((item) => item.getProductId()));
     const productMap: ProductMap = new Map(products.map((p) => [p.getId().getValue(), p]));
     validateStock(items, productMap);
     await this.reserveStock(items, productMap);

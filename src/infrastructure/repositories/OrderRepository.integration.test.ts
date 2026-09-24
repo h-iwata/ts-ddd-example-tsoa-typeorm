@@ -160,7 +160,6 @@ describe('OrderRepository Integration', () => {
   });
 
   describe('#add', () => {
-    // insertはリレーションをカスケードしないため、明細を明示的に挿入している
     it('明細を持つ注文を追加しても明細が失われない', async () => {
       const order = createOrder();
       addItemToOrder(order);
@@ -170,7 +169,6 @@ describe('OrderRepository Integration', () => {
       expect(found!.getItems()).toHaveLength(1);
     });
 
-    // 注文と明細が同一トランザクションで書かれることを検証する。
     it('明細の保存に失敗したら注文も残らない', async () => {
       const order = createOrder();
       order.addItem(ProductId.fromString('missing-product'), '存在しない商品', Money.create(100), Quantity.create(1));

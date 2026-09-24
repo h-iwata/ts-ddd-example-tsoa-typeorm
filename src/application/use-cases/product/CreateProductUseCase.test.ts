@@ -5,6 +5,7 @@ describe('CreateProductUseCase', () => {
   const mockRepo = (): jest.Mocked<IProductRepository> => ({
     findById: jest.fn(),
     findByIds: jest.fn(),
+    findByIdsForUpdate: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),
     save: jest.fn(),
@@ -30,7 +31,6 @@ describe('CreateProductUseCase', () => {
     expect(result.currency).toBe('USD');
   });
 
-  // 既定通貨はMoneyが持つ。ユースケース側で既定値を補うとドメインと二重管理になる
   it('通貨を省略するとMoneyの既定値になる', async () => {
     const result = await new CreateProductUseCase(mockRepo()).execute({ ...dto, currency: undefined });
 

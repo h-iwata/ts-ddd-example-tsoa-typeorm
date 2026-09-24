@@ -131,7 +131,18 @@ if (!customer) {
 | **TODO** | `// TODO: 〜`（放置しない。残す理由を書く） |
 | **生成物の入力**（後述） | tsoaコントローラーのJSDoc、`biome-ignore` |
 
-テストでは、テスト名に収まらない**前提条件や、そのテストが何を守っているか**を書いてよい。
+**テストにはコメントを書かない。** `describe` / `context` / `it` の名前と、
+ヘルパー・変数の名前だけで何を検証しているか分かる構成にする。
+説明したくなったら、テスト名を具体的にするか、意図が伝わる名前のヘルパーに切り出す。
+
+```typescript
+// ❌ コメントで補う
+// 配送先なし → 確定は失敗する
+const customer = await createCustomer();
+
+// ⭕️ 名前で表す
+const customer = await createCustomerWithoutAddress();
+```
 
 #### 書いてはいけないコメント
 
@@ -404,6 +415,39 @@ await this.productRepository.save(product);  // ❌ 衝突時に既存商品を�
 
 なお `save()` を「更新専用」にはしていない。MySQLの `affected` は既定で
 *一致した行数* ではなく *変更された行数* を返すため、値が変わらない更新を「該当なし」と誤判定するリスクがある。
+
+## 同時実行制御
+
+トランザクションで囲むだけでは同時実行の競合は防げない。MySQL InnoDB の既定は `REPEATABLE READ` で、
+**ロック句のない `SELECT` はスナップショット読み取り**になりロックを取らないため、
+2つのトランザクションが同じ古い値を読んで両方とも書き込める（ロストアップデート）。
+
+**読んだ値を根拠に書き込む場合は、読み取り時に行ロックを取る。**
+
+```typescript
+// ProductRepository: 在庫の確認と更新の間に割り込ませない
+async findByIdsForUpdate(ids: ProductId[]): Promise<Product[]> {
+  const entities = await this.repository.find({
+    where: ids.map((id) => ({ id: id.getValue() })),
+    lock: { mode: 'pessimistic_write' },   // SELECT ... FOR UPDATE
+    order: { id: 'ASC' },                  // 複数行をロックする際のデッドロックを避ける
+  });
+  ...
+}
+```
+
+| リポジトリのメソッド | 用途 |
+|---|---|
+| `findById` / `findByIds` | 表示用。ロックなし |
+| `findByIdForUpdate` / `findByIdsForUpdate` | **状態を見て更新する場合。トランザクション内でのみ使う** |
+
+`ConfirmOrderUseCase` / `CancelOrderUseCase` は注文と商品の両方をロックして取得する。
+どちらか一方でも欠けると次の事故が起きる。
+
+- 商品をロックしない → 在庫1に2件の注文が同時確定して**売り越す**
+- 注文をロックしない → 同じ注文の同時確定が両方通り、**在庫が二重に引き当てられる**
+
+ロック句は**トランザクション内でしか機能しない**（TypeORMは外で使うと例外を投げる）。
 
 ## トランザクション
 

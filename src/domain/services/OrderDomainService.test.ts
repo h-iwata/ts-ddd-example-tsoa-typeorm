@@ -12,6 +12,7 @@ describe('OrderDomainService', () => {
   const mockRepo = (): jest.Mocked<IProductRepository> => ({
     findById: jest.fn(),
     findByIds: jest.fn(),
+    findByIdsForUpdate: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),
     save: jest.fn(),
@@ -42,7 +43,7 @@ describe('OrderDomainService', () => {
     it('在庫が十分な場合は成功する', async () => {
       const repo = mockRepo();
       const product = createProduct('product-1', 10);
-      repo.findByIds.mockResolvedValue([product]);
+      repo.findByIdsForUpdate.mockResolvedValue([product]);
 
       await new OrderDomainService(repo).validateAndReserveStock(createOrder());
 
@@ -53,7 +54,7 @@ describe('OrderDomainService', () => {
     context('when 商品が見つからない', () => {
       it('エラーを投げる', async () => {
         const repo = mockRepo();
-        repo.findByIds.mockResolvedValue([]);
+        repo.findByIdsForUpdate.mockResolvedValue([]);
 
         await expect(new OrderDomainService(repo).validateAndReserveStock(createOrder())).rejects.toThrow(ProductNotFoundError);
       });
@@ -62,7 +63,7 @@ describe('OrderDomainService', () => {
     context('when 在庫不足', () => {
       it('エラーを投げる', async () => {
         const repo = mockRepo();
-        repo.findByIds.mockResolvedValue([createProduct('product-1', 1)]);
+        repo.findByIdsForUpdate.mockResolvedValue([createProduct('product-1', 1)]);
 
         await expect(new OrderDomainService(repo).validateAndReserveStock(createOrder())).rejects.toThrow(InsufficientStockError);
       });
@@ -78,7 +79,7 @@ describe('OrderDomainService', () => {
 
         const product1 = createProduct('product-1', 10);
         const product2 = createProduct('product-2', 10);
-        repo.findByIds.mockResolvedValue([product1, product2]);
+        repo.findByIdsForUpdate.mockResolvedValue([product1, product2]);
 
         await new OrderDomainService(repo).validateAndReserveStock(order);
 

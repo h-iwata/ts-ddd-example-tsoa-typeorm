@@ -8,6 +8,7 @@ import { ConfirmOrderUseCase } from './ConfirmOrderUseCase';
 describe('ConfirmOrderUseCase', () => {
   const mockRepo = (): jest.Mocked<IOrderRepository> => ({
     findById: jest.fn(),
+    findByIdForUpdate: jest.fn(),
     findByCustomerId: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),
@@ -25,7 +26,7 @@ describe('ConfirmOrderUseCase', () => {
     const repo = mockRepo();
     const service = mockService();
     const order = orderFactory.build({}, { transient: { withItems: true, withAddress: true } });
-    repo.findById.mockResolvedValue(order);
+    repo.findByIdForUpdate.mockResolvedValue(order);
 
     const result = await new ConfirmOrderUseCase(repo, service, stubTransactionManager()).execute(order.getId().getValue());
 
@@ -37,7 +38,7 @@ describe('ConfirmOrderUseCase', () => {
   context('when 注文が見つからない', () => {
     it('エラーを投げる', async () => {
       const repo = mockRepo();
-      repo.findById.mockResolvedValue(null);
+      repo.findByIdForUpdate.mockResolvedValue(null);
 
       await expect(new ConfirmOrderUseCase(repo, mockService(), stubTransactionManager()).execute('x')).rejects.toThrow(OrderNotFoundError);
     });
@@ -48,7 +49,7 @@ describe('ConfirmOrderUseCase', () => {
       const repo = mockRepo();
       const service = mockService();
       const order = orderFactory.build({}, { transient: { withItems: true, withAddress: true } });
-      repo.findById.mockResolvedValue(order);
+      repo.findByIdForUpdate.mockResolvedValue(order);
       service.validateAndReserveStock.mockRejectedValue(new Error('在庫不足'));
 
       await expect(new ConfirmOrderUseCase(repo, service, stubTransactionManager()).execute(order.getId().getValue())).rejects.toThrow(

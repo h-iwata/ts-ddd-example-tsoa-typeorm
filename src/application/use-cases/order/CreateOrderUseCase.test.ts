@@ -6,6 +6,7 @@ import { CreateOrderUseCase } from './CreateOrderUseCase';
 describe('CreateOrderUseCase', () => {
   const mockOrderRepo = (): jest.Mocked<IOrderRepository> => ({
     findById: jest.fn(),
+    findByIdForUpdate: jest.fn(),
     findByCustomerId: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),

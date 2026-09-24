@@ -13,7 +13,6 @@ describe('runInTransaction Integration', () => {
   };
 
   context('ネストして呼ばれたとき', () => {
-    // 内側で新しくトランザクションを張ると別コネクションになり、外側のロールバックから外れてしまう
     it('内側は外側のトランザクションに参加し、外側の失敗で一緒に巻き戻る', async () => {
       await expect(
         runInTransaction(async () => {

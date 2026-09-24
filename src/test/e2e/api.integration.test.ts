@@ -35,8 +35,8 @@ describe('API E2E', () => {
     return response;
   };
 
-  // 注文の確定には配送先が必要。注文は作成時に顧客の配送先を引き継ぐため、
-  // 注文を作る前に顧客側へ設定しておく
+  const createCustomerWithoutAddress = createCustomer;
+
   const createCustomerWithAddress = async (overrides: Record<string, unknown> = {}) => {
     const customer = await createCustomer(overrides);
     await request(app)
@@ -130,7 +130,6 @@ describe('API E2E', () => {
       expect(response.body.code).toBe('VALIDATION_ERROR');
     });
 
-    // Express 5では未パースのbodyが {} ではなく undefined になるため、挙動の固定を兼ねる
     it('bodyなしのリクエストは400を返す', async () => {
       const response = await request(app).post('/api/products').set('Content-Type', 'application/json').send();
       expect(response.status).toBe(400);
@@ -144,7 +143,6 @@ describe('API E2E', () => {
       expect(response.body.code).toBe('EMAIL_ALREADY_EXISTS');
     });
 
-    // 事前チェックと保存の間には隙間があり、同時実行では両方がチェックを通過しうる
     it('同じメールアドレスで同時に登録しても500にならず409を返す', async () => {
       const [first, second] = await Promise.all([
         createCustomer({ email: 'race@example.com' }),
@@ -158,7 +156,6 @@ describe('API E2E', () => {
       expect(conflict.body.code).toBe('EMAIL_ALREADY_EXISTS');
     });
 
-    // 値オブジェクトが投げる検証エラーもドメインエラーとして扱われ、500にならない
     it('空の顧客IDで注文すると400を返す', async () => {
       const response = await request(app).post('/api/orders').send({ customerId: '' });
 
@@ -179,7 +176,7 @@ describe('API E2E', () => {
 
     it('配送先が未設定の注文を確定すると400を返す', async () => {
       const product = await createProduct();
-      const customer = await createCustomer(); // 配送先を設定しない
+      const customer = await createCustomerWithoutAddress();
       const order = await request(app).post('/api/orders').send({ customerId: customer.body.id });
       await request(app).post(`/api/orders/${order.body.id}/items`).send({ productId: product.body.id, quantity: 1 });
 
@@ -198,11 +195,48 @@ describe('API E2E', () => {
     });
   });
 
-  context('確定処理の原子性', () => {
-    // 確定が失敗した場合に在庫だけが減っていてはならない
-    it('確定に失敗した場合は在庫が変化しない', async () => {
+  context('在庫の同時引き当て', () => {
+    const orderFor = async (customerId: string, productId: string) => {
+      const order = await request(app).post('/api/orders').send({ customerId });
+      await request(app).post(`/api/orders/${order.body.id}/items`).send({ productId, quantity: 1 });
+      return order.body.id as string;
+    };
+
+    it('在庫1の商品を2つの注文が同時に確定しようとすると片方だけ成功する', async () => {
+      const product = await createProduct({ initialStock: 1 });
+      const customer = await createCustomerWithAddress({ email: 'stock-race@example.com' });
+      const orderIds = [await orderFor(customer.body.id, product.body.id), await orderFor(customer.body.id, product.body.id)];
+
+      const responses = await Promise.all(orderIds.map((id) => request(app).post(`/api/orders/${id}/confirm`).send()));
+
+      expect(responses.map((r) => r.status).sort()).toEqual([200, 400]);
+      expect(responses.find((r) => r.status === 400)?.body.code).toBe('INSUFFICIENT_STOCK');
+
+      const after = await request(app).get(`/api/products/${product.body.id}`);
+      expect(after.body.stock).toBe(0);
+    });
+
+    it('同じ注文を同時に2回確定しようとしても在庫は1回分しか減らない', async () => {
       const product = await createProduct({ initialStock: 10 });
-      const customer = await createCustomer(); // 配送先なし → 確定は失敗する
+      const customer = await createCustomerWithAddress({ email: 'same-order-race@example.com' });
+      const orderId = await orderFor(customer.body.id, product.body.id);
+
+      const responses = await Promise.all([
+        request(app).post(`/api/orders/${orderId}/confirm`).send(),
+        request(app).post(`/api/orders/${orderId}/confirm`).send(),
+      ]);
+
+      expect(responses.map((r) => r.status).sort()).toEqual([200, 400]);
+
+      const after = await request(app).get(`/api/products/${product.body.id}`);
+      expect(after.body.stock).toBe(9);
+    });
+  });
+
+  context('確定処理の原子性', () => {
+    it('配送先未設定で確定に失敗した場合は在庫が変化しない', async () => {
+      const product = await createProduct({ initialStock: 10 });
+      const customer = await createCustomerWithoutAddress();
       const order = await request(app).post('/api/orders').send({ customerId: customer.body.id });
       await request(app).post(`/api/orders/${order.body.id}/items`).send({ productId: product.body.id, quantity: 3 });
 
@@ -229,7 +263,6 @@ describe('API E2E', () => {
   });
 
   context('OpenAPI仕様の配信', () => {
-    // res.sendFile を通るため、Express移行時の回帰検知を兼ねる
     it('/swagger.json がOpenAPI仕様を返す', async () => {
       const response = await request(app).get('/swagger.json');
       expect(response.status).toBe(200);
@@ -238,8 +271,6 @@ describe('API E2E', () => {
     });
   });
 
-  // OpenAPIの宣言は手で書くため、実装が返すステータスと静かにずれていく。
-  // 上のテストで実際に観測したレスポンスが宣言に含まれているかを最後に突き合わせる。
   describe('OpenAPI仕様と実装の整合', () => {
     it('観測したレスポンスがすべてOpenAPIに宣言されている', () => {
       expect(findUndeclaredResponses(swagger as OpenApiSpec)).toEqual([]);

@@ -22,6 +22,16 @@ export class OrderRepository implements IOrderRepository {
     return entity ? this.toDomain(entity) : null;
   }
 
+  // 状態を確認してから更新するまでの間に、別トランザクションが同じ注文を進めないようにロックする
+  async findByIdForUpdate(id: OrderId): Promise<Order | null> {
+    const entity = await this.repository.findOne({
+      where: { id: id.getValue() },
+      relations: { items: true },
+      lock: { mode: 'pessimistic_write' },
+    });
+    return entity ? this.toDomain(entity) : null;
+  }
+
   async findByCustomerId(customerId: CustomerId): Promise<Order[]> {
     const entities = await this.repository.find({
       where: { customerId: customerId.getValue() },

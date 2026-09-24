@@ -22,7 +22,7 @@ export class CancelOrderUseCase {
     const id = OrderId.fromString(orderId);
     // 途中で失敗したときに在庫だけが戻った状態にならないよう、同一トランザクションで囲む
     return this.transactionManager.run(async () => {
-      const order = await this.orderRepository.findById(id);
+      const order = await this.orderRepository.findByIdForUpdate(id);
       if (!order) {
         throw new OrderNotFoundError(orderId);
       }

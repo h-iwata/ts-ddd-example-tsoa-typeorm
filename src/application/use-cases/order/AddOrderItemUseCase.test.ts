@@ -7,6 +7,7 @@ import { AddOrderItemUseCase } from './AddOrderItemUseCase';
 describe('AddOrderItemUseCase', () => {
   const mockOrderRepo = (): jest.Mocked<IOrderRepository> => ({
     findById: jest.fn(),
+    findByIdForUpdate: jest.fn(),
     findByCustomerId: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),
@@ -16,6 +17,7 @@ describe('AddOrderItemUseCase', () => {
   const mockProductRepo = (): jest.Mocked<IProductRepository> => ({
     findById: jest.fn(),
     findByIds: jest.fn(),
+    findByIdsForUpdate: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),
     save: jest.fn(),

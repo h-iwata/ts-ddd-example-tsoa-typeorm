@@ -25,6 +25,18 @@ export class ProductRepository implements IProductRepository {
     return entities.map((e) => this.toDomain(e));
   }
 
+  // 在庫の確認と更新の間に他トランザクションを割り込ませないため、読み取り時に行ロックを取る。
+  // id順で取ることで、複数商品をロックする際のデッドロックを避ける
+  async findByIdsForUpdate(ids: ProductId[]): Promise<Product[]> {
+    if (ids.length === 0) return [];
+    const entities = await this.repository.find({
+      where: ids.map((id) => ({ id: id.getValue() })),
+      lock: { mode: 'pessimistic_write' },
+      order: { id: 'ASC' },
+    });
+    return entities.map((e) => this.toDomain(e));
+  }
+
   async findAll(): Promise<Product[]> {
     const entities = await this.repository.find();
     return entities.map((e) => this.toDomain(e));

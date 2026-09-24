@@ -3,6 +3,7 @@ import { type CustomerId, type OrderId } from '../value-objects';
 
 export interface IOrderRepository {
   findById(id: OrderId): Promise<Order | null>;
+  findByIdForUpdate(id: OrderId): Promise<Order | null>;
   findByCustomerId(customerId: CustomerId): Promise<Order[]>;
   findAll(): Promise<Order[]>;
   add(order: Order): Promise<void>;

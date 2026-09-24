@@ -58,7 +58,6 @@ describe('OrderItem', () => {
       expect(item.withQuantity(Quantity.create(5)).getId().getValue()).toBe(item.getId().getValue());
     });
 
-    // 元の明細が変わってしまうと、Orderが握っている参照ごと書き換わってしまう
     it('元の明細は変わらない', () => {
       const item = createItem(1000, 2);
       item.withQuantity(Quantity.create(5));
