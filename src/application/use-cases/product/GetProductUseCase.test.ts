@@ -6,6 +6,7 @@ import { GetProductUseCase } from './GetProductUseCase';
 describe('GetProductUseCase', () => {
   const mockRepo = (): jest.Mocked<IProductRepository> => ({
     findById: jest.fn(),
+    findByIdOrFail: jest.fn(),
     findByIds: jest.fn(),
     findByIdsForUpdate: jest.fn(),
     findAll: jest.fn(),
@@ -17,7 +18,7 @@ describe('GetProductUseCase', () => {
   it('商品を取得する', async () => {
     const repo = mockRepo();
     const product = productFactory.build();
-    repo.findById.mockResolvedValue(product);
+    repo.findByIdOrFail.mockResolvedValue(product);
 
     const result = await new GetProductUseCase(repo).execute(product.getId().getValue());
 
@@ -28,7 +29,7 @@ describe('GetProductUseCase', () => {
   context('when 見つからない', () => {
     it('エラーを投げる', async () => {
       const repo = mockRepo();
-      repo.findById.mockResolvedValue(null);
+      repo.findByIdOrFail.mockRejectedValue(new ProductNotFoundError('x'));
 
       await expect(new GetProductUseCase(repo).execute('not-found')).rejects.toThrow(ProductNotFoundError);
     });

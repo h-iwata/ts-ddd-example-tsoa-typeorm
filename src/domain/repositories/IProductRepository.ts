@@ -3,6 +3,7 @@ import { type ProductId } from '../value-objects';
 
 export interface IProductRepository {
   findById(id: ProductId): Promise<Product | null>;
+  findByIdOrFail(id: ProductId): Promise<Product>;
   findByIds(ids: ProductId[]): Promise<Product[]>;
   findByIdsForUpdate(ids: ProductId[]): Promise<Product[]>;
   findAll(): Promise<Product[]>;

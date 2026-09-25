@@ -1,7 +1,7 @@
 import { injectable } from 'inversify';
 import { type Repository } from 'typeorm';
 import { Customer, CustomerId, Email } from '../../domain/aggregates/customer';
-import { EmailAlreadyExistsError } from '../../domain/aggregates/customer/errors';
+import { CustomerNotFoundError, EmailAlreadyExistsError } from '../../domain/aggregates/customer/errors';
 import { type ICustomerRepository } from '../../domain/repositories';
 import { Address } from '../../domain/shared/value-objects';
 import { CustomerEntity, UQ_CUSTOMERS_EMAIL } from '../database/entities';
@@ -19,6 +19,14 @@ export class CustomerRepository implements ICustomerRepository {
       where: { id: id.getValue() },
     });
     return entity ? this.toDomain(entity) : null;
+  }
+
+  async findByIdOrFail(id: CustomerId): Promise<Customer> {
+    const customer = await this.findById(id);
+    if (!customer) {
+      throw new CustomerNotFoundError(id.getValue());
+    }
+    return customer;
   }
 
   async findByEmail(email: Email): Promise<Customer | null> {

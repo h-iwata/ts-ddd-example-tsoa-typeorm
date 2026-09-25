@@ -6,7 +6,8 @@ import { GetOrderUseCase } from './GetOrderUseCase';
 describe('GetOrderUseCase', () => {
   const mockRepo = (): jest.Mocked<IOrderRepository> => ({
     findById: jest.fn(),
-    findByIdForUpdate: jest.fn(),
+    findByIdOrFail: jest.fn(),
+    findByIdForUpdateOrFail: jest.fn(),
     findByCustomerId: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),
@@ -17,7 +18,7 @@ describe('GetOrderUseCase', () => {
   it('注文を取得する', async () => {
     const repo = mockRepo();
     const order = orderFactory.build();
-    repo.findById.mockResolvedValue(order);
+    repo.findByIdOrFail.mockResolvedValue(order);
 
     const result = await new GetOrderUseCase(repo).execute(order.getId().getValue());
 
@@ -28,7 +29,7 @@ describe('GetOrderUseCase', () => {
   context('when 見つからない', () => {
     it('エラーを投げる', async () => {
       const repo = mockRepo();
-      repo.findById.mockResolvedValue(null);
+      repo.findByIdOrFail.mockRejectedValue(new OrderNotFoundError('x'));
 
       await expect(new GetOrderUseCase(repo).execute('not-found')).rejects.toThrow(OrderNotFoundError);
     });

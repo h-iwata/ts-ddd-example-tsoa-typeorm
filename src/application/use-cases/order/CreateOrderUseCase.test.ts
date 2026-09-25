@@ -6,7 +6,8 @@ import { CreateOrderUseCase } from './CreateOrderUseCase';
 describe('CreateOrderUseCase', () => {
   const mockOrderRepo = (): jest.Mocked<IOrderRepository> => ({
     findById: jest.fn(),
-    findByIdForUpdate: jest.fn(),
+    findByIdOrFail: jest.fn(),
+    findByIdForUpdateOrFail: jest.fn(),
     findByCustomerId: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),
@@ -15,6 +16,7 @@ describe('CreateOrderUseCase', () => {
   });
   const mockCustomerRepo = (): jest.Mocked<ICustomerRepository> => ({
     findById: jest.fn(),
+    findByIdOrFail: jest.fn(),
     findByEmail: jest.fn(),
     existsByEmail: jest.fn(),
     findAll: jest.fn(),
@@ -27,7 +29,7 @@ describe('CreateOrderUseCase', () => {
     const orderRepo = mockOrderRepo();
     const customerRepo = mockCustomerRepo();
     const customer = customerFactory.build();
-    customerRepo.findById.mockResolvedValue(customer);
+    customerRepo.findByIdOrFail.mockResolvedValue(customer);
 
     const result = await new CreateOrderUseCase(orderRepo, customerRepo).execute({
       customerId: customer.getId().getValue(),
@@ -44,7 +46,7 @@ describe('CreateOrderUseCase', () => {
       const orderRepo = mockOrderRepo();
       const customerRepo = mockCustomerRepo();
       const customer = customerFactory.build({}, { transient: { withAddress: true } });
-      customerRepo.findById.mockResolvedValue(customer);
+      customerRepo.findByIdOrFail.mockResolvedValue(customer);
 
       const result = await new CreateOrderUseCase(orderRepo, customerRepo).execute({
         customerId: customer.getId().getValue(),
@@ -57,7 +59,7 @@ describe('CreateOrderUseCase', () => {
   context('when 顧客が見つからない', () => {
     it('エラーを投げる', async () => {
       const customerRepo = mockCustomerRepo();
-      customerRepo.findById.mockResolvedValue(null);
+      customerRepo.findByIdOrFail.mockRejectedValue(new CustomerNotFoundError('x'));
 
       await expect(new CreateOrderUseCase(mockOrderRepo(), customerRepo).execute({ customerId: 'x' })).rejects.toThrow(
         CustomerNotFoundError

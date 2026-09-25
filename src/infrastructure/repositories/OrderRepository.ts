@@ -2,6 +2,7 @@ import { injectable } from 'inversify';
 import { type Repository } from 'typeorm';
 import { CustomerId } from '../../domain/aggregates/customer';
 import { Order, OrderId, OrderItem, OrderItemId, type OrderStatus } from '../../domain/aggregates/order';
+import { OrderNotFoundError } from '../../domain/aggregates/order/errors';
 import { ProductId } from '../../domain/aggregates/product';
 import { type IOrderRepository } from '../../domain/repositories';
 import { Address, Money, Quantity } from '../../domain/shared/value-objects';
@@ -22,14 +23,25 @@ export class OrderRepository implements IOrderRepository {
     return entity ? this.toDomain(entity) : null;
   }
 
+  async findByIdOrFail(id: OrderId): Promise<Order> {
+    return this.orFail(await this.findById(id), id);
+  }
+
   // 状態を確認してから更新するまでの間に、別トランザクションが同じ注文を進めないようにロックする
-  async findByIdForUpdate(id: OrderId): Promise<Order | null> {
+  async findByIdForUpdateOrFail(id: OrderId): Promise<Order> {
     const entity = await this.repository.findOne({
       where: { id: id.getValue() },
       relations: { items: true },
       lock: { mode: 'pessimistic_write' },
     });
-    return entity ? this.toDomain(entity) : null;
+    return this.orFail(entity ? this.toDomain(entity) : null, id);
+  }
+
+  private orFail(order: Order | null, id: OrderId): Order {
+    if (!order) {
+      throw new OrderNotFoundError(id.getValue());
+    }
+    return order;
   }
 
   async findByCustomerId(customerId: CustomerId): Promise<Order[]> {

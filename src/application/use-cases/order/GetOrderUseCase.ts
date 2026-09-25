@@ -1,5 +1,4 @@
 import { inject, injectable } from 'inversify';
-import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
 import { type IOrderRepository } from '../../../domain/repositories';
 import { OrderId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
@@ -13,10 +12,7 @@ export class GetOrderUseCase {
   ) {}
 
   async execute(orderId: string): Promise<OrderResponseDto> {
-    const order = await this.orderRepository.findById(OrderId.fromString(orderId));
-    if (!order) {
-      throw new OrderNotFoundError(orderId);
-    }
+    const order = await this.orderRepository.findByIdOrFail(OrderId.fromString(orderId));
 
     return toOrderResponseDto(order);
   }

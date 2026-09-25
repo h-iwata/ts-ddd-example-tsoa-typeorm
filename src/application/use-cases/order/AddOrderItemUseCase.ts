@@ -1,6 +1,4 @@
 import { inject, injectable } from 'inversify';
-import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
-import { ProductNotFoundError } from '../../../domain/aggregates/product/errors';
 import { type IOrderRepository, type IProductRepository } from '../../../domain/repositories';
 import { OrderId, ProductId, Quantity } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
@@ -17,10 +15,8 @@ export class AddOrderItemUseCase {
 
   async execute(orderId: string, dto: AddOrderItemDto): Promise<OrderResponseDto> {
     const productId = ProductId.fromString(dto.productId);
-    const order = await this.orderRepository.findById(OrderId.fromString(orderId));
-    if (!order) throw new OrderNotFoundError(orderId);
-    const product = await this.productRepository.findById(productId);
-    if (!product) throw new ProductNotFoundError(dto.productId);
+    const order = await this.orderRepository.findByIdOrFail(OrderId.fromString(orderId));
+    const product = await this.productRepository.findByIdOrFail(productId);
 
     order.addItem(productId, product.getName(), product.getPrice(), Quantity.create(dto.quantity));
     await this.orderRepository.save(order);

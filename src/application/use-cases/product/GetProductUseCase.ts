@@ -1,5 +1,4 @@
 import { inject, injectable } from 'inversify';
-import { ProductNotFoundError } from '../../../domain/aggregates/product/errors';
 import { type IProductRepository } from '../../../domain/repositories';
 import { ProductId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
@@ -13,10 +12,7 @@ export class GetProductUseCase {
   ) {}
 
   async execute(productId: string): Promise<ProductResponseDto> {
-    const product = await this.productRepository.findById(ProductId.fromString(productId));
-    if (!product) {
-      throw new ProductNotFoundError(productId);
-    }
+    const product = await this.productRepository.findByIdOrFail(ProductId.fromString(productId));
 
     return toProductResponseDto(product);
   }

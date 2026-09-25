@@ -1,5 +1,4 @@
 import { inject, injectable } from 'inversify';
-import { CustomerNotFoundError } from '../../../domain/aggregates/customer/errors';
 import { type ICustomerRepository } from '../../../domain/repositories';
 import { Address, CustomerId } from '../../../domain/value-objects';
 import { TYPES } from '../../../infrastructure/di/types';
@@ -13,10 +12,7 @@ export class SetCustomerAddressUseCase {
   ) {}
 
   async execute(customerId: string, dto: SetAddressDto): Promise<CustomerResponseDto> {
-    const customer = await this.customerRepository.findById(CustomerId.fromString(customerId));
-    if (!customer) {
-      throw new CustomerNotFoundError(customerId);
-    }
+    const customer = await this.customerRepository.findByIdOrFail(CustomerId.fromString(customerId));
     customer.setShippingAddress(Address.create(dto.postalCode, dto.prefecture, dto.city, dto.street, dto.building));
     await this.customerRepository.save(customer);
 

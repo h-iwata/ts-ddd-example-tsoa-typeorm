@@ -1,6 +1,7 @@
 import { injectable } from 'inversify';
 import { type Repository } from 'typeorm';
 import { Product, ProductId } from '../../domain/aggregates/product';
+import { ProductNotFoundError } from '../../domain/aggregates/product/errors';
 import { type IProductRepository } from '../../domain/repositories';
 import { Money, Quantity } from '../../domain/shared/value-objects';
 import { ProductEntity } from '../database/entities';
@@ -17,6 +18,14 @@ export class ProductRepository implements IProductRepository {
       where: { id: id.getValue() },
     });
     return entity ? this.toDomain(entity) : null;
+  }
+
+  async findByIdOrFail(id: ProductId): Promise<Product> {
+    const product = await this.findById(id);
+    if (!product) {
+      throw new ProductNotFoundError(id.getValue());
+    }
+    return product;
   }
 
   async findByIds(ids: ProductId[]): Promise<Product[]> {

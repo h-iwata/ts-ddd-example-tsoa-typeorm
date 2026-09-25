@@ -6,6 +6,7 @@ import { SetCustomerAddressUseCase } from './SetCustomerAddressUseCase';
 describe('SetCustomerAddressUseCase', () => {
   const mockRepo = (): jest.Mocked<ICustomerRepository> => ({
     findById: jest.fn(),
+    findByIdOrFail: jest.fn(),
     findByEmail: jest.fn(),
     existsByEmail: jest.fn(),
     findAll: jest.fn(),
@@ -19,7 +20,7 @@ describe('SetCustomerAddressUseCase', () => {
   it('住所を設定する', async () => {
     const repo = mockRepo();
     const customer = customerFactory.build();
-    repo.findById.mockResolvedValue(customer);
+    repo.findByIdOrFail.mockResolvedValue(customer);
 
     const result = await new SetCustomerAddressUseCase(repo).execute(customer.getId().getValue(), addressDto);
 
@@ -30,7 +31,7 @@ describe('SetCustomerAddressUseCase', () => {
   it('建物名を含む住所を設定する', async () => {
     const repo = mockRepo();
     const customer = customerFactory.build();
-    repo.findById.mockResolvedValue(customer);
+    repo.findByIdOrFail.mockResolvedValue(customer);
 
     const result = await new SetCustomerAddressUseCase(repo).execute(customer.getId().getValue(), {
       ...addressDto,
@@ -43,7 +44,7 @@ describe('SetCustomerAddressUseCase', () => {
   context('when 見つからない', () => {
     it('エラーを投げる', async () => {
       const repo = mockRepo();
-      repo.findById.mockResolvedValue(null);
+      repo.findByIdOrFail.mockRejectedValue(new CustomerNotFoundError('x'));
 
       await expect(new SetCustomerAddressUseCase(repo).execute('not-found', addressDto)).rejects.toThrow(CustomerNotFoundError);
     });

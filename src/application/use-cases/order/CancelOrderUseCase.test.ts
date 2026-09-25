@@ -8,7 +8,8 @@ import { CancelOrderUseCase } from './CancelOrderUseCase';
 describe('CancelOrderUseCase', () => {
   const mockRepo = (): jest.Mocked<IOrderRepository> => ({
     findById: jest.fn(),
-    findByIdForUpdate: jest.fn(),
+    findByIdOrFail: jest.fn(),
+    findByIdForUpdateOrFail: jest.fn(),
     findByCustomerId: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),
@@ -26,7 +27,7 @@ describe('CancelOrderUseCase', () => {
     it('キャンセルする（在庫戻しなし）', async () => {
       const repo = mockRepo();
       const service = mockService();
-      repo.findByIdForUpdate.mockResolvedValue(orderFactory.build());
+      repo.findByIdForUpdateOrFail.mockResolvedValue(orderFactory.build());
 
       const result = await new CancelOrderUseCase(repo, service, stubTransactionManager()).execute('order-1');
 
@@ -41,7 +42,7 @@ describe('CancelOrderUseCase', () => {
       const repo = mockRepo();
       const service = mockService();
       const order = confirmedOrderFactory.build();
-      repo.findByIdForUpdate.mockResolvedValue(order);
+      repo.findByIdForUpdateOrFail.mockResolvedValue(order);
 
       const result = await new CancelOrderUseCase(repo, service, stubTransactionManager()).execute(order.getId().getValue());
 
@@ -55,7 +56,7 @@ describe('CancelOrderUseCase', () => {
       const repo = mockRepo();
       const service = mockService();
       const order = paidOrderFactory.build();
-      repo.findByIdForUpdate.mockResolvedValue(order);
+      repo.findByIdForUpdateOrFail.mockResolvedValue(order);
 
       const result = await new CancelOrderUseCase(repo, service, stubTransactionManager()).execute(order.getId().getValue());
 
@@ -67,7 +68,7 @@ describe('CancelOrderUseCase', () => {
   context('when 注文が見つからない', () => {
     it('エラーを投げる', async () => {
       const repo = mockRepo();
-      repo.findByIdForUpdate.mockResolvedValue(null);
+      repo.findByIdForUpdateOrFail.mockRejectedValue(new OrderNotFoundError('x'));
 
       await expect(new CancelOrderUseCase(repo, mockService(), stubTransactionManager()).execute('x')).rejects.toThrow(OrderNotFoundError);
     });

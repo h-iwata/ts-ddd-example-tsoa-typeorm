@@ -4,6 +4,7 @@ import { CreateCustomerUseCase } from './CreateCustomerUseCase';
 describe('CreateCustomerUseCase', () => {
   const mockRepo = (): jest.Mocked<ICustomerRepository> => ({
     findById: jest.fn(),
+    findByIdOrFail: jest.fn(),
     findByEmail: jest.fn(),
     existsByEmail: jest.fn(),
     findAll: jest.fn(),

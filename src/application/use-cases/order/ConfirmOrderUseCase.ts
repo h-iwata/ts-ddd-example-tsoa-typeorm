@@ -1,5 +1,4 @@
 import { inject, injectable } from 'inversify';
-import { OrderNotFoundError } from '../../../domain/aggregates/order/errors';
 import { type IOrderRepository, type ITransactionManager } from '../../../domain/repositories';
 import { type OrderDomainService } from '../../../domain/services';
 import { OrderId } from '../../../domain/value-objects';
@@ -21,11 +20,7 @@ export class ConfirmOrderUseCase {
     const id = OrderId.fromString(orderId);
     // 途中で失敗したときに在庫だけが減った状態にならないよう、確定と引き当てを同一トランザクションで囲む
     return this.transactionManager.run(async () => {
-      const order = await this.orderRepository.findByIdForUpdate(id);
-      if (!order) {
-        throw new OrderNotFoundError(orderId);
-      }
-
+      const order = await this.orderRepository.findByIdForUpdateOrFail(id);
       // 書き込みの前に注文側のルールを検証する
       order.confirm();
 

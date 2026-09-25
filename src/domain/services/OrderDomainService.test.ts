@@ -11,6 +11,7 @@ import { OrderDomainService } from './OrderDomainService';
 describe('OrderDomainService', () => {
   const mockRepo = (): jest.Mocked<IProductRepository> => ({
     findById: jest.fn(),
+    findByIdOrFail: jest.fn(),
     findByIds: jest.fn(),
     findByIdsForUpdate: jest.fn(),
     findAll: jest.fn(),

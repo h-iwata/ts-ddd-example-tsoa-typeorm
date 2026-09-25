@@ -416,6 +416,38 @@ await this.productRepository.save(product);  // ❌ 衝突時に既存商品を�
 なお `save()` を「更新専用」にはしていない。MySQLの `affected` は既定で
 *一致した行数* ではなく *変更された行数* を返すため、値が変わらない更新を「該当なし」と誤判定するリスクがある。
 
+### 見つからないときの扱い
+
+`null` を返す版と例外を投げる版を分け、**例外を投げる側に `OrFail` 接尾辞**を付ける。
+
+```typescript
+findById(id: OrderId): Promise<Order | null>;          // 無いかもしれない
+findByIdOrFail(id: OrderId): Promise<Order>;            // 無ければ OrderNotFoundError
+findByIdForUpdateOrFail(id: OrderId): Promise<Order>;   // 上記 + 行ロック
+```
+
+`get` を「必ずある」の意味に使わないこと。**JS/TSでは `get` は nullable を返すのが標準**であり、
+`get = 例外` は Java / C# の規約なので、持ち込むと標準ライブラリと衝突する。
+
+```typescript
+Map.get(key): V | undefined
+document.getElementById(id): HTMLElement | null
+new FormData().get(name): FormDataEntryValue | null
+```
+
+`OrFail` はエコシステムの主流でもある。
+
+| ライブラリ | nullを返す | 例外を投げる |
+|---|---|---|
+| **TypeORM**（本プロジェクト） | `findOne` | **`findOneOrFail`** |
+| Prisma | `findUnique` | `findUniqueOrThrow` |
+| Mongoose | `findById` | `.orFail()` |
+
+`OrThrow` ではなく `OrFail` を選ぶのは、本プロジェクトが使う TypeORM に揃えるため。
+
+**`null` 版も残す。** 見つからないことが正常な場合（`OrderDomainService.releaseStock` は
+商品が無ければ黙って飛ばす）に必要で、「常に投げる」に統一すると書けなくなる。
+
 ## 同時実行制御
 
 トランザクションで囲むだけでは同時実行の競合は防げない。MySQL InnoDB の既定は `REPEATABLE READ` で、

@@ -7,7 +7,8 @@ import { AddOrderItemUseCase } from './AddOrderItemUseCase';
 describe('AddOrderItemUseCase', () => {
   const mockOrderRepo = (): jest.Mocked<IOrderRepository> => ({
     findById: jest.fn(),
-    findByIdForUpdate: jest.fn(),
+    findByIdOrFail: jest.fn(),
+    findByIdForUpdateOrFail: jest.fn(),
     findByCustomerId: jest.fn(),
     findAll: jest.fn(),
     add: jest.fn(),
@@ -16,6 +17,7 @@ describe('AddOrderItemUseCase', () => {
   });
   const mockProductRepo = (): jest.Mocked<IProductRepository> => ({
     findById: jest.fn(),
+    findByIdOrFail: jest.fn(),
     findByIds: jest.fn(),
     findByIdsForUpdate: jest.fn(),
     findAll: jest.fn(),
@@ -29,8 +31,8 @@ describe('AddOrderItemUseCase', () => {
     const productRepo = mockProductRepo();
     const order = orderFactory.build();
     const product = productFactory.build();
-    orderRepo.findById.mockResolvedValue(order);
-    productRepo.findById.mockResolvedValue(product);
+    orderRepo.findByIdOrFail.mockResolvedValue(order);
+    productRepo.findByIdOrFail.mockResolvedValue(product);
 
     const result = await new AddOrderItemUseCase(orderRepo, productRepo).execute(order.getId().getValue(), {
       productId: product.getId().getValue(),
@@ -45,7 +47,7 @@ describe('AddOrderItemUseCase', () => {
   context('when 注文が見つからない', () => {
     it('エラーを投げる', async () => {
       const orderRepo = mockOrderRepo();
-      orderRepo.findById.mockResolvedValue(null);
+      orderRepo.findByIdOrFail.mockRejectedValue(new OrderNotFoundError('x'));
 
       await expect(new AddOrderItemUseCase(orderRepo, mockProductRepo()).execute('x', { productId: 'p', quantity: 1 })).rejects.toThrow(
         OrderNotFoundError
@@ -57,8 +59,8 @@ describe('AddOrderItemUseCase', () => {
     it('エラーを投げる', async () => {
       const orderRepo = mockOrderRepo();
       const productRepo = mockProductRepo();
-      orderRepo.findById.mockResolvedValue(orderFactory.build());
-      productRepo.findById.mockResolvedValue(null);
+      orderRepo.findByIdOrFail.mockResolvedValue(orderFactory.build());
+      productRepo.findByIdOrFail.mockRejectedValue(new ProductNotFoundError('x'));
 
       await expect(new AddOrderItemUseCase(orderRepo, productRepo).execute('o', { productId: 'x', quantity: 1 })).rejects.toThrow(
         ProductNotFoundError
